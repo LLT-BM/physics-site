@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c1930"/><stop offset=".55" stop-color="#070f1d"/><stop offset="1" stop-color="#04070d"/>
+    </linearGradient>
+    <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
+      <path d="M46 0H0V46" fill="none" stroke="#78beff" stroke-opacity=".06"/>
+    </pattern>
+    <radialGradient id="vig" cx=".5" cy=".45" r=".8">
+      <stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/>
+    </radialGradient>
+    <radialGradient id="amber" cx=".35" cy=".35" r=".95">
+      <stop offset="0" stop-color="#ffe1b8"/><stop offset=".55" stop-color="#ffb454"/><stop offset="1" stop-color="#b06414"/>
+    </radialGradient>
+    <radialGradient id="cyan" cx=".35" cy=".35" r=".95">
+      <stop offset="0" stop-color="#d8f7ff"/><stop offset=".55" stop-color="#5fe0ff"/><stop offset="1" stop-color="#1775a8"/>
+    </radialGradient>
+    <linearGradient id="trail" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#5fe0ff" stop-opacity="0"/><stop offset="1" stop-color="#5fe0ff" stop-opacity=".9"/>
+    </linearGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <rect width="1200" height="750" fill="url(#grid)"/>
+  <path d="M560 520 C 380 660, 260 480, 420 400 S 720 640, 880 470 S 660 280, 520 430 S 300 560, 430 620"
+        fill="none" stroke="url(#trail)" stroke-width="3" filter="url(#glow)"/>
+  <g stroke="#ff6a5e" stroke-opacity=".5" fill="none" stroke-width="3">
+    <path d="M600 140 L 688 340 L 574 540"/>
+    <circle cx="688" cy="340" r="24"/><circle cx="574" cy="540" r="20"/>
+  </g>
+  <rect x="520" y="118" width="160" height="14" fill="#182a40" stroke="#78beff" stroke-opacity=".3"/>
+  <g stroke="#78beff" stroke-opacity=".35">
+    <path d="M528 118l8-10"/><path d="M552 118l8-10"/><path d="M576 118l8-10"/><path d="M600 118l8-10"/><path d="M624 118l8-10"/><path d="M648 118l8-10"/>
+  </g>
+  <g stroke="#a8bfd2" stroke-width="6" stroke-linecap="round">
+    <path d="M600 140 L 710 330"/><path d="M710 330 L 560 520"/>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="710" cy="330" r="30" fill="url(#amber)"/>
+    <circle cx="560" cy="520" r="26" fill="url(#cyan)"/>
+    <circle cx="600" cy="140" r="7" fill="#c9d8e6"/>
+  </g>
+  <g fill="none" stroke-dasharray="4 6">
+    <path d="M600 140 V 260" stroke="#dcebfA" stroke-opacity=".25"/>
+    <path d="M600 200 A 60 60 0 0 0 632 190" stroke="#ffb454" stroke-opacity=".6"/>
+    <path d="M710 330 V 430" stroke="#dcebfA" stroke-opacity=".25"/>
+    <path d="M710 380 A 50 50 0 0 1 682 372" stroke="#5fe0ff" stroke-opacity=".6"/>
+  </g>
+  <text x="640" y="212" fill="#ffb454" font-size="20">θ₁</text>
+  <text x="662" y="398" fill="#5fe0ff" font-size="20">θ₂</text>
+  <text x="48" y="64" fill="#ffb454" font-size="20" letter-spacing="6">LIBLABTAB · 01</text>
+  <text x="48" y="94" fill="#8ba3b8" font-size="16" letter-spacing="3">МЕХАНИКА · ДЕТЕРМИНИРОВАННЫЙ ХАОС</text>
+  <text x="1152" y="700" fill="#8ba3b8" font-size="16" text-anchor="end" opacity=".8">δ = 0.1° · РК4</text>
+  <g stroke="#78beff" stroke-opacity=".3" fill="none">
+    <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
+  </g>
+  <rect width="1200" height="750" fill="url(#vig)"/>
+</svg>

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c1930"/><stop offset=".55" stop-color="#070f1d"/><stop offset="1" stop-color="#04070d"/>
+    </linearGradient>
+    <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
+      <path d="M46 0H0V46" fill="none" stroke="#78beff" stroke-opacity=".06"/>
+    </pattern>
+    <radialGradient id="vig" cx=".5" cy=".45" r=".8">
+      <stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/>
+    </radialGradient>
+    <radialGradient id="prot" cx=".35" cy=".35" r=".95">
+      <stop offset="0" stop-color="#ffe3d8"/><stop offset=".5" stop-color="#ff7a5c"/><stop offset="1" stop-color="#b03a2a"/>
+    </radialGradient>
+    <radialGradient id="neut" cx=".35" cy=".35" r=".95">
+      <stop offset="0" stop-color="#f2f7fc"/><stop offset=".5" stop-color="#a4b8cd"/><stop offset="1" stop-color="#51637a"/>
+    </radialGradient>
+    <radialGradient id="elec" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#eafcff"/><stop offset=".35" stop-color="#5fe0ff"/><stop offset="1" stop-color="#5fe0ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <rect width="1200" height="750" fill="url(#grid)"/>
+  <g fill="none" stroke="#5fe0ff">
+    <ellipse cx="600" cy="390" rx="200" ry="78" stroke-opacity=".35" transform="rotate(-18 600 390)"/>
+    <ellipse cx="600" cy="390" rx="300" ry="118" stroke-opacity=".25" transform="rotate(14 600 390)"/>
+    <ellipse cx="600" cy="390" rx="400" ry="158" stroke-opacity=".18" transform="rotate(-7 600 390)"/>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="582" cy="372" r="24" fill="url(#prot)"/><circle cx="618" cy="372" r="24" fill="url(#neut)"/>
+    <circle cx="566" cy="398" r="24" fill="url(#neut)"/><circle cx="600" cy="398" r="24" fill="url(#prot)"/>
+    <circle cx="634" cy="398" r="24" fill="url(#prot)"/><circle cx="582" cy="424" r="24" fill="url(#neut)"/>
+    <circle cx="618" cy="424" r="24" fill="url(#prot)"/><circle cx="600" cy="346" r="24" fill="url(#neut)"/>
+  </g>
+  <g filter="url(#glow)">
+    <circle cx="798" cy="330" r="26" fill="url(#elec)"/><circle cx="798" cy="330" r="7" fill="#eafcff"/>
+    <circle cx="312" cy="470" r="26" fill="url(#elec)"/><circle cx="312" cy="470" r="7" fill="#eafcff"/>
+    <circle cx="985" cy="430" r="26" fill="url(#elec)"/><circle cx="985" cy="430" r="7" fill="#eafcff"/>
+    <circle cx="238" cy="300" r="26" fill="url(#elec)"/><circle cx="238" cy="300" r="7" fill="#eafcff"/>
+  </g>
+  <g fill="#96e1ff" font-size="20" opacity=".85">
+    <text x="806" y="296">K</text><text x="906" y="330">L</text><text x="1006" y="362">M</text>
+  </g>
+  <text x="48" y="64" fill="#ffb454" font-size="20" letter-spacing="6">LIBLABTAB · 03</text>
+  <text x="48" y="94" fill="#8ba3b8" font-size="16" letter-spacing="3">КВАНТОВАЯ ФИЗИКА · ОБОЛОЧКИ K L M</text>
+  <g>
+    <rect x="1030" y="576" width="122" height="122" fill="#0d1626" stroke="#5fe0ff" stroke-opacity=".5"/>
+    <text x="1136" y="602" fill="#8ba3b8" font-size="16" text-anchor="end">6</text>
+    <text x="1091" y="662" fill="#5fe0ff" font-size="56" text-anchor="middle" font-family="Unbounded, sans-serif" font-weight="800">C</text>
+    <text x="1091" y="686" fill="#8ba3b8" font-size="13" text-anchor="middle">углерод</text>
+  </g>
+  <g stroke="#78beff" stroke-opacity=".3" fill="none">
+    <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
+  </g>
+  <rect width="1200" height="750" fill="url(#vig)"/>
+</svg>

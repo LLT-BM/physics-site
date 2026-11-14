@@ -4,7 +4,7 @@ date: 2026-11-14
 description: "Два груза на шарнирах и детерминированный хаос: почти одинаковые начальные условия расходятся экспоненциально."
 tags: ["механика", "хаос"]
 model: "pendulum.html"
-cover: "/covers/pendulum.png"
+cover: "/covers/pendulum.svg"
 ---
 
 ## Как пользоваться
