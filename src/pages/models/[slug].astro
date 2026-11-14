@@ -9,6 +9,7 @@ export async function getStaticPaths() {
 
 const { id } = Astro.props;
 const m = await getEntry('models', id);
+if (!m) throw new Error(`Модель не найдена: ${id}`);
 const { Content } = await render(m);
 ---
 <Base title={`${m.data.title} — интерактивная модель`} description={m.data.description} image={m.data.cover}>
