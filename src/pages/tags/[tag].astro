@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const models = await getCollection('models');
+  const tags = [...new Set(models.flatMap(m => m.data.tags))];
+  return tags.map(tag => ({
+    params: { tag },
+    props: {
+      tag,
+      models: models
+        .filter(m => m.data.tags.includes(tag))
+        .sort((a, b) => b.data.date.getTime() - a.data.date.getTime()),
+    },
+  }));
+}
+const { tag, models } = Astro.props;
+---
+<Base title={`Модели по тегу: ${tag}`}>
+  <h1>#{tag}</h1>
+  <p class="hint">Моделей: {models.length} · <a href="/">весь каталог</a></p>
+  <div class="cards">
+    {models.map(m => (
+      <a class="card" href={`/models/${m.id}/`}>
+        <div class="meta"><time datetime={m.data.date.toISOString()}>{m.data.date.toLocaleDateString('ru-RU')}</time></div>
+        <h2>{m.data.title}</h2>
+        <p>{m.data.description}</p>
+        <span class="open">открыть модель →</span>
+      </a>
+    ))}
+  </div>
+</Base>

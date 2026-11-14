@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+const models = (await getCollection('models'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const tags = [...new Set(models.flatMap(m => m.data.tags))].sort();
+---
+<Base title="Интерактивные физические модели — каталог">
+  <section class="hero">
+    <h1>Физика, которую можно потрогать</h1>
+    <p>Интерактивные симуляции прямо в браузере: тяните магнит, крутите маятник, меняйте параметры — и смотрите, как работают законы природы.</p>
+    <p class="count">моделей в каталоге: {models.length}</p>
+  </section>
+  {tags.length > 0 && (
+    <div class="tagbar">
+      {tags.map(t => <a class="tag" href={`/tags/${t}/`}>#{t}</a>)}
+    </div>
+  )}
+  <div class="cards">
+    {models.map(m => (
+      <a class="card" href={`/models/${m.id}/`}>
+        <div class="meta">
+          <time datetime={m.data.date.toISOString()}>{m.data.date.toLocaleDateString('ru-RU')}</time>
+          {m.data.tags.map(t => <span class="tag">#{t}</span>)}
+        </div>
+        <h2>{m.data.title}</h2>
+        <p>{m.data.description}</p>
+        <span class="open">открыть модель →</span>
+      </a>
+    ))}
+  </div>
+</Base>

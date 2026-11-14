@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Современная модель атома</title>
+<style>
+:root{--bg:#f7f6f2;--fg:#1d1d1a;--mut:#65645c;--card:#ecebe4;--bd:#d2d0c6;--acc:#2f6fb5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101216;--fg:#e8e7e1;--mut:#9a9a92;--card:#1a1d23;--bd:#2c3038;--acc:#6aa8ee;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101216;--fg:#e8e7e1;--mut:#9a9a92;--card:#1a1d23;--bd:#2c3038;--acc:#6aa8ee;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 40px}
+h1{font:600 clamp(26px,5vw,38px)/1.15 "Iowan Old Style",Georgia,"Times New Roman",serif;margin:0 0 6px;letter-spacing:-.01em}
+.sub{color:var(--mut);margin:0 0 18px;max-width:62ch}
+.tabs,.orbs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+button{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.stage{position:relative;border:1px solid var(--bd);border-radius:12px;background:radial-gradient(ellipse at center,var(--card),var(--bg) 75%);overflow:hidden}
+canvas{display:block;width:100%;height:clamp(320px,60vh,560px);touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+.scale{position:absolute;left:12px;bottom:10px;font-size:14px;color:var(--mut)}
+.hint{position:absolute;right:12px;bottom:10px;font-size:13px;color:var(--mut)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:12px 0 4px;color:var(--mut);font-size:14px}
+.legend{display:flex;gap:14px;flex-wrap:wrap}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.info{margin-top:14px;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.info div{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
+.info h3{margin:0 0 6px;font-size:16px}
+.info p{margin:0;color:var(--mut);font-size:15px}
+.note{color:var(--mut);font-size:13px;margin-top:16px}
+@media (prefers-reduced-motion:reduce){canvas{cursor:default}}
+</style>
+</head>
+<body>
+<main>
+<h1>Атом: как его видит современная физика</h1>
+<p class="sub">Три уровня одной картины: электронные облака, ядро из нуклонов и кварк‑глюонная структура протона. Вращайте модель мышью или пальцем.</p>
+
+<div class="tabs" role="group" aria-label="Масштаб">
+<button data-mode="atom" aria-pressed="true">Атом</button>
+<button data-mode="nuc" aria-pressed="false">Ядро</button>
+<button data-mode="nct" aria-pressed="false">Протон</button>
+</div>
+<div class="orbs" id="orbs" role="group" aria-label="Орбиталь"></div>
+
+<div class="stage">
+<canvas id="cv" aria-label="Интерактивная модель атома"></canvas>
+<div class="scale" id="scale"></div>
+<div class="hint">перетащите, чтобы повернуть</div>
+</div>
+
+<div class="row">
+<div class="legend" id="legend"></div>
+<label><input type="checkbox" id="auto" checked> автовращение</label>
+</div>
+
+<div class="info" id="info"></div>
+<p class="note">Облака электронов построены по волновым функциям водородоподобного атома (метод Монте‑Карло). Ядро и протон — образные иллюстрации: у них нет траекторий, как у шариков.</p>
+</main>
+
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let W=0,H=0,mode='atom',orb='1s',yaw=.6,pitch=.4,auto=true,drag=false,lx=0,ly=0,ext=10,pts=null;
+const POS='#3b8be0',NEG='#e8643a';
+
+function fit(){const d=Math.min(devicePixelRatio||1,2),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',fit);
+
+/* Орбитали: радиальная плотность r²R², угловая плотность |Y|², знак фазы */
+const ORB={
+'1s':{rad:r=>r*r*Math.exp(-2*r),rmax:14,ang:c=>1,am:1,ph:(r,c)=>1,
+ t:'Основное состояние водорода: сферическое облако без узлов. Наиболее вероятное расстояние до ядра — боровский радиус, 0,53 Å.'},
+'2s':{rad:r=>r*r*(2-r)**2*Math.exp(-r),rmax:34,ang:c=>1,am:1,ph:(r,c)=>r<2?1:-1,
+ t:'Сфера с одной узловой поверхностью, на которой вероятность найти электрон равна нулю. Внутренняя и внешняя части имеют противоположные фазы.'},
+'2p':{rad:r=>r**4*Math.exp(-r),rmax:34,ang:c=>c*c,am:1,ph:(r,c)=>c>=0?1:-1,
+ t:'Две доли («гантель») с противоположными фазами. Узловая плоскость проходит через ядро — электрон в ней не бывает.'},
+'3p':{rad:r=>r**4*(1-r/6)**2*Math.exp(-2*r/3),rmax:46,ang:c=>c*c,am:1,ph:(r,c)=>(r<6?1:-1)*(c>=0?1:-1),
+ t:'Гантель с дополнительной сферической узловой поверхностью: две внутренние и две внешние доли.'},
+'3d':{rad:r=>r**6*Math.exp(-2*r/3),rmax:42,ang:c=>(3*c*c-1)**2,am:4,ph:(r,c)=>3*c*c-1>=0?1:-1,
+ t:'Две доли вдоль оси и «бублик» вокруг ядра противоположной фазы; узловые поверхности — два конуса.'}
+};
+function build(k){
+ const o=ORB[k];let fm=0;
+ for(let i=0;i<=400;i++)fm=Math.max(fm,o.rad(o.rmax*i/400));fm*=1.05;
+ const N=6000,P=new Float32Array(N*4),rs=[];let n=0;
+ while(n<N){
+  const r=Math.random()*o.rmax;if(Math.random()*fm>o.rad(r))continue;
+  const c=2*Math.random()-1;if(Math.random()*o.am>o.ang(c))continue;
+  const s=Math.sqrt(1-c*c),f=6.2832*Math.random();
+  P[n*4]=r*s*Math.cos(f);P[n*4+1]=r*s*Math.sin(f);P[n*4+2]=r*c;P[n*4+3]=o.ph(r,c);rs.push(r);n++;
+ }
+ rs.sort((a,b)=>a-b);ext=rs[Math.floor(N*.97)]*1.1;pts=P;
+}
+
+/* Поворот: z — вертикальная ось; возвращает [x, y экрана, глубина] */
+function rot(x,y,z){
+ const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+ const x1=x*cy-y*sy,y1=x*sy+y*cy;
+ return [x1,-(z*cp+y1*sp),y1*cp-z*sp];
+}
+
+function drawAtom(){
+ const sc=Math.min(W,H)*.46/ext,cx=W/2,cy=H/2,P=pts;
+ ctx.globalAlpha=.6;
+ for(const sg of [1,-1]){
+  ctx.fillStyle=sg>0?POS:NEG;
+  for(let i=0;i<P.length;i+=4){
+   if(P[i+3]!==sg)continue;
+   const q=rot(P[i],P[i+1],P[i+2]),s=1.3+Math.max(-.5,Math.min(.9,-q[2]/ext*.9));
+   ctx.fillRect(cx+q[0]*sc-s/2,cy+q[1]*sc-s/2,s,s);
+  }
+ }
+ ctx.globalAlpha=1;
+ ctx.fillStyle='#e24b4a';ctx.shadowColor='#e24b4a';ctx.shadowBlur=12;
+ ctx.beginPath();ctx.arc(cx,cy,3,0,6.283);ctx.fill();ctx.shadowBlur=0;
+}
+
+/* Ядро: углерод‑12 (6 p + 6 n) */
+const NU=[];
+(function(){
+ for(let i=0;i<12;i++){let v;do{v=[Math.random()*2-1,Math.random()*2-1,Math.random()*2-1]}while(v[0]**2+v[1]**2+v[2]**2>1);
+  NU.push({p:v.map(a=>a*.62),z:i%2,ph:Math.random()*6.28})}
+ for(let it=0;it<300;it++)for(const a of NU){
+  for(const b of NU){if(a===b)continue;const d=[0,1,2].map(k=>a.p[k]-b.p[k]),l=Math.hypot(...d)||.01;
+   if(l<.58)for(let k=0;k<3;k++)a.p[k]+=d[k]/l*(.58-l)*.25}
+  const m=Math.hypot(...a.p);if(m>.72)for(let k=0;k<3;k++)a.p[k]*=.72/m;
+ }
+})();
+function ball(x,y,r,c1,c2,al){
+ const g=ctx.createRadialGradient(x-r*.35,y-r*.35,r*.1,x,y,r);g.addColorStop(0,c1);g.addColorStop(1,c2);
+ ctx.globalAlpha=al;ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,6.283);ctx.fill();ctx.globalAlpha=1;
+}
+function drawNuc(t){
+ const sc=Math.min(W,H)*.42,cx=W/2,cy=H/2;
+ const L=NU.map(n=>{const q=rot(n.p[0]+.03*Math.sin(t*3+n.ph),n.p[1]+.03*Math.cos(t*2.6+n.ph),n.p[2]+.03*Math.sin(t*3.3+n.ph*2));return{q,z:n.z}});
+ L.sort((a,b)=>b.q[2]-a.q[2]);
+ for(const n of L){const r=sc*.3*(1-n.q[2]*.08);
+  n.z?ball(cx+n.q[0]*sc,cy+n.q[1]*sc,r,'#f5a98d','#c4491f',.93):ball(cx+n.q[0]*sc,cy+n.q[1]*sc,r,'#d9d8d0','#76756d',.93)}
+}
+
+/* Протон: uud, глюоны, «море» виртуальных пар */
+const hs=n=>{const s=Math.sin(n*12.9898)*43758.5453;return s-Math.floor(s)};
+const QK=[{l:'u',f:[1.1,1.7,1.3],p:[0,1,2]},{l:'u',f:[1.4,.9,1.9],p:[2,4,1]},{l:'d',f:[.8,1.5,1.2],p:[4,0,3]}];
+const CC=['#e24b4a','#1d9e75','#378add'];
+function drawNct(t){
+ const sc=Math.min(W,H)*.4,cx=W/2,cy=H/2;
+ const g=ctx.createRadialGradient(cx,cy,sc*.2,cx,cy,sc*1.1);
+ g.addColorStop(0,'rgba(239,159,39,.16)');g.addColorStop(.8,'rgba(239,159,39,.08)');g.addColorStop(1,'rgba(239,159,39,0)');
+ ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,sc*1.1,0,6.283);ctx.fill();
+ ctx.strokeStyle='rgba(150,150,140,.45)';ctx.setLineDash([4,5]);ctx.beginPath();ctx.arc(cx,cy,sc,0,6.283);ctx.stroke();ctx.setLineDash([]);
+ for(let i=0;i<40;i++){
+  const life=t*.6+hs(i*7.1),cyc=Math.floor(life),a=Math.sin((life-cyc)*Math.PI);
+  const v=[hs(i*3+cyc*17)*2-1,hs(i*5+cyc*13)*2-1,hs(i*11+cyc*19)*2-1];if(Math.hypot(...v)>1)continue;
+  const q=rot(v[0]*.9,v[1]*.9,v[2]*.9),d=.04+.05*a;
+  ctx.globalAlpha=a*.7;ctx.fillStyle=CC[i%3];ctx.fillRect(cx+q[0]*sc-1.5,cy+q[1]*sc-1.5,3,3);
+  ctx.fillStyle='#9a9a92';ctx.fillRect(cx+(q[0]+d)*sc-1.5,cy+q[1]*sc-1.5,3,3);ctx.globalAlpha=1;
+ }
+ const Q=QK.map((k,i)=>{const p=k.f.map((f,j)=>.5*Math.sin(f*t+k.p[j]));return{k,i,q:rot(p[0],p[1],p[2])}});
+ const S=Q.map(o=>[cx+o.q[0]*sc,cy+o.q[1]*sc]);
+ ctx.lineWidth=1.6;
+ for(let a=0;a<3;a++)for(let b=a+1;b<3;b++){
+  const A=S[a],B=S[b],dx=B[0]-A[0],dy=B[1]-A[1],l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;
+  ctx.strokeStyle='rgba(239,159,39,.75)';ctx.beginPath();
+  for(let s=0;s<=28;s++){const u=s/28,w=Math.sin(u*Math.PI)*7*Math.sin(u*22-t*9);
+   const x=A[0]+dx*u+nx*w,y=A[1]+dy*u+ny*w;s?ctx.lineTo(x,y):ctx.moveTo(x,y)}
+  ctx.stroke();
+ }
+ Q.sort((a,b)=>b.q[2]-a.q[2]);
+ for(const o of Q){
+  const c=CC[(Math.floor(t*1.2)+o.i)%3],x=cx+o.q[0]*sc,y=cy+o.q[1]*sc,r=sc*.15*(1-o.q[2]*.15);
+  ball(x,y,r,'#fff',c,1);
+  ctx.fillStyle='#fff';ctx.font='600 '+Math.round(r*.9)+'px Georgia,serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(o.k.l,x,y+1);
+ }
+}
+
+/* Текст и интерфейс */
+const INFO={
+atom:{scale:'≈ 10⁻¹⁰ м (1 Å). Ядро здесь в 100 000 раз меньше — красная точка не в масштабе.',
+ leg:`<span><i style="background:${POS}"></i>фаза +</span><span><i style="background:${NEG}"></i>фаза −</span><span><i style="background:#e24b4a"></i>ядро</span>`,
+ cards:[['Нет орбит, есть облака','Электрон не летает по траектории. Его состояние задаёт волновая функция ψ, а плотность точек показывает вероятность |ψ|² обнаружить электрон в данном месте.'],
+ ['Цвет — знак фазы','Узловые поверхности, где ψ меняет знак, — прямое следствие волновой природы электрона. Именно фазы определяют, как атомы образуют химические связи.'],
+ ['Электрон — точка','Структуры у электрона не нашли вплоть до масштаба порядка 10⁻¹⁹ м. Он считается элементарной частицей, в отличие от ядра.']]},
+nuc:{scale:'≈ 10⁻¹⁵–10⁻¹⁴ м (1–10 фм). Показан углерод‑12: 6 протонов и 6 нейтронов.',
+ leg:'<span><i style="background:#d9582b"></i>протон</span><span><i style="background:#8d8c84"></i>нейтрон</span>',
+ cards:[['Остаточная сила','Нуклоны держит остаточное сильное взаимодействие — «хвост» связи между кварками, подобно тому как молекулы притягиваются остатком электрических сил атомов.'],
+ ['Не твёрдые шарики','Нуклоны в ядре перекрываются и непрерывно движутся. Ядро имеет оболочечную структуру, а в лёгких ядрах возможны α‑кластеры — как в состоянии Хойла углерода‑12.'],
+ ['Почти вся масса атома','В ядре сосредоточено более 99,9 % массы атома при объёме порядка 10⁻¹⁵ от атомного.']]},
+nct:{scale:'≈ 10⁻¹⁵ м: радиус протона около 0,84 фм. Кварки точечны (< 10⁻¹⁸ м).',
+ leg:'<span><i style="background:#e24b4a"></i><i style="background:#1d9e75"></i><i style="background:#378add"></i>цветовой заряд</span><span><i style="background:#ef9f27"></i>глюоны</span>',
+ cards:[['Состав uud','Три валентных кварка: два u (заряд +⅔) и один d (−⅓) дают заряд +1. Цвета — не оттенки, а три вида заряда сильного взаимодействия; кварки обмениваются ими через глюоны.'],
+ ['Конфайнмент','Кварк нельзя извлечь из протона: при растяжении глюонной «струны» энергия рождает новые пары кварк—антикварк. Глюоны сами несут цвет и взаимодействуют друг с другом.'],
+ ['Откуда масса','Массы трёх кварков (даёт механизм Хиггса) — лишь около 1 % массы протона. Остальное — энергия движения кварков и глюонного поля, E = mc². Внутри ещё и «море» виртуальных пар.']]}
+};
+function render(){
+ const d=INFO[mode];
+ document.getElementById('scale').textContent=d.scale;
+ document.getElementById('legend').innerHTML=d.leg;
+ let c=d.cards.slice();
+ if(mode==='atom')c.unshift(['Орбиталь '+orb,ORB[orb].t]);
+ document.getElementById('info').innerHTML=c.map(x=>`<div><h3>${x[0]}</h3><p>${x[1]}</p></div>`).join('');
+ document.getElementById('orbs').style.display=mode==='atom'?'flex':'none';
+ document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===mode));
+ document.querySelectorAll('#orbs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.o===orb));
+}
+const ob=document.getElementById('orbs');
+Object.keys(ORB).forEach(k=>{const b=document.createElement('button');b.textContent=k;b.dataset.o=k;
+ b.onclick=()=>{orb=k;build(k);render()};ob.appendChild(b)});
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;render()});
+document.getElementById('auto').onchange=e=>auto=e.target.checked;
+cv.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;cv.setPointerCapture(e.pointerId)});
+cv.addEventListener('pointermove',e=>{if(!drag)return;yaw+=(e.clientX-lx)*.008;pitch=Math.max(-1.4,Math.min(1.4,pitch+(e.clientY-ly)*.008));lx=e.clientX;ly=e.clientY});
+cv.addEventListener('pointerup',()=>drag=false);
+cv.addEventListener('pointercancel',()=>drag=false);
+
+let last=0;
+function frame(ms){
+ const t=ms/1000,dt=Math.min(t-last,.05);last=t;
+ if(auto&&!drag)yaw+=dt*.35;
+ ctx.clearRect(0,0,W,H);
+ if(mode==='atom')drawAtom();else if(mode==='nuc')drawNuc(t);else drawNct(t);
+ requestAnimationFrame(frame);
+}
+fit();build(orb);render();requestAnimationFrame(frame);
+</script>
+</body>
+</html>

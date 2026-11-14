@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, getEntry, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const models = await getCollection('models');
+  return models.map((m) => ({ params: { slug: m.id }, props: { id: m.id } }));
+}
+
+const { id } = Astro.props;
+const m = await getEntry('models', id);
+const { Content } = await render(m);
+---
+<Base title={`${m.data.title} — интерактивная модель`}>
+  <article>
+    <div class="meta">
+      <time datetime={m.data.date.toISOString()}>{m.data.date.toLocaleDateString('ru-RU')}</time>
+      {m.data.tags.map(t => <a class="tag" href={`/tags/${t}/`}>#{t}</a>)}
+    </div>
+    <h1>{m.data.title}</h1>
+    <p class="hint">{m.data.description}</p>
+    <iframe class="frame" src={`/sim/${m.data.model}`} title={m.data.title}></iframe>
+    <p class="hint">Не помещается? <a href={`/sim/${m.data.model}`} target="_blank" rel="noopener">Открыть на весь экран →</a></p>
+    <div class="content"><Content /></div>
+    <a class="back" href="/">← все модели</a>
+  </article>
+</Base>

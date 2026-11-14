@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Закон Ленца — интерактивная модель</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#eaf3fa; --mut:#8ba3b8; --line:rgba(130,200,255,.16);
+    --cyan:#54e8ff; --warm:#ffb454; --npole:#ff6a55; --spole:#5c8dff;
+    --mono:'JetBrains Mono',monospace; --disp:'Unbounded',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);
+    background:#060b13;user-select:none;-webkit-user-select:none}
+  .bg{position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(1100px 700px at 78% 8%, rgba(255,170,80,.05), transparent 60%),
+      radial-gradient(1200px 900px at 12% 92%, rgba(60,200,240,.08), transparent 60%),
+      radial-gradient(1600px 1200px at 50% 40%, #0b1626 0%, #070f1c 55%, #04070d 100%);}
+  .bg::after{content:'';position:absolute;inset:0;
+    background-image:linear-gradient(rgba(120,190,255,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(120,190,255,.05) 1px,transparent 1px);
+    background-size:48px 48px;
+    -webkit-mask-image:radial-gradient(80% 75% at 50% 45%,#000 30%,transparent 100%);
+            mask-image:radial-gradient(80% 75% at 50% 45%,#000 30%,transparent 100%);}
+  #scene{position:fixed;inset:0;z-index:1;touch-action:none}
+  .vig{position:fixed;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(125% 95% at 50% 45%,transparent 55%,rgba(2,5,10,.5))}
+  .corner{position:fixed;width:26px;height:26px;border:1px solid rgba(120,200,255,.28);z-index:4;pointer-events:none}
+  .tl{top:10px;left:10px;border-right:0;border-bottom:0}
+  .tr{top:10px;right:10px;border-left:0;border-bottom:0}
+  .bl{bottom:10px;left:10px;border-right:0;border-top:0}
+  .br{bottom:10px;right:10px;border-left:0;border-top:0}
+
+  header{position:fixed;top:22px;left:26px;z-index:5;pointer-events:none}
+  .eyebrow{font:600 10px var(--mono);color:var(--warm);letter-spacing:.32em;text-transform:uppercase}
+  h1{font:800 clamp(22px,3vw,34px)/1.05 var(--disp);letter-spacing:.02em;margin:8px 0 8px;
+    text-shadow:0 0 28px rgba(255,180,84,.22)}
+  .sub{display:flex;align-items:center;gap:8px;font:400 11px var(--mono);color:var(--mut)}
+  .live{width:7px;height:7px;background:var(--warm);border-radius:50%;
+    box-shadow:0 0 10px var(--warm);animation:pulse 1.7s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+  .chain{position:fixed;right:22px;top:96px;width:272px;z-index:5;padding:18px;
+    background:linear-gradient(160deg,rgba(16,30,48,.92),rgba(8,15,27,.94));
+    border:1px solid var(--line);
+    clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)}
+  .formula{font:600 21px var(--disp);letter-spacing:.02em;text-align:center;padding:6px 0 2px}
+  .formula b{display:inline-block;color:#0a1220;background:var(--warm);border-radius:4px;
+    padding:0 7px;margin:0 3px;box-shadow:0 0 16px rgba(255,180,84,.45)}
+  .formula sub{font-size:11px;color:var(--mut)}
+  .fnote{font:400 9.5px var(--mono);color:var(--mut);text-align:center;letter-spacing:.08em;margin-bottom:12px}
+  .steps{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:13px}
+  .steps li{border:1px solid var(--line);background:rgba(10,22,38,.55);padding:8px 11px;transition:border-color .25s}
+  .steps i{display:block;font:600 8.5px var(--mono);letter-spacing:.18em;text-transform:uppercase;
+    color:var(--mut);font-style:normal;margin-bottom:3px}
+  .steps b{font:600 13.5px 'IBM Plex Sans';color:var(--ink)}
+  .steps small{display:block;font:400 10px 'IBM Plex Sans';color:var(--mut);margin-top:2px}
+  li[data-st=up] b{color:var(--warm)}
+  li[data-st=down] b{color:var(--cyan)}
+  li[data-st=zero] b{color:var(--mut)}
+  li[data-st=up],li[data-st=down]{border-color:rgba(255,200,130,.3)}
+  .meters{border-top:1px dashed rgba(130,200,255,.22);padding-top:11px}
+  .mrow{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+  .mlab{font:600 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);width:58px}
+  .bar{flex:1;height:8px;background:rgba(8,16,28,.9);border:1px solid var(--line);overflow:hidden}
+  .bar div{height:100%;width:0%;background:linear-gradient(90deg,#ff9d4e,#ff5a4e);
+    box-shadow:0 0 10px rgba(255,140,80,.6);transition:width .12s linear}
+  .mrow b{font:600 12px var(--mono);color:var(--cyan);width:16px;text-align:center}
+  .mrow2{display:flex;gap:8px}
+  .mrow2>div{flex:1;border:1px solid var(--line);background:rgba(10,22,38,.55);
+    padding:7px 9px;display:flex;justify-content:space-between;align-items:baseline}
+  .mrow2 span{font:600 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+  .mrow2 b{font:600 15px var(--mono)}
+  #emfVal{color:var(--warm)} #iVal{color:var(--cyan)}
+  .note2{margin-top:12px;font:400 10.5px/1.55 'IBM Plex Sans';color:var(--mut)}
+  .note2 em{color:var(--warm);font-style:600}
+
+  .controls{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;
+    display:flex;align-items:center;gap:11px;padding:10px 16px;
+    background:rgba(10,20,34,.9);border:1px solid var(--line);
+    clip-path:polygon(13px 0,100% 0,100% calc(100% - 13px),calc(100% - 13px) 100%,0 100%,0 13px)}
+  .tgl{font:600 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);
+    background:rgba(12,24,40,.7);border:1px solid var(--line);padding:8px 11px;cursor:pointer;
+    transition:.18s;white-space:nowrap}
+  .tgl:hover{color:var(--ink);border-color:rgba(150,220,255,.4);transform:translateY(-1px)}
+  .tgl.on{color:var(--cyan);border-color:rgba(84,232,255,.5);
+    box-shadow:inset 0 0 12px rgba(84,232,255,.08),0 0 10px rgba(84,232,255,.12)}
+  .tgl.main.on{color:var(--warm);border-color:rgba(255,180,84,.55);
+    box-shadow:inset 0 0 12px rgba(255,180,84,.1),0 0 10px rgba(255,180,84,.15)}
+  #btnFlip{color:var(--warm);border-color:rgba(255,180,84,.35)}
+  #btnFlip:hover{box-shadow:0 0 14px rgba(255,180,84,.25)}
+  .flash{animation:flash .4s}
+  @keyframes flash{0%{box-shadow:0 0 0 rgba(255,180,84,0)}40%{box-shadow:0 0 22px rgba(255,180,84,.7)}100%{box-shadow:0 0 0 rgba(255,180,84,0)}}
+  .spd{display:flex;align-items:center;gap:8px}
+  .spd .lbl{font:600 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+  .spd b{font:600 10.5px var(--mono);color:var(--cyan);min-width:48px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:96px;height:3px;outline:none;cursor:pointer;
+    background:linear-gradient(90deg,var(--cyan),rgba(120,200,255,.15));border-radius:2px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;
+    background:#0b1626;border:2px solid var(--cyan);box-shadow:0 0 8px rgba(84,232,255,.6)}
+  input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;
+    background:#0b1626;border:2px solid var(--cyan)}
+  .hint{font:400 9.5px var(--mono);color:rgba(140,165,190,.6);white-space:nowrap}
+
+  .note{position:fixed;left:26px;bottom:20px;z-index:5;pointer-events:none;
+    font:400 9.5px var(--mono);color:rgba(140,165,190,.5);letter-spacing:.1em}
+
+  @media(max-width:1240px){.hint{display:none}}
+  @media(max-width:900px){
+    header{left:14px;top:12px}
+    .chain{right:8px;top:118px;width:206px;padding:12px}
+    .formula{font-size:17px}
+    .steps b{font-size:11.5px}
+    .note2,.fnote{display:none}
+    .controls{left:8px;right:8px;transform:none;bottom:8px;padding:8px 10px;gap:8px;overflow-x:auto}
+    .corner,.note{display:none}
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <canvas id="scene"></canvas>
+  <div class="vig"></div>
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+
+  <header>
+    <div class="eyebrow">электромагнитная индукция · 1834</div>
+    <h1>ЗАКОН ЛЕНЦА</h1>
+    <div class="sub"><span class="live"></span><span id="modeTxt">режим: ручной — тяните магнит</span></div>
+  </header>
+
+  <section class="chain">
+    <div class="formula">ε<sub>инд</sub> = <b>−</b> dΦ / dt</div>
+    <div class="fnote">знак «минус» — и есть правило Ленца</div>
+    <ol class="steps">
+      <li id="st1"><i>01 · движение магнита</i><b id="st1b">—</b></li>
+      <li id="st2"><i>02 · магнитный поток Φ</i><b id="st2b">—</b></li>
+      <li id="st3"><i>03 · индукционный ток</i><b id="st3b">—</b><small id="st3s"></small></li>
+      <li id="st4"><i>04 · взаимодействие</i><b id="st4b">—</b></li>
+    </ol>
+    <div class="meters">
+      <div class="mrow"><span class="mlab">поток Φ</span><div class="bar"><div id="fluxFill"></div></div><b id="fluxDir">→</b></div>
+      <div class="mrow2">
+        <div><span>ЭДС ε</span><b id="emfVal">0.0</b></div>
+        <div><span>ток I</span><b id="iVal">0.00</b></div>
+      </div>
+    </div>
+    <p class="note2">Индукционный ток всегда направлен так, чтобы <em>противодействовать</em> изменению магнитного потока, его вызывающего. Катушка «сопротивляется» любому изменению — в этом суть закона Ленца.</p>
+  </section>
+
+  <footer class="controls">
+    <button id="btnAuto" class="tgl main">▶ автоколебания</button>
+    <div class="spd"><span class="lbl">частота</span><input id="freq" type="range" min="20" max="140" value="50"><b id="freqVal">0.50 Гц</b></div>
+    <button id="btnFlip" class="tgl">⇄ полюса</button>
+    <div class="spd"><span class="lbl">витки</span><input id="turns" type="range" min="1" max="8" value="4"><b id="turnsVal">N = 4</b></div>
+    <button class="tgl on" id="tgF">поле</button>
+    <button class="tgl on" id="tgC">ток</button>
+    <button class="tgl on" id="tgB">Bᵢₙд</button>
+    <button class="tgl on" id="tgS">сила</button>
+  </footer>
+
+  <div class="note">Э. Х. Ленц, 1834 · индукционный ток противодействует причине, его вызывающей</div>
+
+<script>
+'use strict';
+const TAU=Math.PI*2;
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const canvas=document.getElementById('scene'), ctx=canvas.getContext('2d');
+let W,H,DPR;
+
+const S={
+  s:1, turns:4, auto:false, phase:0, freq:0.5,
+  mx:0, vS:0, prevMx:null, phiPrev:null, absPrev:null, dAbsS:0,
+  emf:0, needle:0, drag:false, dragOff:0, hover:false,
+  show:{field:true,current:true,bind:true,force:true}
+};
+let geo={}, dashOff=0, tG=0;
+
+function resize(){
+  DPR=Math.min(devicePixelRatio||1,2);
+  W=innerWidth; H=innerHeight;
+  canvas.width=W*DPR; canvas.height=H*DPR;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+addEventListener('resize',resize);
+
+function layout(){
+  const axisY=H*0.40;
+  const ry=clamp(H*0.155,54,148), rx=ry*0.20;
+  const gap=clamp(W*0.011,7,13);
+  const coilX=W*(W<900?0.52:0.60);
+  const Nt=S.turns;
+  const coilLeft=coilX-(Nt-1)*gap/2, coilRight=coilX+(Nt-1)*gap/2;
+  const LW=clamp(W*0.17,120,220), LH=ry*0.66;
+  const xmin=LW+26, xmax=Math.max(xmin+40, coilLeft-rx-20);
+  const mw=clamp(W*0.135,118,168), mh=mw*0.72;
+  const meterCx=coilX+16;
+  const meterCy=Math.min(axisY+ry+clamp(H*0.20,112,168), H-96-mh/2);
+  return {axisY,ry,rx,gap,Nt,coilX,coilLeft,coilRight,LW,LH,xmin,xmax,mw,mh,meterCx,meterCy,
+          cxAuto:(xmin+xmax)/2, amp:(xmax-xmin)*0.42};
+}
+function flux(d){
+  const D0=geo.ry*1.3;
+  return S.s*S.turns*Math.pow(1+(d/D0)*(d/D0),-1.5);
+}
+function setMx(x){S.mx=clamp(x,geo.xmin,geo.xmax);}
+
+/* ---------- графика ---------- */
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function arrow(x1,y1,x2,y2,color,w,head){
+  head=head||8;
+  ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-head*Math.cos(a-0.42),y2-head*Math.sin(a-0.42));
+  ctx.lineTo(x2-head*Math.cos(a+0.42),y2-head*Math.sin(a+0.42));
+  ctx.closePath();ctx.fill();
+}
+function fieldLines(g){
+  const cxm=S.mx-g.LW/2, m=S.s;
+  const Ls=[1.15,1.8,2.5];
+  ctx.lineWidth=1.1;
+  for(let li=0;li<Ls.length;li++){
+    const C=g.LW*Ls[li], a=0.42-0.11*li;
+    for(const mir of[1,-1]){
+      const pts=[];
+      for(let th=0.30;th<=Math.PI-0.29;th+=0.06){
+        const r=C*Math.sin(th)*Math.sin(th);
+        pts.push([cxm+m*r*Math.cos(th), g.axisY-mir*r*Math.sin(th)]);
+      }
+      ctx.strokeStyle=`rgba(255,168,96,${a})`;
+      ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
+      for(const f of[0.28,0.72]){
+        const i=Math.floor(pts.length*f), p=pts[i], q=pts[i+1];
+        arrow(p[0],p[1],q[0],q[1],`rgba(255,168,96,${a+0.15})`,1.1,6);
+      }
+    }
+  }
+  // осевые линии к катушке
+  for(const yo of[0,-g.LH*0.55,g.LH*0.55]){
+    const x1=S.mx+6, x2=Math.min(S.mx+g.LW*1.15, g.coilLeft-g.rx-6);
+    if(x2-x1>14){
+      const al=clamp(0.5-(g.coilLeft-S.mx)/900,0.08,0.45);
+      arrow(x1,g.axisY+yo,x2,g.axisY+yo,`rgba(255,168,96,${al})`,1.2,6);
+    }
+  }
+}
+function drawCoil(g,In,dirB){
+  // свечение потока внутри катушки
+  const phiN=Math.abs(In)>0?0:0; // (заполняется ниже через geo.phiAbs)
+  const aGlow=0.24*clamp(Math.abs(geo.phi)/S.turns,0,1);
+  if(aGlow>0.02){
+    ctx.fillStyle=`rgba(255,160,90,${aGlow})`;
+    ctx.beginPath();ctx.ellipse(g.coilX,g.axisY,g.rx+(g.Nt-1)*g.gap/2+7,g.ry-4,0,0,TAU);ctx.fill();
+  }
+  for(let i=0;i<g.Nt;i++){
+    const x=g.coilLeft+i*g.gap;
+    ctx.lineWidth=Math.max(3,g.ry*0.045);
+    ctx.strokeStyle='rgba(150,96,48,.5)';
+    ctx.beginPath();ctx.ellipse(x,g.axisY,g.rx,g.ry,0,Math.PI/2,Math.PI*1.5);ctx.stroke();
+    const grd=ctx.createLinearGradient(0,g.axisY-g.ry,0,g.axisY+g.ry);
+    grd.addColorStop(0,'#f0b070');grd.addColorStop(.5,'#c97f3e');grd.addColorStop(1,'#8a5326');
+    ctx.strokeStyle=grd;
+    ctx.beginPath();ctx.ellipse(x,g.axisY,g.rx,g.ry,0,Math.PI*1.5,Math.PI*2.5);ctx.stroke();
+  }
+  // символы тока ⊙ / ⊗
+  if(S.show.current&&Math.abs(In)>0.045){
+    const al=clamp(Math.abs(In)*1.7,0,1);
+    const topOut=In>0;
+    for(let i=0;i<g.Nt;i++){
+      const x=g.coilLeft+i*g.gap;
+      sym(x,g.axisY-g.ry,topOut,al);
+      sym(x,g.axisY+g.ry,!topOut,al);
+    }
+  }
+  // полюсы катушки + индуцированное поле
+  if(S.show.bind&&Math.abs(In)>0.045&&dirB!==0){
+    const al=clamp(Math.abs(In)*1.7,0,1);
+    const x1=g.coilLeft-g.rx-14, x2=g.coilRight+g.rx+14;
+    ctx.setLineDash([7,6]);
+    arrow(dirB>0?x1:x2, g.axisY, dirB>0?x2:x1, g.axisY, `rgba(84,232,255,${0.85*al})`,2,10);
+    ctx.setLineDash([]);
+    ctx.font='600 11px "JetBrains Mono",monospace';
+    ctx.fillStyle=`rgba(84,232,255,${al})`;ctx.textAlign='center';
+    ctx.fillText('Bинд',g.coilX,g.axisY-12);
+    poleBadge(g.coilLeft-g.rx-32,g.axisY,dirB<0?'N':'S',al);
+    poleBadge(g.coilRight+g.rx+32,g.axisY,dirB>0?'N':'S',al);
+    ctx.textAlign='left';
+  }
+}
+function sym(x,y,out,al){
+  ctx.beginPath();ctx.arc(x,y,6.5,0,TAU);
+  ctx.fillStyle='rgba(8,16,28,.92)';ctx.fill();
+  ctx.strokeStyle=`rgba(120,235,255,${al})`;ctx.lineWidth=1.6;ctx.stroke();
+  ctx.fillStyle=`rgba(120,235,255,${al})`;ctx.strokeStyle=`rgba(120,235,255,${al})`;
+  if(out){ctx.beginPath();ctx.arc(x,y,2.2,0,TAU);ctx.fill();}
+  else{ctx.lineWidth=1.5;ctx.beginPath();
+    ctx.moveTo(x-3.2,y-3.2);ctx.lineTo(x+3.2,y+3.2);
+    ctx.moveTo(x+3.2,y-3.2);ctx.lineTo(x-3.2,y+3.2);ctx.stroke();}
+}
+function poleBadge(x,y,letter,al){
+  ctx.beginPath();ctx.arc(x,y,11,0,TAU);
+  ctx.fillStyle='rgba(8,16,28,.9)';ctx.fill();
+  ctx.strokeStyle=`rgba(84,232,255,${0.8*al})`;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.fillStyle=`rgba(84,232,255,${al})`;
+  ctx.font='700 10px Unbounded,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(letter,x,y+0.5);
+  ctx.textBaseline='alphabetic';
+}
+function drawMagnet(g,now){
+  const x0=S.mx-g.LW,y0=g.axisY-g.LH/2,nRight=S.s===1;
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=18;ctx.shadowOffsetY=10;
+  rr(x0,y0,g.LW,g.LH,9);ctx.clip();
+  const blue=['#8ab6ff','#2f5cc4'], red=['#ff8a6e','#c23726'];
+  const lc=nRight?blue:red, rc=nRight?red:blue;
+  let grd=ctx.createLinearGradient(0,y0,0,y0+g.LH);
+  grd.addColorStop(0,lc[0]);grd.addColorStop(1,lc[1]);
+  ctx.fillStyle=grd;ctx.fillRect(x0,y0,g.LW/2,g.LH);
+  grd=ctx.createLinearGradient(0,y0,0,y0+g.LH);
+  grd.addColorStop(0,rc[0]);grd.addColorStop(1,rc[1]);
+  ctx.fillStyle=grd;ctx.fillRect(x0+g.LW/2,y0,g.LW/2,g.LH);
+  ctx.restore();
+  rr(x0,y0,g.LW,g.LH,9);
+  ctx.strokeStyle='rgba(230,240,255,.3)';ctx.lineWidth=1.2;ctx.stroke();
+  ctx.strokeStyle='rgba(8,14,24,.6)';
+  ctx.beginPath();ctx.moveTo(x0+g.LW/2,y0);ctx.lineTo(x0+g.LW/2,y0+g.LH);ctx.stroke();
+  ctx.font='800 '+Math.round(g.LH*0.46)+'px Unbounded,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(255,255,255,.94)';
+  ctx.fillText(nRight?'S':'N',x0+g.LW*0.25,g.axisY+1);
+  ctx.fillText(nRight?'N':'S',x0+g.LW*0.75,g.axisY+1);
+  ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  if(S.hover||S.drag){
+    rr(x0-4,y0-4,g.LW+8,g.LH+8,11);
+    ctx.strokeStyle='rgba(84,232,255,.55)';ctx.lineWidth=1.5;ctx.stroke();
+  }
+  if(!S.drag&&!S.auto&&Math.abs(S.vS)<12){
+    ctx.globalAlpha=0.35+0.25*Math.sin(now*0.004);
+    ctx.font='600 10px "JetBrains Mono",monospace';
+    ctx.fillStyle='#cfe6f5';ctx.textAlign='center';
+    ctx.fillText('⟵  тяните магнит  ⟶',x0+g.LW/2,y0-16);
+    ctx.textAlign='left';ctx.globalAlpha=1;
+  }
+}
+function drawWires(g,In,dt){
+  const ty=g.meterCy-g.mh/2-16;
+  const tL={x:g.meterCx-g.mw*0.22,y:g.meterCy-g.mh/2};
+  const tR={x:g.meterCx+g.mw*0.22,y:g.meterCy-g.mh/2};
+  const leadL=[[g.coilLeft,g.axisY+g.ry],[g.coilLeft,ty],[tL.x,ty],[tL.x,tL.y]];
+  const leadR=[[g.coilRight,g.axisY+g.ry],[g.coilRight,ty-10],[tR.x,ty-10],[tR.x,tR.y]];
+  for(const p of[leadL,leadR]){
+    ctx.strokeStyle='#28405c';ctx.lineWidth=3;ctx.lineJoin='round';
+    ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();
+  }
+  if(S.show.current&&Math.abs(In)>0.05){
+    dashOff+=In*dt*170;
+    ctx.lineWidth=2;ctx.strokeStyle=`rgba(120,230,255,${clamp(Math.abs(In)*1.5,0,0.95)})`;
+    ctx.setLineDash([5,11]);
+    ctx.lineDashOffset=-dashOff;
+    ctx.beginPath();leadL.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();
+    ctx.lineDashOffset=dashOff;
+    ctx.beginPath();leadR.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();
+    ctx.setLineDash([]);ctx.lineDashOffset=0;
+  }
+}
+function drawMeter(g){
+  const mCx=g.meterCx,mCy=g.meterCy,mw=g.mw,mh=g.mh;
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=16;ctx.shadowOffsetY=8;
+  rr(mCx-mw/2,mCy-mh/2,mw,mh,10);ctx.fillStyle='#0f1b2b';ctx.fill();
+  ctx.restore();
+  rr(mCx-mw/2,mCy-mh/2,mw,mh,10);
+  ctx.strokeStyle='rgba(130,200,255,.25)';ctx.lineWidth=1;ctx.stroke();
+  const dw=mw*0.84,dh=mh*0.62,dx=mCx-dw/2,dy=mCy-mh/2+mh*0.12;
+  rr(dx,dy,dw,dh,7);ctx.fillStyle='#f2e8d5';ctx.fill();
+  const pivX=mCx,pivY=dy+dh*0.95,R=dh*0.82;
+  for(let a=-60;a<=60;a+=10){
+    const rad=(a-90)*Math.PI/180, major=a%30===0;
+    const r1=R*(major?0.80:0.87),r2=R*0.95;
+    ctx.strokeStyle=a===0?'#22323f':'#7a8994';ctx.lineWidth=major?2:1;
+    ctx.beginPath();
+    ctx.moveTo(pivX+r1*Math.cos(rad),pivY+r1*Math.sin(rad));
+    ctx.lineTo(pivX+r2*Math.cos(rad),pivY+r2*Math.sin(rad));ctx.stroke();
+  }
+  ctx.fillStyle='#43525d';ctx.font='700 '+Math.round(mw*0.085)+'px "JetBrains Mono",monospace';
+  ctx.textAlign='center';
+  ctx.fillText('−',pivX-R*0.6,pivY-R*0.28);
+  ctx.fillText('+',pivX+R*0.6,pivY-R*0.28);
+  ctx.font='600 '+Math.round(mw*0.062)+'px "JetBrains Mono",monospace';
+  ctx.fillText('мкА',pivX,pivY-R*0.42);
+  const ang=(clamp(S.needle,-1.15,1.15)*55-90)*Math.PI/180;
+  ctx.strokeStyle='#c93a2e';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(pivX-10*Math.cos(ang),pivY-10*Math.sin(ang));
+  ctx.lineTo(pivX+R*0.92*Math.cos(ang),pivY+R*0.92*Math.sin(ang));ctx.stroke();
+  ctx.beginPath();ctx.arc(pivX,pivY,4.5,0,TAU);ctx.fillStyle='#22323f';ctx.fill();
+  ctx.font='600 '+Math.round(mw*0.058)+'px "JetBrains Mono",monospace';
+  ctx.fillStyle='rgba(139,163,184,.85)';
+  ctx.fillText('ГАЛЬВАНОМЕТР',mCx,mCy+mh*0.38);
+  ctx.textAlign='left';
+  for(const tx of[mCx-mw*0.22,mCx+mw*0.22]){
+    ctx.beginPath();ctx.arc(tx,mCy-mh/2,3.6,0,TAU);
+    ctx.fillStyle='#c9a25f';ctx.fill();
+    ctx.strokeStyle='rgba(8,14,24,.7)';ctx.lineWidth=1;ctx.stroke();
+  }
+}
+
+/* ---------- панель ---------- */
+const $=id=>document.getElementById(id);
+function setState(id,st){$(id).setAttribute('data-st',st);}
+function updatePanel(phi,In,now){
+  const thr=14, moving=S.vS>thr?1:S.vS<-thr?-1:0;
+  const eps=0.14, cur=Math.abs(S.emf)>eps&&moving!==0;
+  const growing=S.dAbsS>0.05;
+  setState('st1',moving===0?'zero':moving>0?'up':'down');
+  $('st1b').textContent=moving>0?'→ приближается к катушке':moving<0?'← удаляется от катушки':'магнит покоится';
+  setState('st2',moving===0?'zero':growing?'up':'down');
+  $('st2b').textContent=moving===0?'неизменен — ЭДС = 0':growing?'растёт ↑':'убывает ↓';
+  const ccw=(S.s*S.vS)>0;
+  setState('st3',!cur?'zero':ccw?'down':'up');
+  $('st3b').textContent=!cur?'отсутствует':ccw?'против часовой ↺':'по часовой ↻';
+  $('st3s').textContent=!cur?'цепь разомкнута для потока: нет изменений — нет тока':'если смотреть со стороны магнита';
+  setState('st4',moving===0?'zero':moving>0?'up':'down');
+  $('st4b').textContent=moving>0?'катушка отталкивает магнит':moving<0?'катушка притягивает магнит':'нет взаимодействия';
+  $('fluxFill').style.width=(clamp(Math.abs(phi)/S.turns,0,1)*100).toFixed(1)+'%';
+  $('fluxDir').textContent=Math.abs(phi)<0.02?'·':phi>0?'→':'←';
+  $('emfVal').textContent=(S.emf>=0?'+':'−')+Math.abs(S.emf).toFixed(1);
+  $('iVal').textContent=(In>=0?'+':'−')+Math.abs(In).toFixed(2);
+}
+
+/* ---------- управление ---------- */
+function hitMagnet(x,y){
+  const pad=10;
+  return x>S.mx-geo.LW-pad&&x<S.mx+pad&&Math.abs(y-geo.axisY)<geo.LH/2+pad;
+}
+canvas.addEventListener('pointerdown',e=>{
+  if(hitMagnet(e.clientX,e.clientY)){
+    S.drag=true;S.dragOff=S.mx-e.clientX;
+    if(S.auto)setAuto(false);
+    canvas.setPointerCapture(e.pointerId);
+  }
+});
+canvas.addEventListener('pointermove',e=>{
+  if(S.drag){setMx(e.clientX+S.dragOff);}
+  else{S.hover=hitMagnet(e.clientX,e.clientY);}
+  canvas.style.cursor=S.drag?'grabbing':S.hover?'ew-resize':'default';
+});
+const endDrag=()=>{S.drag=false;canvas.style.cursor=S.hover?'ew-resize':'default';};
+canvas.addEventListener('pointerup',endDrag);
+canvas.addEventListener('pointercancel',endDrag);
+
+const btnAuto=$('btnAuto');
+function setAuto(on){
+  S.auto=on;
+  btnAuto.classList.toggle('on',on);
+  btnAuto.textContent=on?'⏸ автоколебания':'▶ автоколебания';
+  if(on){
+    const u=clamp((S.mx-geo.cxAuto)/Math.max(1,geo.amp),-1,1);
+    S.phase=Math.asin(u);
+  }
+  $('modeTxt').textContent=on?'режим: автоколебания':'режим: ручной — тяните магнит';
+}
+btnAuto.addEventListener('click',()=>setAuto(!S.auto));
+
+$('freq').addEventListener('input',e=>{
+  S.freq=e.target.value/100;
+  $('freqVal').textContent=S.freq.toFixed(2)+' Гц';
+});
+$('turns').addEventListener('input',e=>{
+  S.turns=+e.target.value;
+  $('turnsVal').textContent='N = '+S.turns;
+});
+$('btnFlip').addEventListener('click',()=>{
+  S.s*=-1;
+  $('btnFlip').classList.remove('flash');void $('btnFlip').offsetWidth;
+  $('btnFlip').classList.add('flash');
+});
+function bindTgl(id,key){
+  $(id).addEventListener('click',()=>{
+    S.show[key]=!S.show[key];
+    $(id).classList.toggle('on',S.show[key]);
+  });
+}
+bindTgl('tgF','field');bindTgl('tgC','current');bindTgl('tgB','bind');bindTgl('tgS','force');
+
+addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();setAuto(!S.auto);}
+  else if(e.code==='KeyF'){$('btnFlip').click();}
+  else if(e.key==='ArrowRight'){if(S.auto)setAuto(false);setMx(S.mx+26);}
+  else if(e.key==='ArrowLeft'){if(S.auto)setAuto(false);setMx(S.mx-26);}
+});
+
+/* ---------- цикл ---------- */
+let last=performance.now();
+function frame(now){
+  requestAnimationFrame(frame);
+  let dt=(now-last)/1000;last=now;
+  if(dt>0.033)dt=0.033;
+  tG+=dt;
+  geo=layout();
+  if(S.mx===0)S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;
+  if(S.auto&&!S.drag){
+    S.phase+=TAU*S.freq*dt;
+    setMx(geo.cxAuto+geo.amp*Math.sin(S.phase));
+  }
+  if(S.prevMx===null)S.prevMx=S.mx;
+  const vRaw=(S.mx-S.prevMx)/Math.max(dt,1e-4);
+  S.prevMx=S.mx;
+  S.vS+=(vRaw-S.vS)*0.35;
+
+  const d=Math.max(0,geo.coilLeft-geo.rx-S.mx);
+  const phi=flux(d);
+  if(S.phiPrev===null){S.phiPrev=phi;S.absPrev=Math.abs(phi);}
+  const emfRaw=-(phi-S.phiPrev)/Math.max(dt,1e-4);
+  const dAbsRaw=(Math.abs(phi)-S.absPrev)/Math.max(dt,1e-4);
+  S.phiPrev=phi;S.absPrev=Math.abs(phi);
+  S.emf+=(emfRaw-S.emf)*0.3;
+  S.dAbsS+=(dAbsRaw-S.dAbsS)*0.3;
+  geo.phi=phi;
+  const In=clamp(S.emf*0.07,-1,1);
+  S.needle+=(In-S.needle)*Math.min(1,dt*9);
+  const dirB=Math.abs(S.emf)>0.14?-Math.sign(S.emf*0+ (phi-S.phiPrev))*Math.sign(-(phi-S.phiPrev))*Math.sign(S.emf>0?1:-1):0;
+  const dirBv=Math.abs(In)>0.045?(S.emf>0?-1:1)*Math.sign(phi!==0?phi:S.s)*Math.sign(phi!==0?1:1):0;
+  // направление индуцированного поля вдоль +x: против знака dΦ/dt
+  const dirBf=Math.abs(In)>0.045?(S.dAbsS>0?-Math.sign(phi||S.s):Math.sign(phi||S.s)):0;
+
+  /* рисуем */
+  ctx.clearRect(0,0,W,H);
+  // ось установки
+  ctx.setLineDash([2,7]);ctx.strokeStyle='rgba(140,180,220,.14)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(20,geo.axisY);ctx.lineTo(W-20,geo.axisY);ctx.stroke();ctx.setLineDash([]);
+
+  if(S.show.field)fieldLines(geo);
+  drawWires(geo,In,dt);
+  drawCoil(geo,In,dirBf);
+  drawMagnet(geo,now);
+
+  // стрелка скорости
+  if(Math.abs(S.vS)>14){
+    const len=clamp(Math.abs(S.vS)*0.09,26,72)*Math.sign(S.vS);
+    arrow(S.mx-geo.LW/2-len,geo.axisY+geo.LH/2+22,S.mx-geo.LW/2,geo.axisY+geo.LH/2+22,'#cfe6f5',2,8);
+    ctx.font='600 11px "JetBrains Mono",monospace';ctx.fillStyle='#cfe6f5';
+    ctx.fillText('v',S.mx-geo.LW/2-6,geo.axisY+geo.LH/2+38);
+  }
+  // сила противодействия
+  if(S.show.force&&Math.abs(In)>0.06&&Math.abs(S.vS)>14){
+    const len=clamp(30+70*Math.abs(In),30,100)*-Math.sign(S.vS);
+    const y=geo.axisY-geo.LH/2-18;
+    arrow(S.mx-geo.LW/2,y,S.mx-geo.LW/2+len,y,'#ffb454',2.5,10);
+    ctx.font='600 11px "JetBrains Mono",monospace';ctx.fillStyle='#ffb454';
+    ctx.fillText('F',S.mx-geo.LW/2+len/2-4,y-9);
+  }
+  drawMeter(geo);
+  updatePanel(phi,In,now);
+}
+
+resize();
+geo=layout();
+S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
