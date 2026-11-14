@@ -47,3 +47,5 @@ h1{font:800 clamp(24px,4vw,40px)/1.15 var(--disp);margin:18px 0 10px}
   border-bottom:1px solid var(--line);
   background:linear-gradient(135deg,#0d1626,#13243c);
   font:800 42px var(--disp);color:rgba(95,224,255,.35)}
+  .cover{aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--line);background:#05080f}
+.cover svg{width:100%;height:100%;display:block}

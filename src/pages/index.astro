@@ -1,9 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import fs from 'node:fs';
+import path from 'node:path';
+
 const models = (await getCollection('models'))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const tags = [...new Set(models.flatMap(m => m.data.tags))].sort();
+
+const inlineCover = (file?: string) => {
+  if (!file) return null;
+  try {
+    return fs.readFileSync(path.join(process.cwd(), 'public', file), 'utf-8');
+  } catch { return null; }
+};
 ---
 <Base title="Интерактивные физические модели — каталог">
   <section class="hero">
@@ -12,28 +22,25 @@ const tags = [...new Set(models.flatMap(m => m.data.tags))].sort();
     <p class="count">моделей в каталоге: {models.length}</p>
   </section>
   {tags.length > 0 && (
-    <div class="tagbar">
-      {tags.map(t => <a class="tag" href={`/tags/${t}/`}>#{t}</a>)}
-    </div>
+    <div class="tagbar">{tags.map(t => <a class="tag" href={`/tags/${t}/`}>#{t}</a>)}</div>
   )}
   <div class="cards">
-    {models.map(m => (
-      <a class="card" href={`/models/${m.id}/`}>
-        {m.data.cover ? (
-          <img class="cover" src={m.data.cover} alt={m.data.title} loading="lazy" />
-        ) : (
-          <div class="nocover"><span>{m.data.title.charAt(0)}</span></div>
-        )}
-        <div class="card-body">
-          <div class="meta">
-            <time datetime={m.data.date.toISOString()}>{m.data.date.toLocaleDateString('ru-RU')}</time>
-            {m.data.tags.map(t => <span class="tag">#{t}</span>)}
+    {models.map(m => {
+      const svg = inlineCover(m.data.cover);
+      return (
+        <a class="card" href={`/models/${m.id}/`}>
+          {svg ? <div class="cover" set:html={svg} /> : <div class="nocover"><span>{m.data.title.charAt(0)}</span></div>}
+          <div class="card-body">
+            <div class="meta">
+              <time datetime={m.data.date.toISOString()}>{m.data.date.toLocaleDateString('ru-RU')}</time>
+              {m.data.tags.map(t => <span class="tag">#{t}</span>)}
+            </div>
+            <h2>{m.data.title}</h2>
+            <p>{m.data.description}</p>
+            <span class="open">открыть модель →</span>
           </div>
-          <h2>{m.data.title}</h2>
-          <p>{m.data.description}</p>
-          <span class="open">открыть модель →</span>
-        </div>
-      </a>
-    ))}
+        </a>
+      );
+    })}
   </div>
 </Base>
