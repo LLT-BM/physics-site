@@ -19,13 +19,20 @@ const tags = [...new Set(models.flatMap(m => m.data.tags))].sort();
   <div class="cards">
     {models.map(m => (
       <a class="card" href={`/models/${m.id}/`}>
-        <div class="meta">
-          <time datetime={m.data.date.toISOString()}>{m.data.date.toLocaleDateString('ru-RU')}</time>
-          {m.data.tags.map(t => <span class="tag">#{t}</span>)}
+        {m.data.cover ? (
+          <img class="cover" src={m.data.cover} alt={m.data.title} loading="lazy" />
+        ) : (
+          <div class="nocover"><span>{m.data.title.charAt(0)}</span></div>
+        )}
+        <div class="card-body">
+          <div class="meta">
+            <time datetime={m.data.date.toISOString()}>{m.data.date.toLocaleDateString('ru-RU')}</time>
+            {m.data.tags.map(t => <span class="tag">#{t}</span>)}
+          </div>
+          <h2>{m.data.title}</h2>
+          <p>{m.data.description}</p>
+          <span class="open">открыть модель →</span>
         </div>
-        <h2>{m.data.title}</h2>
-        <p>{m.data.description}</p>
-        <span class="open">открыть модель →</span>
       </a>
     ))}
   </div>

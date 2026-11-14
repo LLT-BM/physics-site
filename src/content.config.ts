@@ -8,7 +8,8 @@ const models = defineCollection({
     date: z.coerce.date(),
     description: z.string(),
     tags: z.array(z.string()).default([]),
-    model: z.string(), // имя файла в public/sim/
+    model: z.string(),
+    cover: z.string().optional(),
   }),
 });
 

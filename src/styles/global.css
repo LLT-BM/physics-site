@@ -39,3 +39,11 @@ h1{font:800 clamp(24px,4vw,40px)/1.15 var(--disp);margin:18px 0 10px}
 .content p,.content li{color:#c6d6e2}
 .content code{font:600 13px var(--mono);color:var(--amber)}
 .back{display:inline-block;margin-top:34px;font:600 12px var(--mono);text-decoration:none}
+.card{padding:0;overflow:hidden}
+.card-body{display:flex;flex-direction:column;gap:9px;padding:14px 16px 16px;flex:1}
+.cover{width:100%;aspect-ratio:16/10;object-fit:cover;object-position:center;
+  border-bottom:1px solid var(--line);background:#05080f;display:block}
+.nocover{aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(135deg,#0d1626,#13243c);
+  font:800 42px var(--disp);color:rgba(95,224,255,.35)}
