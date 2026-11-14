@@ -11,7 +11,7 @@ const { id } = Astro.props;
 const m = await getEntry('models', id);
 const { Content } = await render(m);
 ---
-<Base title={`${m.data.title} — интерактивная модель`}>
+<Base title={`${m.data.title} — интерактивная модель`} description={m.data.description} image={m.data.cover}>
   <article>
     <div class="meta">
       <time datetime={m.data.date.toISOString()}>{m.data.date.toLocaleDateString('ru-RU')}</time>
