@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Сборка изображения тонкой линзой</title>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+:root{
+  --bg:#070c15; --grid:rgba(120,190,255,.05); --surface:#0d1626; --ink:#eaf3fa; --muted:#8ba3b8; --line:rgba(130,200,255,.16);
+  --obj:#5fe0ff; --img:#ffb454; --r1:#5fe0ff; --r2:#ffb454; --r3:#ff7ab6; --ok:#4cc58d; --warn:#ff7a6e; --on:#07121c;
+  --glass:rgba(120,190,255,.18); --glassEdge:#78beff; --axis:#3a4654; --screen:#9aa8b5;
+  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);color:var(--ink);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:46px 46px;font:16px/1.5 var(--sans)}
+.wrap{max-width:920px;margin:0 auto;padding:20px 16px 40px}
+h1{font:800 1.7rem/1.15 var(--disp);margin:0 0 8px;letter-spacing:-.01em}
+.lead{margin:0 0 16px;color:var(--muted);max-width:68ch}
+.lead b{color:var(--ink);font-family:var(--mono);white-space:nowrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+svg.scene{display:block;width:100%;height:auto;touch-action:none}
+.note{margin:6px 2px 0;font-size:.85rem;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:.82rem;color:var(--muted);font-family:var(--mono)}
+.legend i{display:inline-block;width:22px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.status{margin-top:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-weight:600;font-family:var(--mono);font-size:.92rem}
+.status.ok{border-color:var(--ok);color:var(--ok)}
+.status.warn{border-color:var(--warn);color:var(--warn)}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+.grp h2{font:600 1rem var(--disp);margin:0 0 4px;padding-left:10px;border-left:4px solid var(--obj)}
+.grp.r h2{border-color:var(--img)} .grp.s h2{border-color:var(--r3)}
+label{display:flex;justify-content:space-between;align-items:baseline;font-size:.92rem;margin-top:10px}
+output{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600}
+input[type=range]{width:100%;height:30px;margin:2px 0 0;-webkit-appearance:none;appearance:none;background:transparent}
+.grp.l input[type=range]{accent-color:var(--obj)} .grp.r input[type=range]{accent-color:var(--img)} .grp.s input[type=range]{accent-color:var(--r3)}
+.head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.head h2{font:600 1rem var(--disp);margin:0}
+select{font:inherit;font-family:var(--mono);padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-variant-numeric:tabular-nums}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:.9rem}
+th:first-child,td:first-child{text-align:left}
+tr.sum td{border-top:1px solid var(--line);font-weight:700}
+.props{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{font-family:var(--mono);font-size:.82rem;padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.chip.on{border-color:var(--ok);color:var(--ok)}
+.chip.img{border-color:var(--img);color:var(--img)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+button{font:inherit;font-family:var(--sans);min-height:44px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.pri{background:var(--obj);color:var(--on);border-color:var(--obj);font-weight:600}
+:focus-visible{outline:3px solid var(--obj);outline-offset:2px}
+/* SVG elements */
+.axis{stroke:var(--axis);stroke-width:1.5}
+.lens{fill:var(--glass);stroke:var(--glassEdge);stroke-width:2}
+.fmark{fill:var(--muted)}
+.ftxt{fill:var(--muted);font-size:13px;font-family:var(--mono);text-anchor:middle}
+.objLine{stroke:var(--obj);stroke-width:3;stroke-linecap:round}
+.objHead{fill:var(--obj)}
+.imgLine{stroke:var(--img);stroke-width:3;stroke-linecap:round}
+.imgHead{fill:var(--img)}
+.imgLine.virt,.imgHead.virt{opacity:.55}
+.ray{stroke-width:2;fill:none}
+.ray.dash{stroke-dasharray:5 5;opacity:.7}
+.screenLine{stroke:var(--screen);stroke-width:3}
+.screenHit{fill:transparent}
+.hit{fill:transparent;cursor:grab}
+.blur{fill:var(--img);opacity:.18}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Сборка изображения тонкой линзой</h1>
+  <p class="lead">Тонкая линза связана формулой <b>1/d + 1/f = 1/F</b>, а увеличение <b>Γ = |f/d|</b>. Двигайте предмет и экран мышью или ползунками: когда экран стоит в плоскости действительного изображения — картинка резкая; мнимое изображение на экран не проецируется.</p>
+
+  <section class="card">
+    <svg class="scene" id="svg" viewBox="0 0 900 480" role="img" aria-label="Оптическая скамья с линзой, предметом и экраном">
+      <defs>
+        <clipPath id="sceneClip"><rect x="0" y="0" width="900" height="480"/></clipPath>
+      </defs>
+      <g clip-path="url(#sceneClip)">
+        <line class="axis" x1="0" y1="240" x2="900" y2="240"/>
+        <g id="rays"></g>
+        <path id="lensShape" class="lens"/>
+        <g id="fmarks"></g>
+        <line id="screenLine" class="screenLine" x1="700" y1="60" x2="700" y2="420"/>
+        <rect id="screenHit" class="screenHit" x="688" y="60" width="24" height="360"/>
+        <g id="imgGroup"></g>
+        <g id="objGroup">
+          <line class="objLine" x1="0" y1="0" x2="0" y2="0"/>
+          <polygon class="objHead"/>
+          <rect class="hit" id="objHit"/>
+        </g>
+      </g>
+    </svg>
+    <p class="note">Шкала: 1 клетка сетки ≈ 2 см. Ось — главная оптическая. Предмет (голубая стрелка) и экран (серая вертикаль) перетаскиваются по горизонтали.</p>
+    <div class="legend">
+      <span><i style="background:var(--r1)"></i>луч ∥ оси → фокус</span>
+      <span><i style="background:var(--r2)"></i>луч через центр</span>
+      <span><i style="background:var(--r3)"></i>луч через фокус → ∥ оси</span>
+      <span><i style="background:var(--img)"></i>изображение</span>
+    </div>
+    <div id="status" class="status" aria-live="polite"></div>
+  </section>
+
+  <div class="ctl">
+    <section class="card grp l">
+      <h2>Предмет</h2>
+      <label for="d">Расстояние d <output id="o_d"></output></label>
+      <input type="range" id="d" min="2" max="24" step="0.5">
+      <label for="h">Высота h <output id="o_h"></output></label>
+      <input type="range" id="h" min="1" max="8" step="0.5">
+    </section>
+    <section class="card grp r">
+      <h2>Линза</h2>
+      <label for="type">Тип
+        <select id="type"><option value="conv">собирающая</option><option value="div">рассеивающая</option></select>
+      </label>
+      <label for="F">Фокусное |F| <output id="o_F"></output></label>
+      <input type="range" id="F" min="4" max="14" step="1">
+    </section>
+    <section class="card grp s">
+      <h2>Экран</h2>
+      <label for="scr">Положение экрана <output id="o_scr"></output></label>
+      <input type="range" id="scr" min="-24" max="24" step="0.5">
+      <div class="row"><button id="toImg" class="pri">Экран на изображение</button></div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:12px">
+    <div class="head"><h2>Расчёт</h2></div>
+    <table id="rd"></table>
+    <div class="props" id="props"></div>
+  </section>
+
+  <div class="row">
+    <button id="reset">Сброс</button>
+  </div>
+</main>
+
+<script>
+(function(){
+  var $ = function(id){return document.getElementById(id)};
+  var CX=450, CY=240, SC=16;            // центр оси и px на см (viewBox-координаты)
+  var DEF={d:16,h:4,F:8,type:'conv',scr:24};
+  var S={d:DEF.d,h:DEF.h,F:DEF.F,type:DEF.type,scr:DEF.scr};
+  var drag=null, reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function fmt(x,n){return x.toFixed(n).replace('.',',')}
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+  function X(cm){return CX+cm*SC}       // см от линзы -> viewBox x
+  function Y(cmUp){return CY-cmUp*SC}   // см вверх от оси -> viewBox y
+
+  // физика: Fs — фокусное со знаком типа (собирающая +, рассеивающая -)
+  function solve(){
+    var Fs = S.type==='conv' ? S.F : -S.F;
+    var denom = 1/Fs - 1/S.d;
+    var inf = Math.abs(denom) < 1e-6;
+    var f = inf ? Infinity : 1/denom;
+    var gamma = inf ? Infinity : Math.abs(f/S.d);
+    var him = inf ? Infinity : -(f/S.d)*S.h;   // знак him: >0 прямо, <0 перевёрнуто
+    var real = !inf && f>0;
+    return {Fs:Fs,f:f,inf:inf,gamma:gamma,him:him,real:real};
+  }
+
+  // пересечение луча (x1,y1)->(x2,y2) с границей viewBox, для рисования «до края»
+  function edgePt(x1,y1,dx,dy){
+    var t=1e9;
+    if(dx!==0){var tx1=(0-x1)/dx,tx2=(900-x1)/dx;t=Math.min(t,tx1>0?tx1:1e9,tx2>0?tx2:1e9)}
+    if(dy!==0){var ty1=(0-y1)/dy,ty2=(480-y1)/dy;t=Math.min(t,ty1>0?ty1:1e9,ty2>0?ty2:1e9)}
+    if(t>1e8)t=1e9/1000;
+    return [x1+dx*t, y1+dy*t];
+  }
+  function seg(x1,y1,x2,y2,cls){
+    var dx=x2-x1,dy=y2-y1,e=edgePt(x1,y1,dx,dy);
+    return '<line class="ray '+cls+'" x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+e[0].toFixed(1)+'" y2="'+e[1].toFixed(1)+'"/>';
+  }
+
+  function buildRays(s){
+    var ox=X(-S.d), oy=Y(S.h);          // верхушка предмета
+    var lx=X(0), ly=S.h*SC;             // точка входа луча1 в линзу (x=0, y=h)
+    var out='';
+    // луч 1: параллельно оси до линзы, затем через (Fs,0)
+    out+=seg(ox,oy,lx,Y(0)+ (CY-oy)*0 + 0, ''); // горизонталь до линзы: y=oy
+    // перечитаем: горизонтальный сегмент от предмета до линзы на высоте h
+    out='';
+    out+=seg(ox,oy, X(0), oy, '');                 // ∥ оси до линзы
+    var fx=X(s.Fs), fy=Y(0);                       // задний/соотв. фокус на оси
+    out+=seg(X(0),oy, fx,fy, '');                  // после линзы к фокусу (и дальше)
+    // луч 2: через центр (0,0)
+    out+=seg(ox,oy, X(0),Y(0), '');
+    out+=seg(X(0),Y(0), X(0)+(X(0)-ox), Y(0)+(Y(0)-oy), ''); // продолжение за центр
+    // луч 3: только собирающая и d>F — через передний фокус (-|F|,0) потом ∥ оси
+    if(s.Fs>0 && S.d>S.F){
+      var pf=X(-S.F), pfy=Y(0);
+      // от верхушки через передний фокус до линзы x=0
+      var t=(0-ox)/(pf-ox); var yAtLens=oy+(pfy-oy)*t;
+      out+=seg(ox,oy, X(0), yAtLens, '');
+      out+=seg(X(0), yAtLens, X(24), yAtLens, ''); // параллельно оси вправо
+    }
+    // мнимые продолжения (пунктир) к точке изображения, если f<0
+    if(!s.inf && s.f<0){
+      var ix=X(s.f), iy=Y(s.him);
+      out+=seg(X(0),oy, ix,iy, 'dash');            // backward луча1
+      out+=seg(X(0),Y(0), ix,iy, 'dash');          // backward луча2
+    }
+    return out;
+  }
+
+  function lensPath(type){
+    var top=Y(9), bot=Y(-9), w=14;
+    if(type==='conv') return 'M'+X(0)+','+top+' Q'+(X(0)+w)+','+CY+' '+X(0)+','+bot+' Q'+(X(0)-w)+','+CY+' '+X(0)+','+top+' Z';
+    return 'M'+X(0)+','+top+' Q'+(X(0)-w)+','+CY+' '+X(0)+','+bot+' L'+(X(0)+0)+','+bot+' Q'+(X(0)+w)+','+CY+' '+X(0)+','+top+' Z';
+  }
+
+  function arrow(x,yTop,hCm,color,headCls,lineCls,virt){
+    // стрелка от оси (Y0) вверх/вниз на hCm см; virt — полупрозрачная (мнимая)
+    var y0=Y(0), y1=Y(hCm);
+    var dir=hCm>=0?-1:1; // наконечник по направлению роста
+    var hh=8*dir;
+    return '<line class="'+lineCls+'" x1="'+x+'" y1="'+y0+'" x2="'+x+'" y2="'+y1+'"/>'+
+           '<polygon class="'+headCls+'" points="'+x+','+y1+' '+(x-5)+','+(y1+hh)+' '+(x+5)+','+(y1+hh)+'"/>';
+  }
+
+  function render(){
+    var s=solve();
+    // лучи
+    $('rays').innerHTML=buildRays(s);
+    // линза
+    $('lensShape').setAttribute('d', lensPath(S.type));
+    // фокусные метки ±|F|
+    var fm='';
+    [-S.F,S.F].forEach(function(c){
+      fm+='<circle class="fmark" cx="'+X(c)+'" cy="'+Y(0)+'" r="3.5"/>';
+      fm+='<text class="ftxt" x="'+X(c)+'" y="'+(Y(0)+18)+'">F</text>';
+    });
+    $('fmarks').innerHTML=fm;
+    // предмет
+    var ox=X(-S.d);
+    $('objGroup').innerHTML=arrow(ox,0,S.h,'','objHead','objLine',false)+
+      '<rect class="hit" x="'+(ox-12)+'" y="'+(Y(S.h)-6)+'" width="24" height="'+(S.h*SC+12)+'"/>';
+    // изображение
+    var ig='';
+    if(!s.inf && Math.abs(X(s.f))<880 && Math.abs(Y(s.him))<460){
+      var virt = s.f<0;
+      ig=arrow(X(s.f),0,s.him,'', virt?'imgHead virt':'imgHead', virt?'imgLine virt':'imgLine', virt);
+    } else if(!s.inf){
+      ig='<text class="ftxt" x="'+clamp(X(s.f),40,860)+'" y="'+(Y(0)-12)+'">изображение за сценой</text>';
+    }
+    $('imgGroup').innerHTML=ig;
+    // экран
+    $('screenLine').setAttribute('x1',X(S.scr)); $('screenLine').setAttribute('x2',X(S.scr));
+    $('screenHit').setAttribute('x',X(S.scr)-12);
+    // размытое пятно, если экран не в плоскости действительного изображения
+    var sharp = s.real && Math.abs(S.scr - s.f) < 0.4;
+    var blur='';
+    if(s.real && !sharp && Math.abs(X(S.scr))<880){
+      var bh=Math.abs(s.him)* (1+Math.abs(S.scr-s.f)*0.06);
+      blur='<rect class="blur" x="'+(X(S.scr)-10)+'" y="'+(Y(0)-bh*SC/2)+'" width="20" height="'+(bh*SC)+'" rx="6"/>';
+    }
+    $('imgGroup').insertAdjacentHTML('beforeend', blur);
+
+    // статус
+    var st=$('status'); st.className='status';
+    if(s.inf){ st.classList.add('warn'); st.textContent='Предмет в фокусе (d = F): лучи после линзы параллельны, изображение на бесконечности.'; }
+    else if(s.real){
+      if(sharp){ st.classList.add('ok'); st.textContent='Резкость: экран в плоскости изображения, f = '+fmt(s.f,1)+' см.'; }
+      else { st.textContent='Действительное изображение при f = '+fmt(s.f,1)+' см. Экран не в этой плоскости — изображение размыто.'; }
+    } else {
+      st.classList.add('warn');
+      st.textContent='Изображение мнимое (f = '+fmt(s.f,1)+' см, по ту же сторону, что предмет). На экран не проецируется.';
+    }
+
+    // таблица расчёта
+    var invSum = s.inf? '—' : fmt(1/S.d+1/s.f,3);
+    $('rd').innerHTML=
+      '<thead><tr><th>Величина</th><th>Значение</th></tr></thead><tbody>'+
+      '<tr><td>Расстояние предмета d</td><td>'+fmt(S.d,1)+' см</td></tr>'+
+      '<tr><td>Фокусное F ('+(S.type==='conv'?'собирающая':'рассеивающая')+')</td><td>'+fmt(s.Fs,1)+' см</td></tr>'+
+      '<tr><td>Расстояние изображения f</td><td>'+(s.inf?'∞':fmt(s.f,1))+' см</td></tr>'+
+      '<tr><td>Увеличение Γ = |f/d|</td><td>'+(s.inf?'∞':fmt(s.gamma,2))+'</td></tr>'+
+      '<tr><td>Высота изображения h′</td><td>'+(s.inf?'∞':fmt(s.him,2))+' см</td></tr>'+
+      '<tr class="sum"><td>Проверка: 1/d + 1/f</td><td>'+invSum+'  = 1/F = '+fmt(1/s.Fs,3)+'</td></tr></tbody>';
+
+    // чипы свойств
+    var chips=[];
+    if(s.inf) chips.push(['на бесконечности','on']);
+    else {
+      chips.push([s.real?'действительное':'мнимое', s.real?'on':'img']);
+      chips.push([s.him>=0?'прямое':'перевёрнутое','']);
+      chips.push([s.gamma>1.02?'увеличенное':s.gamma<0.98?'уменьшенное':'равное','']);
+    }
+    $('props').innerHTML=chips.map(function(c){return '<span class="chip '+c[1]+'">'+c[0]+'</span>'}).join('');
+
+    // sync outputs
+    $('o_d').textContent=fmt(S.d,1)+' см'; $('o_h').textContent=fmt(S.h,1)+' см';
+    $('o_F').textContent=fmt(S.F,0)+' см'; $('o_scr').textContent=fmt(S.scr,1)+' см';
+  }
+
+  // ползунки
+  ['d','h','F','scr'].forEach(function(k){
+    $(k).addEventListener('input',function(e){ S[k]=+e.target.value; render(); });
+  });
+  $('type').addEventListener('change',function(e){ S.type=e.target.value; render(); });
+  $('toImg').addEventListener('click',function(){ var s=solve(); if(!s.inf&&s.real){S.scr=clamp(s.f,-24,24);$('scr').value=S.scr;} render(); });
+  $('reset').addEventListener('click',function(){ S={d:DEF.d,h:DEF.h,F:DEF.F,type:DEF.type,scr:DEF.scr};
+    $('d').value=S.d;$('h').value=S.h;$('F').value=S.F;$('scr').value=S.scr;$('type').value=S.type; render(); });
+
+  // drag предмета и экрана
+  var svg=$('svg');
+  function viewX(e){ var r=svg.getBoundingClientRect(); return (e.clientX-r.left)*(900/r.width); }
+  $('objGroup').addEventListener('pointerdown',function(e){ drag='obj'; e.preventDefault(); if(this.setPointerCapture){try{this.setPointerCapture(e.pointerId)}catch(_){}} });
+  $('screenHit').addEventListener('pointerdown',function(e){ drag='scr'; e.preventDefault(); if(this.setPointerCapture){try{this.setPointerCapture(e.pointerId)}catch(_){}} });
+  svg.addEventListener('pointermove',function(e){
+    if(!drag) return;
+    var cm=(viewX(e)-CX)/SC;
+    if(drag==='obj'){ S.d=clamp(Math.round(-cm*2)/2,2,24); $('d').value=S.d; }
+    else { S.scr=clamp(Math.round(cm*2)/2,-24,24); $('scr').value=S.scr; }
+    render();
+  });
+  function end(){ drag=null; }
+  svg.addEventListener('pointerup',end); svg.addEventListener('pointercancel',end); window.addEventListener('pointerup',end);
+  svg.addEventListener('touchmove',function(e){ if(drag) e.preventDefault(); },{passive:false});
+
+  render();
+})();
+</script>
+</body>
+</html>

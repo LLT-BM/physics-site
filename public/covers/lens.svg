@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c1930"/><stop offset=".55" stop-color="#070f1d"/><stop offset="1" stop-color="#04070d"/>
+    </linearGradient>
+    <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
+      <path d="M46 0H0V46" fill="none" stroke="#78beff" stroke-opacity=".06"/>
+    </pattern>
+    <radialGradient id="vig" cx=".5" cy=".45" r=".8">
+      <stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/>
+    </radialGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#78beff" stop-opacity=".10"/><stop offset=".5" stop-color="#9fd6ff" stop-opacity=".28"/><stop offset="1" stop-color="#78beff" stop-opacity=".10"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <rect width="1200" height="750" fill="url(#grid)"/>
+
+  <!-- главная оптическая ось -->
+  <line x1="60" y1="400" x2="1140" y2="400" stroke="#3a4654" stroke-width="2"/>
+
+  <!-- линза (собирающая, двояковыпуклая) -->
+  <path d="M600 150 Q640 400 600 650 Q560 400 600 150 Z" fill="url(#glass)" stroke="#78beff" stroke-width="2.5"/>
+  <line x1="600" y1="120" x2="600" y2="680" stroke="#78beff" stroke-opacity=".4" stroke-width="1.5"/>
+
+  <!-- фокусы -->
+  <g fill="#8ba3b8">
+    <circle cx="430" cy="400" r="5"/><circle cx="770" cy="400" r="5"/>
+    <text x="430" y="432" font-size="20" text-anchor="middle">F</text>
+    <text x="770" y="432" font-size="20" text-anchor="middle">F′</text>
+  </g>
+
+  <!-- предмет (голубая стрелка слева) -->
+  <g filter="url(#glow)">
+    <line x1="250" y1="400" x2="250" y2="250" stroke="#5fe0ff" stroke-width="5" stroke-linecap="round"/>
+    <polygon points="250,238 240,262 260,262" fill="#5fe0ff"/>
+  </g>
+
+  <!-- три луча от верхушки предмета -->
+  <g fill="none" stroke-width="2.5" filter="url(#glow)">
+    <!-- луч 1: параллельно оси -> через F' -->
+    <path d="M250 250 L600 250" stroke="#5fe0ff"/>
+    <path d="M600 250 L1010 560" stroke="#5fe0ff"/>
+    <!-- луч 2: через центр -->
+    <path d="M250 250 L1010 560" stroke="#ffb454" stroke-opacity=".9"/>
+    <!-- луч 3: через F -> параллельно -->
+    <path d="M250 250 L600 470" stroke="#ff7ab6"/>
+    <path d="M600 470 L1010 470" stroke="#ff7ab6"/>
+  </g>
+
+  <!-- изображение (янтарная перевёрнутая стрелка справа) -->
+  <g filter="url(#glow)">
+    <line x1="1010" y1="400" x2="1010" y2="560" stroke="#ffb454" stroke-width="5" stroke-linecap="round"/>
+    <polygon points="1010,572 1000,548 1020,548" fill="#ffb454"/>
+  </g>
+  <!-- точка схождения лучей -->
+  <circle cx="1010" cy="560" r="6" fill="#fff" filter="url(#glow)"/>
+
+  <!-- подписи -->
+  <text x="48" y="64" fill="#ffb454" font-size="20" letter-spacing="6">LIBLABTAB · 06</text>
+  <text x="48" y="94" fill="#8ba3b8" font-size="16" letter-spacing="3">ОПТИКА · 1/d + 1/f = 1/F</text>
+  <text x="250" y="220" fill="#5fe0ff" font-size="18" text-anchor="middle">предмет</text>
+  <text x="1010" y="610" fill="#ffb454" font-size="18" text-anchor="middle">изображение</text>
+
+  <!-- угловые скобки -->
+  <g stroke="#78beff" stroke-opacity=".3" fill="none">
+    <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
+  </g>
+  <rect width="1200" height="750" fill="url(#vig)"/>
+</svg>
