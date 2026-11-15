@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Правило моментов — модель рычага</title>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+:root{
+  --bg:#070c15; --grid:rgba(120,190,255,.05); --surface:#0d1626; --ink:#eaf3fa; --muted:#8ba3b8; --line:rgba(130,200,255,.16);
+  --left:#5fe0ff; --right:#ffb454; --third:#ff7ab6; --ok:#4cc58d; --on:#07121c;
+  --beam:#6c7b89; --edge:#9aa8b5; --brass:#d1a93f; --stand:#6a7784;
+  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{
+  margin:0; background-color:var(--bg); color:var(--ink);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:46px 46px;
+  font:16px/1.5 var(--sans);
+}
+.wrap{max-width:880px;margin:0 auto;padding:20px 16px 40px}
+h1{font:800 1.7rem/1.15 var(--disp);margin:0 0 8px;letter-spacing:-.01em}
+.lead{margin:0 0 16px;color:var(--muted);max-width:66ch}
+.lead b{color:var(--ink);font-family:var(--mono);white-space:nowrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+svg{display:block;width:100%;height:auto}
+.note{margin:6px 2px 0;font-size:.85rem;color:var(--muted)}
+.status{margin-top:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-weight:600;font-family:var(--mono);font-size:.92rem}
+.status.ok{border-color:var(--ok);color:var(--ok)}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px}
+.side{--c:var(--left)} .side.r{--c:var(--right)} .side.t{--c:var(--third)}
+.side h2{font:600 1rem var(--disp);margin:0 0 4px;padding-left:10px;border-left:4px solid var(--c)}
+label{display:flex;justify-content:space-between;align-items:baseline;font-size:.92rem;margin-top:10px}
+output{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;color:var(--c)}
+input[type=range]{width:100%;height:30px;margin:2px 0 0;accent-color:var(--c);-webkit-appearance:none;appearance:none;background:transparent}
+.head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.head h2{font:600 1rem var(--disp);margin:0}
+select{font:inherit;font-family:var(--mono);padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.92rem;margin:0 0 2px;cursor:pointer;user-select:none}
+.chk input{width:18px;height:18px;accent-color:var(--third)}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-variant-numeric:tabular-nums}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:.9rem}
+th:first-child,td:first-child{text-align:left}
+th.cl{color:var(--left)} th.cr{color:var(--right)} th.ct{color:var(--third)}
+tr.sum td{border-top:1px solid var(--line);font-weight:700}
+#ratio{margin:10px 0 0;color:var(--muted);font-size:.9rem;font-family:var(--mono)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+button{font:inherit;font-family:var(--sans);min-height:44px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.pri{background:var(--left);color:var(--on);border-color:var(--left);font-weight:600}
+button:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--left);outline-offset:2px}
+.task{display:none;margin-top:12px;padding:10px 12px;border-left:4px solid var(--ok);background:var(--surface);border-radius:0 10px 10px 0}
+.task.on{display:block}
+.task p{margin:0 0 6px}
+#taskRes{font-weight:600;margin:0;font-family:var(--mono)}
+.tw{overflow-x:auto;margin-top:8px}
+.log th,.log td{font-size:.82rem;white-space:nowrap;text-align:center}
+.log td.y{color:var(--ok);font-weight:700}
+#concl{margin:10px 0 0;font-size:.9rem;color:var(--muted)}
+.dim{opacity:.4}
+/* SVG */
+.beam{fill:var(--beam);stroke:var(--edge);stroke-width:1.5}
+.tk{stroke:var(--edge);stroke-width:1.2}
+.tl{fill:var(--muted);font-size:11px;font-family:var(--mono);text-anchor:middle}
+.stand{fill:var(--stand)}
+.pivot{fill:var(--brass);stroke:var(--stand);stroke-width:2}
+.wg{cursor:grab;touch-action:none}
+.wg line{stroke:var(--ink);stroke-width:1.6}
+.wg text{fill:var(--on);font-size:12px;font-weight:700;font-family:var(--mono);text-anchor:middle;dominant-baseline:middle;pointer-events:none}
+.wl rect{fill:var(--left)} .wr rect{fill:var(--right)} .wt rect{fill:var(--third)}
+#armL{fill:var(--left)} #armR{fill:var(--right)} #arm3{fill:var(--third)}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Правило моментов</h1>
+  <p class="lead">Рычаг в равновесии, когда сумма моментов, вращающих его по часовой стрелке, равна сумме моментов против часовой: <b>ΣMслева = ΣMсправа</b>. Для двух грузов это даёт <b>F₁·l₁ = F₂·l₂</b>. Меняйте грузы и плечи ползунками, перетаскивайте грузы по рычагу и включайте третий груз.</p>
+
+  <section class="card">
+    <svg id="svg" viewBox="0 0 700 400" role="img" aria-label="Рычаг с грузами на оси">
+      <polygon class="stand" points="350,214 318,372 382,372"/>
+      <rect class="stand" x="290" y="372" width="120" height="12" rx="3"/>
+      <g id="beam">
+        <rect id="armL" y="217" height="5" x="350" width="0" opacity=".9"/>
+        <rect id="armR" y="217" height="5" x="350" width="0" opacity=".9"/>
+        <rect id="arm3" y="224" height="4" x="350" width="0" opacity=".85"/>
+        <rect class="beam" x="40" y="203" width="620" height="14" rx="4"/>
+        <g id="ticks"></g>
+        <circle class="pivot" cx="350" cy="210" r="9"/>
+      </g>
+      <g id="gL" class="wg wl"><line x1="0" y1="0" x2="0" y2="34"/><rect rx="5"/><text></text></g>
+      <g id="gR" class="wg wr"><line x1="0" y1="0" x2="0" y2="34"/><rect rx="5"/><text></text></g>
+      <g id="g3" class="wg wt" style="display:none"><line x1="0" y1="0" x2="0" y2="64"/><rect rx="5"/><text></text></g>
+    </svg>
+    <p class="note">Шкала в сантиметрах от оси вращения. Массой самого рычага пренебрегаем. Цветная полоска под рычагом показывает плечо силы; третий груз (малиновый) висит на удлинённом подвесе.</p>
+    <div id="status" class="status" aria-live="polite"></div>
+  </section>
+
+  <div class="ctl">
+    <section class="card side l">
+      <h2>Левый груз</h2>
+      <label for="m1">Масса m₁ <output id="o_m1"></output></label>
+      <input type="range" id="m1" min="10" max="500" step="10">
+      <label for="d1">Плечо l₁ <output id="o_d1"></output></label>
+      <input type="range" id="d1" min="5" max="50" step="1">
+    </section>
+    <section class="card side r">
+      <h2>Правый груз</h2>
+      <label for="m2">Масса m₂ <output id="o_m2"></output></label>
+      <input type="range" id="m2" min="10" max="500" step="10">
+      <label for="d2">Плечо l₂ <output id="o_d2"></output></label>
+      <input type="range" id="d2" min="5" max="50" step="1">
+    </section>
+    <section class="card side t" id="card3">
+      <h2>Третий груз</h2>
+      <label class="chk"><input type="checkbox" id="chk3"> Включить третий груз</label>
+      <label for="side3">Сторона
+        <select id="side3"><option value="L">слева</option><option value="R">справа</option></select>
+      </label>
+      <label for="m3">Масса m₃ <output id="o_m3"></output></label>
+      <input type="range" id="m3" min="10" max="500" step="10">
+      <label for="d3">Плечо l₃ <output id="o_d3"></output></label>
+      <input type="range" id="d3" min="5" max="50" step="1">
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:12px">
+    <div class="head">
+      <h2>Расчёт</h2>
+      <select id="g" aria-label="Ускорение свободного падения">
+        <option value="10">g = 10 Н/кг</option>
+        <option value="9.8">g = 9,8 Н/кг</option>
+      </select>
+    </div>
+    <table id="rd"></table>
+    <p id="ratio"></p>
+  </section>
+
+  <div class="row">
+    <button class="pri" id="rec">Записать опыт</button>
+    <button id="taskBtn">Задача на равновесие</button>
+  </div>
+
+  <div id="task" class="task">
+    <p id="taskTxt"></p>
+    <p id="taskRes"></p>
+  </div>
+
+  <section class="card" style="margin-top:12px">
+    <div class="head">
+      <h2>Таблица опытов</h2>
+      <button id="clr">Очистить</button>
+    </div>
+    <div class="tw">
+      <table class="log" id="log"></table>
+    </div>
+    <p id="concl"></p>
+  </section>
+</main>
+
+<script>
+(function(){
+  var $ = function(id){return document.getElementById(id)};
+  var CX = 350, CY = 210, K = 6;
+  var S = {m1:200, d1:30, m2:300, d2:30, g:10};
+  var S3 = {active:false, m3:150, d3:20, side:'L'};
+  var R = [];
+  var ang = 0, vel = 0, target = 0, raf = null, last = 0, drag = null, task = null;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function fmt(x, n){ return x.toFixed(n).replace('.', ','); }
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+  // шкала
+  (function(){
+    var t = '';
+    for (var i = -50; i <= 50; i += 5) {
+      var x = CX + i * K, big = i % 10 === 0;
+      t += '<line class="tk" x1="' + x + '" x2="' + x + '" y1="203" y2="' + (big ? 193 : 198) + '"/>';
+      if (big && i !== 0) t += '<text class="tl" x="' + x + '" y="184">' + Math.abs(i) + '</text>';
+    }
+    $('ticks').innerHTML = t;
+  })();
+
+  // активные грузы как единый список: {key, mKey, side, m, d}
+  function loads(){
+    var a = [
+      {key:'d1', mKey:'m1', side:'L', m:S.m1, d:S.d1},
+      {key:'d2', mKey:'m2', side:'R', m:S.m2, d:S.d2}
+    ];
+    if (S3.active) a.push({key:'d3', mKey:'m3', side:S3.side, m:S3.m3, d:S3.d3});
+    return a;
+  }
+  function sumInt(side){ // Σ m·d по целым (g и 100 сокращаются при сравнении)
+    var s = 0; loads().forEach(function(L){ if (L.side===side) s += L.m * L.d; }); return s;
+  }
+  function sumNm(side){ // Σ M в Н·м
+    var s = 0; loads().forEach(function(L){ if (L.side===side) s += (L.m/1000*S.g) * (L.d/100); }); return s;
+  }
+  function calc(){
+    var Li = sumInt('L'), Ri = sumInt('R');
+    return {Li:Li, Ri:Ri, diff:Ri-Li, Lm:sumNm('L'), Rm:sumNm('R'), bal:(Ri-Li)===0};
+  }
+
+  function place(id, signedDist, m, lineLen){
+    var r = ang * Math.PI / 180;
+    var x = CX + signedDist * K * Math.cos(r), y = CY + signedDist * K * Math.sin(r);
+    var w = 22 + Math.sqrt(m) * 1.6, h = w * 0.85;
+    var g = $(id);
+    g.setAttribute('transform', 'translate(' + x + ' ' + y + ')');
+    var rc = g.querySelector('rect');
+    rc.setAttribute('x', -w / 2); rc.setAttribute('y', lineLen);
+    rc.setAttribute('width', w); rc.setAttribute('height', h);
+    var tx = g.querySelector('text');
+    tx.setAttribute('x', 0); tx.setAttribute('y', lineLen + h / 2);
+    tx.textContent = m + ' г';
+  }
+
+  function draw(){
+    $('beam').setAttribute('transform', 'rotate(' + ang + ' ' + CX + ' ' + CY + ')');
+    place('gL', -S.d1, S.m1, 34);
+    place('gR', S.d2, S.m2, 34);
+    if (S3.active){
+      $('g3').style.display = '';
+      place('g3', S3.side==='L' ? -S3.d3 : S3.d3, S3.m3, 64);
+      $('arm3').style.display = '';
+      $('arm3').setAttribute('x', S3.side==='L' ? CX - S3.d3*K : CX);
+      $('arm3').setAttribute('width', S3.d3*K);
+    } else {
+      $('g3').style.display = 'none';
+      $('arm3').style.display = 'none';
+    }
+    $('armL').setAttribute('x', CX - S.d1 * K); $('armL').setAttribute('width', S.d1 * K);
+    $('armR').setAttribute('x', CX); $('armR').setAttribute('width', S.d2 * K);
+  }
+
+  function step(t){
+    var dt = Math.min(0.03, (t - last) / 1000 || 0.016); last = t;
+    var a = (target - ang) * 55 - vel * 6;
+    vel += a * dt; ang += vel * dt;
+    draw();
+    if (Math.abs(vel) < 0.02 && Math.abs(target - ang) < 0.02) { ang = target; vel = 0; draw(); raf = null; return; }
+    raf = requestAnimationFrame(step);
+  }
+  function kick(){
+    if (reduce) { ang = target; draw(); return; }
+    if (!raf) { last = performance.now(); raf = requestAnimationFrame(step); }
+  }
+
+  function syncInputs(){
+    $('m1').value = S.m1; $('o_m1').textContent = S.m1 + ' г';
+    $('d1').value = S.d1; $('o_d1').textContent = S.d1 + ' см';
+    $('m2').value = S.m2; $('o_m2').textContent = S.m2 + ' г';
+    $('d2').value = S.d2; $('o_d2').textContent = S.d2 + ' см';
+    $('chk3').checked = S3.active;
+    $('side3').value = S3.side;
+    $('m3').value = S3.m3; $('o_m3').textContent = S3.m3 + ' г';
+    $('d3').value = S3.d3; $('o_d3').textContent = S3.d3 + ' см';
+    $('card3').classList.toggle('dim', !S3.active);
+    refreshDisabled();
+  }
+
+  function refreshDisabled(){
+    var off3 = !S3.active;
+    $('m3').disabled = off3 || !!task; $('d3').disabled = off3 || !!task; $('side3').disabled = off3 || !!task;
+    if (task){
+      ['m1','d1','m2','d2','chk3','g'].forEach(function(k){ $(k).disabled = (k !== task.pick && k !== 'g'); });
+      // подбираемое плечо остаётся активным
+      $(task.pick).disabled = false;
+    } else {
+      ['m1','d1','m2','d2','chk3'].forEach(function(k){ $(k).disabled = false; });
+      $('g').disabled = false;
+    }
+  }
+
+  function update(){
+    var c = calc();
+    target = c.bal ? 0 : (c.diff > 0 ? 1 : -1) * Math.min(12, 2 + Math.abs(c.Rm - c.Lm) * 50);
+
+    var rows = loads().map(function(L){
+      var F = L.m/1000*S.g, l = L.d/100, M = F*l;
+      var cls = L.side==='L' ? 'cl' : (L.mKey==='m3' ? 'ct' : 'cr');
+      var name = L.mKey==='m1' ? 'Груз 1' : L.mKey==='m2' ? 'Груз 2' : 'Груз 3';
+      return '<tr><td>'+name+'</td><td class="'+cls+'">'+(L.side==='L'?'слева':'справа')+'</td>'+
+             '<td>'+fmt(F,2)+' Н</td><td>'+fmt(l,2)+' м</td><td><b>'+fmt(M,3)+' Н·м</b></td></tr>';
+    }).join('');
+    $('rd').innerHTML =
+      '<thead><tr><th></th><th>Сторона</th><th>F = m·g</th><th>Плечо l</th><th>Момент M = F·l</th></tr></thead><tbody>' +
+      rows +
+      '<tr class="sum"><td>Σ моментов</td><td></td><td></td><td>слева</td><td><b>'+fmt(c.Lm,3)+' Н·м</b></td></tr>' +
+      '<tr class="sum"><td></td><td></td><td></td><td>справа</td><td><b>'+fmt(c.Rm,3)+' Н·м</b></td></tr></tbody>';
+
+    var two = loads().length === 2;
+    if (two){
+      var F1 = S.m1/1000*S.g, F2 = S.m2/1000*S.g;
+      $('ratio').textContent = 'F₁/F₂ = ' + fmt(F1/F2,2) + ', l₂/l₁ = ' + fmt(S.d2/S.d1,2) +
+        (c.bal ? ' — отношения совпадают: плечи обратно пропорциональны силам.' : '.');
+    } else {
+      $('ratio').textContent = 'Равновесие наступает, когда ΣMслева = ΣMсправа (плечи обратно пропорциональны силам только для двух грузов).';
+    }
+
+    var st = $('status');
+    st.className = 'status' + (c.bal ? ' ok' : '');
+    st.textContent = c.bal
+      ? 'Равновесие: ΣMслева = ΣMсправа = ' + fmt(c.Lm,3) + ' Н·м'
+      : (c.diff > 0 ? 'Правая' : 'Левая') + ' сторона перевешивает: разность моментов ' + fmt(Math.abs(c.Rm - c.Lm),3) + ' Н·м';
+
+    if (task){
+      $('taskRes').textContent = c.bal
+        ? 'Верно! ' + task.explain
+        : 'Пока нет равновесия. Подберите плечо так, чтобы ΣM стали равны.';
+    }
+    kick();
+  }
+
+  // ползунки
+  ['m1','d1','m2','d2','m3','d3'].forEach(function(k){
+    $(k).addEventListener('input', function(e){
+      var v = +e.target.value;
+      if (k==='m3') S3.m3 = v; else if (k==='d3') S3.d3 = v; else S[k] = v;
+      syncInputs(); update();
+    });
+  });
+  $('g').addEventListener('change', function(e){ S.g = +e.target.value; update(); });
+  $('side3').addEventListener('change', function(e){ S3.side = e.target.value; syncInputs(); update(); });
+  $('chk3').addEventListener('change', function(e){
+    S3.active = e.target.checked;
+    if (task) exitTask();      // набор активных грузов изменился — сбрасываем задачу
+    syncInputs(); update();
+  });
+
+  // перетаскивание грузов
+  ['gL','gR','g3'].forEach(function(id){
+    $(id).addEventListener('pointerdown', function(e){
+      if (task) return;        // в режиме задачи перетаскивание только у подбираемого ползунка
+      drag = id; e.preventDefault();
+      if (this.setPointerCapture) { try { this.setPointerCapture(e.pointerId); } catch(_){} }
+    });
+  });
+  var svg = $('svg');
+  svg.addEventListener('pointermove', function(e){
+    if (!drag) return;
+    var r = svg.getBoundingClientRect();
+    var x = (e.clientX - r.left) * (700 / r.width);
+    var co = Math.cos(ang * Math.PI / 180) || 1;
+    var d = clamp(Math.round(Math.abs(x - CX) / (K * co)), 5, 50);
+    if (drag === 'gL') S.d1 = d;
+    else if (drag === 'gR') S.d2 = d;
+    else { S3.d3 = d; S3.side = (x < CX) ? 'L' : 'R'; }   // третий меняет сторону при пересечении оси
+    syncInputs(); update();
+  });
+  function endDrag(){ drag = null; }
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', endDrag);
+  window.addEventListener('pointerup', endDrag);
+  svg.addEventListener('touchmove', function(e){ if (drag) e.preventDefault(); }, {passive:false});
+
+  // таблица опытов
+  function renderLog(){
+    var h = '<thead><tr><th>№</th><th>m₁, г</th><th>l₁, см</th><th>m₂, г</th><th>l₂, см</th><th>m₃, г</th><th>l₃, см</th><th>ΣMлев</th><th>ΣMправ</th><th>равновесие</th></tr></thead><tbody>';
+    R.forEach(function(r, i){
+      var a3 = r.active3 ? (r.m3 + ' / ' + r.d3 + (r.side3==='L'?' сл.':' пр.')) : '—';
+      var m3c = r.active3 ? r.m3 : '—', d3c = r.active3 ? r.d3 : '—';
+      h += '<tr><td>' + (i + 1) + '</td><td>' + r.m1 + '</td><td>' + r.d1 + '</td><td>' + r.m2 + '</td><td>' + r.d2 +
+           '</td><td>' + m3c + '</td><td>' + d3c + (r.active3 ? '<br><small>'+ (r.side3==='L'?'слева':'справа') +'</small>' : '') + '</td>' +
+           '<td>' + fmt(r.Lm,3) + '</td><td>' + fmt(r.Rm,3) + '</td><td' + (r.bal ? ' class="y">да' : '>нет') + '</td></tr>';
+    });
+    if (!R.length) h += '<tr><td colspan="10" style="text-align:center;color:var(--muted)">Соберите рычаг и нажмите «Записать опыт»</td></tr>';
+    $('log').innerHTML = h + '</tbody>';
+    var nb = R.filter(function(r){return r.bal}).length;
+    $('concl').textContent = !R.length ? '' :
+      'Опытов: ' + R.length + ', в равновесии: ' + nb + '. ' +
+      (nb ? 'Во всех равновесных опытах ΣMслева = ΣMсправа; там, где суммы различаются, рычаг поворачивается в сторону большей суммы моментов.'
+          : 'Найдите положения, при которых рычаг уравновешен, и сравните суммы моментов по сторонам.');
+  }
+  $('rec').addEventListener('click', function(){
+    var c = calc();
+    R.push({m1:S.m1, d1:S.d1, m2:S.m2, d2:S.d2, m3:S3.m3, d3:S3.d3, side3:S3.side, active3:S3.active, Lm:c.Lm, Rm:c.Rm, bal:c.bal});
+    if (R.length > 15) R.shift();
+    renderLog();
+  });
+  $('clr').addEventListener('click', function(){ R = []; renderLog(); });
+
+  // задача на равновесие: подбираем плечо случайного включённого груза
+  function exitTask(){
+    task = null;
+    $('task').className = 'task'; $('taskBtn').textContent = 'Задача на равновесие';
+    refreshDisabled(); update();
+  }
+  $('taskBtn').addEventListener('click', function(){
+    if (task) { exitTask(); return; }
+    var Ls = loads();
+    var pickIdx = Math.floor(Math.random() * Ls.length);
+    var pick = Ls[pickIdx];
+    var m1, m2, m3, d1, d2, d3, ans, ok = false;
+    for (var i = 0; i < 800 && !ok; i++){
+      m1 = 50 * (2 + Math.floor(Math.random() * 7));
+      m2 = 50 * (2 + Math.floor(Math.random() * 7));
+      m3 = 50 * (1 + Math.floor(Math.random() * 6));
+      d1 = 10 + Math.floor(Math.random() * 31);
+      d2 = 10 + Math.floor(Math.random() * 31);
+      d3 = 10 + Math.floor(Math.random() * 31);
+      // собираем активные с этими значениями
+      var act = [{side:'L', m:m1, d:d1}, {side:'R', m:m2, d:d2}];
+      if (S3.active) act.push({side:S3.side, m:m3, d:d3});
+      var target = act[pickIdx];
+      var own = 0, opp = 0;
+      act.forEach(function(o){ if (o===target) return; if (o.side===target.side) own += o.m*o.d; else opp += o.m*o.d; });
+      var need = opp - own;
+      ans = need / target.m;
+      ok = (ans % 1 === 0) && ans >= 5 && ans <= 50;
+    }
+    if (!ok){ // fallback
+      m1 = 200; d1 = 30; m2 = 300; d2 = 20; m3 = 100; d3 = 20;
+      if (pick.key==='d1'){ ans = 20; } else if (pick.key==='d2'){ ans = 40; } else { ans = 20; }
+    }
+    S.m1 = m1; S.d1 = d1; S.m2 = m2; S.d2 = d2; S3.m3 = m3; S3.d3 = d3;
+    // подбираемое плечо ставим НЕ в ответ, чтобы ученик нашёл сам
+    if (pick.key==='d1') S.d1 = (ans===d1 ? clamp(d1+5,5,50) : d1);
+    if (pick.key==='d2') S.d2 = (ans===d2 ? clamp(d2+5,5,50) : d2);
+    if (pick.key==='d3') S3.d3 = (ans===d3 ? clamp(d3+5,5,50) : d3);
+    var name = pick.key==='d1' ? 'l₁ (левого груза)' : pick.key==='d2' ? 'l₂ (правого груза)' : 'l₃ (третьего груза)';
+    task = {pick: pick.key, explain: name + ' = ' + ans + ' см'};
+    $('task').className = 'task on';
+    $('taskBtn').textContent = 'Выйти из задачи';
+    $('taskTxt').textContent = 'Задача: подберите плечо ' + name + ', при котором рычаг придёт в равновесие. Остальные параметры зафиксированы.' +
+      (S3.active ? ' (третий груз включён, сторона: ' + (S3.side==='L'?'слева':'справа') + ')' : '');
+    syncInputs(); update();
+  });
+
+  syncInputs(); renderLog(); update();
+})();
+</script>
+</body>
+</html>
