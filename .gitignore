@@ -23,5 +23,7 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+# Локальные скрипты и логи деплоя
 deploy.bat
 deploy.log
+site.zip

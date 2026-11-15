@@ -1,43 +1,110 @@
-# Astro Starter Kit: Minimal
+# ⚛️ LibLabTab — интерактивная физика
 
-```sh
-npm create astro@latest -- --template minimal
+Каталог интерактивных физических симуляций, которые работают прямо в браузере — без установки, плагинов и сложной математики на старте. Тяните магнит, крутите маятник, меняйте ползунки сопротивления и ЭДС и наблюдайте за законами природы в реальном времени. Каждая модель сопровождается короткой теорией и вопросами для самопроверки.
+
+🌐 **Живой сайт:** [https://liblabtab.ru](https://liblabtab.ru)
+
+## 🚀 Особенности
+
+- **Мгновенная загрузка.** Статическая генерация (SSG): страницы собираются один раз и отдаются как обычные HTML-файлы. Локальные шрифты (без обращений к Google Fonts) и векторные обложки SVG делают главную лёгкой даже на медленных сетях.
+- **Настоящая интерактивность.** Все симуляции написаны на чистом JavaScript и HTML5 Canvas, без тяжёлых фреймворков и сборщиков внутри моделей. Их можно открыть и как отдельный файл, и внутри iframe на странице каталога.
+- **SEO и шеринг из коробки.** Автоматически генерируются `sitemap-index.xml`, RSS-лента `rss.xml`, `robots.txt` и Open Graph-мета-теги. Для соцсетей (Telegram, VK) к каждой обложке прилагается PNG-версия, чтобы превью ссылки отображалось корректно.
+- **Простой деплой одной командой.** Скрипт `deploy.bat` собирает сайт и синхронизирует папку сборки с хостингом через WinSCP — без ручной загрузки архивов.
+- **Ритм «одна модель в день».** Добавление новой модели — это три файла и одна команда публикации.
+
+## 🛠 Стек технологий
+
+- [Astro](https://astro.build/) — фреймворк и статическая сборка
+- TypeScript — типизация контента и схем коллекций
+- Markdown + frontmatter — описания моделей
+- Vanilla JS + HTML5 Canvas — физические симуляции
+- SVG / PNG — обложки карточек и превью для соцсетей
+- WinSCP + FTP — автоматическая публикация
+- Хостинг: Reg.ru (Россия), домен `liblabtab.ru`
+
+## 💻 Локальный запуск
+
+Требуется Node.js 22+.
+
+1. Установите зависимости:
+   ```bash
+   npm install
+   ```
+2. Запустите сервер разработки:
+   ```bash
+   npm run dev
+   ```
+3. Откройте в браузере [http://localhost:4321](http://localhost:4321). Изменения в файлах подхватываются автоматически.
+
+Чтобы собрать финальную версию в папку `dist` (как это делает деплой):
+
+```bash
+npm run build
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## 📂 Структура проекта
 
 ```text
-/
+physics-site/
 ├── public/
+│   ├── sim/              # HTML/JS-файлы самих симуляций (atom, lenz, pendulum, ohm…)
+│   ├── covers/           # Обложки: .svg для сайта и .png для соцсетей (одинаковые имена)
+│   ├── fonts/            # Локальные woff2-шрифты и fonts.css
+│   └── robots.txt        # Правила для поисковых роботов + ссылка на sitemap
 ├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+│   ├── content/models/   # Markdown-описания моделей (теория, дата, теги, ссылки на sim и cover)
+│   ├── layouts/          # Base.astro — общая шапка, мета-теги, футер
+│   ├── pages/            # Шаблоны страниц: каталог, страница модели, страница тега, 404
+│   ├── styles/           # global.css — дизайн-система каталога
+│   └── content.config.ts # Схема коллекции моделей (поля frontmatter)
+├── astro.config.mjs      # Конфиг Astro: site-домен и интеграция sitemap
+├── package.json          # Зависимости и скрипты
+└── deploy.bat            # Сборка + синхронизация с хостингом (WinSCP)
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 📦 Публикация на хостинг
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Боевой сайт живёт на Reg.ru и обновляется скриптом `deploy.bat`:
 
-Any static assets, like images, can be placed in the `public/` directory.
+```bash
+deploy.bat
+```
 
-## 🧞 Commands
+Скрипт делает два шага: запускает `npm run build`, а затем через WinSCP синхронизирует содержимое папки `dist` с корнем сайта `/www/liblabtab.ru` на сервере — загружает новые и изменённые файлы, удаляет устаревшие. Первый запуск занимает минуту (качаются все файлы), последующие — секунды (только дельта).
 
-All commands are run from the root of the project, from a terminal:
+> Файлы `deploy.bat`, `deploy.log` и архивы сборки намеренно исключены из Git (см. `.gitignore`): в `deploy.bat` хранится FTP-пароль, поэтому он не должен попадать в публичный репозиторий.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## ➕ Как добавить новую модель
 
-## 👀 Want to learn more?
+1. **Симуляция.** Положите HTML-файл в `public/sim/`, например `ohm.html`. Внутри подключайте локальные шрифты: `<link rel="stylesheet" href="/fonts/fonts.css">`.
+2. **Обложки.** Положите в `public/covers/` два файла с одинаковым именем: `ohm.svg` (для карточки на сайте) и `ohm.png` (для превью в соцсетях).
+3. **Описание.** Создайте `src/content/models/ohm-law.md` с frontmatter:
+   ```yaml
+   ---
+   title: "Закон Ома для полной цепи"
+   date: 2026-11-15
+   description: "Короткое описание для карточки и поисковиков."
+   tags: ["электродинамика", "школьный-курс", "постоянный-ток"]
+   model: "ohm.html"
+   cover: "/covers/ohm.svg"
+   ---
+   ```
+   Теги пишите через дефис, без пробелов — так адреса `/tags/...` остаются читаемыми.
+4. **Проверка локально.** `npm run dev` → откройте `/models/ohm-law/` и поиграйте с моделью.
+5. **Публикация.** `deploy.bat` → через минуту обновите `https://liblabtab.ru` (Ctrl + F5).
+6. **История.** Зафиксируйте в Git:
+   ```bash
+   git add .
+   git commit -m "Модель: закон Ома"
+   git push
+   ```
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+GitHub служит архивом версий и точкой отката; сам сайт публикуется через `deploy.bat`.
+
+## 📜 Лицензия
+
+Проект открыт и развивается публично. При распространении кода рекомендуется добавить файл `LICENSE` (например, MIT) — выберите формат, который вам ближе.
+
+---
+
+*LibLabTab — одна интерактивная модель в день. Физика, которую можно потрогать.*
