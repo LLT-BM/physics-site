@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Игра «Жизнь» — клеточный автомат Конвея</title>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+:root{
+  --bg:#070c15; --grid:rgba(120,190,255,.05); --surface:#0d1626; --ink:#eaf3fa; --muted:#8ba3b8; --line:rgba(130,200,255,.16);
+  --cyan:#5fe0ff; --amber:#ffb454; --pink:#ff7ab6; --ok:#4cc58d; --warn:#ff7a6e; --on:#07121c;
+  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);color:var(--ink);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:46px 46px;font:16px/1.5 var(--sans)}
+.wrap{max-width:960px;margin:0 auto;padding:20px 16px 40px}
+h1{font:800 1.7rem/1.15 var(--disp);margin:0 0 8px;letter-spacing:-.01em}
+.lead{margin:0 0 16px;color:var(--muted);max-width:70ch}
+.lead b{color:var(--ink);font-family:var(--mono);white-space:nowrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.holder{position:relative}
+canvas#field{display:block;width:100%;border-radius:10px;background:#05080f;touch-action:none;cursor:crosshair}
+canvas#graph{display:block;width:100%;height:56px;margin-top:10px;border-radius:8px;background:rgba(0,0,0,.28)}
+.note{margin:8px 2px 0;font-size:.85rem;color:var(--muted)}
+.status{margin-top:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-family:var(--mono);font-size:.9rem;font-weight:600}
+.status.ok{border-color:var(--ok);color:var(--ok)}
+.status.warn{border-color:var(--warn);color:var(--warn)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+button{font:inherit;font-family:var(--sans);min-height:44px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.pri{background:var(--cyan);color:var(--on);border-color:var(--cyan);font-weight:600}
+button[aria-pressed="true"]{border-color:var(--cyan);color:var(--cyan)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.stat{font-family:var(--mono);font-size:.82rem;padding:6px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.stat b{color:var(--ink)}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:12px}
+.grp h2{font:600 1rem var(--disp);margin:0 0 6px;padding-left:10px;border-left:4px solid var(--cyan)}
+.grp.b h2{border-color:var(--amber)} .grp.c h2{border-color:var(--pink)}
+label{display:flex;justify-content:space-between;align-items:baseline;font-size:.92rem;margin-top:10px;gap:8px}
+output{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;color:var(--cyan)}
+input[type=range]{width:100%;height:30px;margin:2px 0 0;-webkit-appearance:none;appearance:none;background:transparent;accent-color:var(--cyan)}
+select{font:inherit;font-family:var(--mono);font-size:.88rem;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);max-width:100%}
+.chk{display:flex;align-items:center;gap:8px;font-size:.9rem;margin-top:10px;cursor:pointer;user-select:none}
+.chk input{width:18px;height:18px;accent-color:var(--cyan);flex:none}
+.rules{margin-top:8px}
+.rrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px}
+.rrow span{font-family:var(--mono);font-size:.82rem;color:var(--muted);min-width:74px}
+.rrow label{display:inline-flex;align-items:center;gap:3px;margin:0;font-family:var(--mono);font-size:.8rem;color:var(--muted);cursor:pointer}
+.rrow input{width:15px;height:15px;margin:0}
+.rrow.b input{accent-color:var(--amber)} .rrow.s input{accent-color:var(--cyan)}
+#ruleStr{font-family:var(--mono);font-size:.95rem;color:var(--amber);margin:8px 0 0}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:.8rem;color:var(--muted);font-family:var(--mono)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink)}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Игра «Жизнь»</h1>
+  <p class="lead">Клеточный автомат Джона Конвея (1970). Правила: в мёртвой клетке с <b>тремя</b> живыми соседями зарождается жизнь; живая клетка выживает при <b>2 или 3</b> соседях, иначе умирает от одиночества или перенаселённости. Это записывается как <b>B3/S23</b>. Рисуйте клетки, ставьте фигуры, меняйте правила — и наблюдайте, как из двух строк закона рождается сложность.</p>
+
+  <section class="card">
+    <div class="holder" id="holder">
+      <canvas id="field" aria-label="Поле клеточного автомата"></canvas>
+    </div>
+    <div class="bar">
+      <button class="pri" id="play">▶ Пуск</button>
+      <button id="stepBtn">Шаг</button>
+      <button id="rnd">Случайное поле</button>
+      <button id="clr">Очистить</button>
+      <span style="flex:1"></span>
+      <button id="mDraw" aria-pressed="true">Рисовать</button>
+      <button id="mErase" aria-pressed="false">Стереть</button>
+    </div>
+    <div class="stats">
+      <span class="stat">поколение <b id="sGen">0</b></span>
+      <span class="stat">живых <b id="sPop">0</b></span>
+      <span class="stat">родилось <b id="sB">0</b></span>
+      <span class="stat">умерло <b id="sD">0</b></span>
+      <span class="stat">поле <b id="sDim">—</b></span>
+    </div>
+    <div id="status" class="status" aria-live="polite"></div>
+    <canvas id="graph" aria-label="График численности по поколениям"></canvas>
+    <div class="legend">
+      <span><i style="background:#5fe0ff"></i>новорождённая</span>
+      <span><i style="background:#ffb454"></i>живёт давно</span>
+      <span><i style="background:#ff7ab6"></i>долгожитель</span>
+      <span><i style="background:rgba(95,224,255,.28)"></i>след погибшей</span>
+    </div>
+    <p class="note">Рисуйте левой кнопкой (или пальцем), стирайте правой кнопкой или в режиме «Стереть». Горячие клавиши: <kbd>Пробел</kbd> пуск/пауза, <kbd>S</kbd> шаг, <kbd>C</kbd> очистить, <kbd>R</kbd> случайное поле.</p>
+  </section>
+
+  <div class="ctl">
+    <section class="card grp">
+      <h2>Фигуры</h2>
+      <label for="pat">Поставить фигуру
+        <select id="pat"><option value="">— рисую вручную —</option></select>
+      </label>
+      <p class="note" id="patInfo" style="margin-top:8px">Выберите фигуру и кликните по полю: она встанет центром под курсором. Повторный выбор «рисую вручную» возвращает кисть.</p>
+      <div class="bar"><button id="center">Поставить в центр</button></div>
+    </section>
+
+    <section class="card grp b">
+      <h2>Правила B/S</h2>
+      <label for="preset">Пресет
+        <select id="preset"></select>
+      </label>
+      <div class="rules">
+        <div class="rrow b" id="rowB"><span>Рождение B</span></div>
+        <div class="rrow s" id="rowS"><span>Выживание S</span></div>
+      </div>
+      <p id="ruleStr">B3/S23</p>
+    </section>
+
+    <section class="card grp c">
+      <h2>Поле и показ</h2>
+      <label for="speed">Скорость <output id="o_speed"></output></label>
+      <input type="range" id="speed" min="1" max="60" step="1" value="12">
+      <label for="cs">Размер клетки <output id="o_cs"></output></label>
+      <input type="range" id="cs" min="4" max="18" step="1" value="8">
+      <label for="dens">Плотность случайного поля <output id="o_dens"></output></label>
+      <input type="range" id="dens" min="5" max="60" step="1" value="22">
+      <label class="chk"><input type="checkbox" id="wrap" checked> Замкнутое поле (тор)</label>
+      <label class="chk"><input type="checkbox" id="ageCol" checked> Цвет по возрасту клетки</label>
+      <label class="chk"><input type="checkbox" id="trails" checked> Следы погибших клеток</label>
+      <label class="chk"><input type="checkbox" id="gridOn" checked> Показывать сетку</label>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var cv=$('field'), ctx=cv.getContext('2d'), gcv=$('graph'), gctx=gcv.getContext('2d');
+  var holder=$('holder');
+  var W=900,H=520,dpr=1,cs=8,cols=0,rows=0,ox=0,oy=0;
+  var cur,nxt,age,fade,gen=0,pop=0,born=0,died=0;
+  var running=false,speed=12,dens=22,wrap=true,ageCol=true,trails=true,gridOn=true;
+  var birth=new Uint8Array(9), survive=new Uint8Array(9);
+  var mode='draw', painting=false, lastCell=null, hover=null, stamp=null;
+  var hist=[], pops=[], raf=null, lastT=0, acc=0;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- ФИГУРЫ (все проверены расчётом) ---------- */
+  var PATTERNS=[
+    {n:'Блок',c:'устойчивая',d:'4 клетки, не меняется никогда.',r:["XX","XX"]},
+    {n:'Улей',c:'устойчивая',d:'6 клеток, устойчива.',r:[".XX.","X..X",".XX."]},
+    {n:'Каравай',c:'устойчивая',d:'7 клеток, устойчива.',r:[".XX.","X..X",".X.X","..X."]},
+    {n:'Лодка',c:'устойчивая',d:'5 клеток, устойчива.',r:["XX.","X.X",".X."]},
+    {n:'Мигалка',c:'осциллятор',d:'3 клетки, период 2.',r:["XXX"]},
+    {n:'Жаба',c:'осциллятор',d:'6 клеток, период 2.',r:[".XXX","XXX."]},
+    {n:'Маяк',c:'осциллятор',d:'8 клеток, период 2.',r:["XX..","XX..","..XX","..XX"]},
+    {n:'Пульсар',c:'осциллятор',d:'48 клеток, период 3 — самая известная пульсирующая фигура.',r:[
+      "..OOO...OOO..",".............","O....O.O....O","O....O.O....O","O....O.O....O",
+      "..OOO...OOO..",".............","..OOO...OOO..","O....O.O....O","O....O.O....O",
+      "O....O.O....O",".............","..OOO...OOO.."]},
+    {n:'Планер',c:'корабль',d:'5 клеток, период 4, смещается по диагонали на 1 клетку — скорость c/4.',r:[".X.","..X","XXX"]},
+    {n:'Лёгкий космический корабль',c:'корабль',d:'9 клеток, период 4, летит по горизонтали на 2 клетки — скорость c/2.',r:[".X..X","X....","X...X","XXXX."]},
+    {n:'Планерное ружьё Госпера',c:'ружьё',d:'36 клеток, период 30: каждые 30 поколений выпускает новый планер. Первая фигура с неограниченным ростом.',r:[
+      "....................................",
+      ".........................X..........",
+      ".......................X.X..........",
+      ".............XX......XX............XX",
+      "............X...X....XX............XX",
+      ".XX........X.....X...XX..............",
+      ".XX........X...X.XX....X.X...........",
+      "...........X.....X.......X...........",
+      "............X...X....................",
+      ".............XX......................"]},
+    {n:'R-пентамино',c:'долгожитель',d:'5 клеток, бурно эволюционирует около 1100 поколений, оставляя 116 клеток.',r:[".XX","XX.",".X."]},
+    {n:'Жёлудь',c:'долгожитель',d:'7 клеток, эволюция около 5200 поколений, остаток 633 клетки.',r:[".X.....","...X...","XX..XXX"]},
+    {n:'Diehard',c:'долгожитель',d:'7 клеток, потомки живут ровно 130 поколений и полностью исчезают.',r:["......X.","XX......",".X...XXX"]}
+  ];
+  function parse(rows){
+    var pts=[],w=0;
+    for(var y=0;y<rows.length;y++){ w=Math.max(w,rows[y].length);
+      for(var x=0;x<rows[y].length;x++){ var ch=rows[y][x]; if(ch==='X'||ch==='O'||ch==='#') pts.push([x,y]); } }
+    return {pts:pts,w:w,h:rows.length};
+  }
+  PATTERNS.forEach(function(p){ var g=parse(p.r); p.pts=g.pts; p.w=g.w; p.h=g.h; });
+
+  /* ---------- ПРАВИЛА ---------- */
+  var PRESETS=[
+    {n:'Жизнь Конвея',b:[3],s:[2,3]},
+    {n:'HighLife',b:[3,6],s:[2,3]},
+    {n:'Семена (Seeds)',b:[2],s:[]},
+    {n:'Лабиринт (Maze)',b:[3],s:[1,2,3,4,5]},
+    {n:'День и ночь',b:[3,6,7,8],s:[3,4,6,7,8]},
+    {n:'Репликатор',b:[1,3,5,7],s:[1,3,5,7]}
+  ];
+  function buildRuleUI(){
+    var rb=$('rowB'), rs=$('rowS');
+    for(var i=0;i<=8;i++){
+      rb.insertAdjacentHTML('beforeend','<label><input type="checkbox" class="b" data-n="'+i+'">'+i+'</label>');
+      rs.insertAdjacentHTML('beforeend','<label><input type="checkbox" class="s" data-n="'+i+'">'+i+'</label>');
+    }
+    PRESETS.forEach(function(p,i){ $('preset').insertAdjacentHTML('beforeend','<option value="'+i+'">'+p.n+'</option>'); });
+    Array.prototype.forEach.call(document.querySelectorAll('.rrow input'),function(inp){
+      inp.addEventListener('change',function(){ readRules(); hist=[]; updateStatus(); });
+    });
+  }
+  function setRules(b,s){
+    birth.fill(0); survive.fill(0);
+    b.forEach(function(n){birth[n]=1}); s.forEach(function(n){survive[n]=1});
+    Array.prototype.forEach.call(document.querySelectorAll('input.b'),function(i){i.checked=!!birth[+i.dataset.n]});
+    Array.prototype.forEach.call(document.querySelectorAll('input.s'),function(i){i.checked=!!survive[+i.dataset.n]});
+    ruleStr();
+  }
+  function readRules(){
+    birth.fill(0); survive.fill(0);
+    Array.prototype.forEach.call(document.querySelectorAll('input.b'),function(i){ if(i.checked) birth[+i.dataset.n]=1; });
+    Array.prototype.forEach.call(document.querySelectorAll('input.s'),function(i){ if(i.checked) survive[+i.dataset.n]=1; });
+    ruleStr();
+  }
+  function ruleStr(){
+    var b='',s='';
+    for(var i=0;i<=8;i++){ if(birth[i])b+=i; if(survive[i])s+=i; }
+    $('ruleStr').textContent='B'+(b||'∅')+'/S'+(s||'∅');
+  }
+
+  /* ---------- ПОЛЕ ---------- */
+  function rebuild(keep){
+    var nc=Math.max(8,Math.floor(W/cs)), nr=Math.max(8,Math.floor(H/cs));
+    var oc=cols, or_=rows, old=cur, oldAge=age;
+    cols=nc; rows=nr;
+    cur=new Uint8Array(cols*rows); nxt=new Uint8Array(cols*rows);
+    age=new Uint16Array(cols*rows); fade=new Float32Array(cols*rows);
+    if(keep&&old){
+      for(var y=0;y<Math.min(or_,rows);y++) for(var x=0;x<Math.min(oc,cols);x++){
+        cur[y*cols+x]=old[y*oc+x]; age[y*cols+x]=oldAge[y*oc+x];
+      }
+    }
+    ox=Math.floor((W-cols*cs)/2); oy=Math.floor((H-rows*cs)/2);
+    countPop(); drawGridCache(); hist=[];
+    $('sDim').textContent=cols+'×'+rows;
+  }
+  var gridCv=document.createElement('canvas'), gxx=gridCv.getContext('2d');
+  function drawGridCache(){
+    gridCv.width=Math.max(1,W*dpr); gridCv.height=Math.max(1,H*dpr);
+    gxx.setTransform(dpr,0,0,dpr,0,0);
+    gxx.clearRect(0,0,W,H);
+    gxx.fillStyle='#05080f'; gxx.fillRect(0,0,W,H);
+    if(gridOn&&cs>=6){
+      gxx.strokeStyle='rgba(120,190,255,.07)'; gxx.lineWidth=1; gxx.beginPath();
+      for(var x=0;x<=cols;x++){ var px=ox+x*cs+.5; gxx.moveTo(px,oy); gxx.lineTo(px,oy+rows*cs); }
+      for(var y=0;y<=rows;y++){ var py=oy+y*cs+.5; gxx.moveTo(ox,py); gxx.lineTo(ox+cols*cs,py); }
+      gxx.stroke();
+    }
+    gxx.strokeStyle='rgba(130,200,255,.22)'; gxx.lineWidth=1;
+    gxx.strokeRect(ox+.5,oy+.5,cols*cs-1,rows*cs-1);
+  }
+  function resize(){
+    W=Math.max(300,Math.round(holder.clientWidth)); H=Math.max(220,Math.round(W*0.56));
+    dpr=Math.min(2,window.devicePixelRatio||1);
+    cv.width=W*dpr; cv.height=H*dpr; cv.style.height=H+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    gcv.width=W*dpr; gcv.height=56*dpr; gctx.setTransform(dpr,0,0,dpr,0,0);
+    rebuild(true); render();
+  }
+  function countPop(){ pop=0; for(var i=0;i<cur.length;i++) pop+=cur[i]; }
+  function idx(x,y){ return y*cols+x; }
+  function setCell(x,y,v){
+    if(wrap){ x=(x+cols)%cols; y=(y+rows)%rows; }
+    else if(x<0||y<0||x>=cols||y>=rows) return;
+    var i=idx(x,y);
+    if(v){ if(!cur[i]){cur[i]=1;age[i]=1;pop++;} }
+    else { if(cur[i]){cur[i]=0;age[i]=0;fade[i]=1;pop--;} }
+  }
+  function clearField(){ cur.fill(0); nxt.fill(0); age.fill(0); fade.fill(0); gen=0;pop=0;born=0;died=0;hist=[];pops=[];updateStatus();render(); }
+  function randomField(){
+    clearField();
+    for(var i=0;i<cur.length;i++) if(Math.random()*100<dens){ cur[i]=1; age[i]=1; pop++; }
+    hist=[]; updateStatus(); render();
+  }
+  function place(p,cx,cy){
+    var x0=cx-Math.floor(p.w/2), y0=cy-Math.floor(p.h/2);
+    p.pts.forEach(function(q){ setCell(x0+q[0],y0+q[1],1); });
+    hist=[]; updateStatus(); render();
+  }
+
+  /* ---------- ШАГ ЭВОЛЮЦИИ ---------- */
+  function step(){
+    var b=0,d=0,np=0;
+    for(var y=0;y<rows;y++){
+      for(var x=0;x<cols;x++){
+        var n=0;
+        for(var dy=-1;dy<=1;dy++){
+          var yy=y+dy;
+          if(wrap) yy=(yy+rows)%rows; else if(yy<0||yy>=rows) continue;
+          for(var dx=-1;dx<=1;dx++){
+            if(dx===0&&dy===0) continue;
+            var xx=x+dx;
+            if(wrap) xx=(xx+cols)%cols; else if(xx<0||xx>=cols) continue;
+            n+=cur[yy*cols+xx];
+          }
+        }
+        var i=y*cols+x, a=cur[i], live=a?survive[n]:birth[n];
+        nxt[i]=live;
+        if(live){ np++; age[i]=a?Math.min(age[i]+1,60000):1; if(!a)b++; }
+        else { if(a){ d++; fade[i]=1; } age[i]=0; }
+      }
+    }
+    var t=cur; cur=nxt; nxt=t;
+    gen++; pop=np; born=b; died=d;
+    pops.push(pop); if(pops.length>260) pops.shift();
+    var h=hash(); hist.push(h); if(hist.length>24) hist.shift();
+    updateStatus();
+  }
+  function hash(){ var h=2166136261>>>0; for(var i=0;i<cur.length;i++){ h=(h^cur[i])>>>0; h=Math.imul(h,16777619)>>>0; } return h; }
+  function cyclePeriod(){
+    if(!hist.length||pop===0) return 0;
+    var last=hist[hist.length-1];
+    for(var k=1;k<hist.length;k++) if(hist[hist.length-1-k]===last) return k;
+    return 0;
+  }
+
+  /* ---------- ОТРИСОВКА ---------- */
+  var palette=[];
+  (function(){
+    function mix(a,b,t){ return [Math.round(a[0]+(b[0]-a[0])*t),Math.round(a[1]+(b[1]-a[1])*t),Math.round(a[2]+(b[2]-a[2])*t)]; }
+    var C=[95,224,255],A=[255,180,84],P=[255,122,182];
+    for(var i=0;i<64;i++){
+      var c = i<8 ? mix(C,A,i/8) : (i<32 ? A : mix(A,P,Math.min(1,(i-32)/24)));
+      palette.push('rgb('+c[0]+','+c[1]+','+c[2]+')');
+    }
+  })();
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    ctx.drawImage(gridCv,0,0,W,H);
+    var pad=cs>=8?1:0, s=cs-pad;
+    if(trails){
+      for(var i=0;i<fade.length;i++){
+        if(fade[i]>0.03&&!cur[i]){
+          ctx.fillStyle='rgba(95,224,255,'+(fade[i]*0.3).toFixed(3)+')';
+          ctx.fillRect(ox+(i%cols)*cs,oy+Math.floor(i/cols)*cs,s,s);
+        }
+      }
+    }
+    for(var y=0;y<rows;y++) for(var x=0;x<cols;x++){
+      var i=y*cols+x;
+      if(cur[i]){
+        ctx.fillStyle = ageCol ? palette[Math.min(63,age[i])] : '#5fe0ff';
+        ctx.fillRect(ox+x*cs,oy+y*cs,s,s);
+      }
+    }
+    if(stamp&&hover&&hover.inside){
+      var x0=hover.x-Math.floor(stamp.w/2), y0=hover.y-Math.floor(stamp.h/2);
+      ctx.fillStyle='rgba(255,180,84,.42)';
+      stamp.pts.forEach(function(q){
+        var x=x0+q[0],y=y0+q[1];
+        if(wrap){x=(x+cols)%cols;y=(y+rows)%rows;}
+        if(x>=0&&y>=0&&x<cols&&y<rows) ctx.fillRect(ox+x*cs,oy+y*cs,s,s);
+      });
+    } else if(hover&&hover.inside&&mode!=='stamp'){
+      ctx.strokeStyle=mode==='erase'?'rgba(255,122,110,.9)':'rgba(95,224,255,.9)';
+      ctx.lineWidth=1.5; ctx.strokeRect(ox+hover.x*cs+.5,oy+hover.y*cs+.5,cs-1,cs-1);
+    }
+    drawGraph();
+    $('sGen').textContent=gen; $('sPop').textContent=pop; $('sB').textContent=born; $('sD').textContent=died;
+  }
+  function drawGraph(){
+    var w=W,h=56;
+    gctx.clearRect(0,0,w,h);
+    if(pops.length<2){ gctx.fillStyle='rgba(139,163,184,.7)'; gctx.font='11px JetBrains Mono, monospace';
+      gctx.fillText('график численности появится после первых поколений',10,32); return; }
+    var mx=Math.max.apply(null,pops)||1;
+    gctx.strokeStyle='rgba(130,200,255,.16)'; gctx.lineWidth=1;
+    gctx.beginPath(); gctx.moveTo(0,h-1.5); gctx.lineTo(w,h-1.5); gctx.stroke();
+    gctx.beginPath();
+    for(var i=0;i<pops.length;i++){
+      var x=i/(pops.length-1)*(w-2)+1, y=h-3-(pops[i]/mx)*(h-10);
+      i?gctx.lineTo(x,y):gctx.moveTo(x,y);
+    }
+    gctx.strokeStyle='#5fe0ff'; gctx.lineWidth=1.8; gctx.stroke();
+    gctx.lineTo(w-1,h-2); gctx.lineTo(1,h-2); gctx.closePath();
+    gctx.fillStyle='rgba(95,224,255,.14)'; gctx.fill();
+    gctx.fillStyle='rgba(139,163,184,.9)'; gctx.font='11px JetBrains Mono, monospace';
+    gctx.fillText('макс '+mx,8,14);
+  }
+  function updateStatus(){
+    var st=$('status'); st.className='status';
+    if(pop===0){ st.classList.add('warn'); st.textContent='Поле пусто: все клетки погибли. Нарисуйте фигуры или нажмите «Случайное поле».'; return; }
+    var per=cyclePeriod();
+    if(per===1){ st.classList.add('ok'); st.textContent='Устойчивая конфигурация: состояние больше не меняется (поколение '+gen+').'; }
+    else if(per>1){ st.classList.add('ok'); st.textContent='Периодическая конфигурация: цикл периода '+per+' (поколение '+gen+').'; }
+    else st.textContent='Эволюция идёт: поколение '+gen+', живых '+pop+', правило '+$('ruleStr').textContent+'.';
+  }
+
+  /* ---------- ЦИКЛ ---------- */
+  function loop(t){
+    raf=requestAnimationFrame(loop);
+    var dt=Math.min(.1,(t-lastT)/1000||0); lastT=t;
+    if(running){
+      acc+=dt; var iv=1/speed, guard=0;
+      while(acc>=iv&&guard<10){ step(); acc-=iv; guard++; }
+      if(acc>iv*10) acc=0;
+    }
+    var k=Math.exp(-dt*3.2);
+    for(var i=0;i<fade.length;i++) if(fade[i]>0) fade[i]*=k;
+    render();
+  }
+  function setRunning(v){
+    running=v; $('play').textContent=v?'❚❚ Пауза':'▶ Пуск'; $('play').classList.toggle('pri',!v);
+  }
+
+  /* ---------- ВВОД ---------- */
+  function cellAt(e){
+    var r=cv.getBoundingClientRect();
+    var px=(e.clientX-r.left)*(W/r.width), py=(e.clientY-r.top)*(H/r.height);
+    var x=Math.floor((px-ox)/cs), y=Math.floor((py-oy)/cs);
+    return {x:x,y:y,inside:x>=0&&y>=0&&x<cols&&y<rows};
+  }
+  function paintLine(a,b,v){
+    var dx=b.x-a.x, dy=b.y-a.y, n=Math.max(Math.abs(dx),Math.abs(dy));
+    for(var i=0;i<=n;i++){
+      var x=Math.round(a.x+dx*(n?i/n:0)), y=Math.round(a.y+dy*(n?i/n:0));
+      setCell(x,y,v);
+    }
+  }
+  cv.addEventListener('contextmenu',function(e){e.preventDefault()});
+  cv.addEventListener('pointerdown',function(e){
+    var c=cellAt(e); hover=c;
+    if(!c.inside) return;
+    e.preventDefault();
+    if(cv.setPointerCapture){ try{cv.setPointerCapture(e.pointerId)}catch(_){} }
+    if(stamp){ place(stamp,c.x,c.y); return; }
+    painting=true; lastCell=c;
+    setCell(c.x,c.y,(e.button===2||mode==='erase')?0:1);
+    hist=[]; updateStatus(); render();
+  });
+  cv.addEventListener('pointermove',function(e){
+    var c=cellAt(e); hover=c;
+    if(painting&&c.inside){
+      paintLine(lastCell||c,c,(e.buttons===2||mode==='erase')?0:1);
+      lastCell=c; hist=[]; updateStatus();
+    }
+    if(!running) render();
+  });
+  function stop(){ painting=false; lastCell=null; }
+  cv.addEventListener('pointerup',stop); cv.addEventListener('pointercancel',stop);
+  window.addEventListener('pointerup',stop);
+  cv.addEventListener('pointerleave',function(){ hover=null; if(!running) render(); });
+  cv.addEventListener('touchmove',function(e){ if(painting||stamp) e.preventDefault(); },{passive:false});
+
+  $('play').addEventListener('click',function(){ setRunning(!running); });
+  $('stepBtn').addEventListener('click',function(){ setRunning(false); step(); render(); });
+  $('clr').addEventListener('click',function(){ setRunning(false); clearField(); });
+  $('rnd').addEventListener('click',function(){ randomField(); });
+  $('mDraw').addEventListener('click',function(){ mode='draw'; stamp=null; $('pat').value=''; syncMode(); });
+  $('mErase').addEventListener('click',function(){ mode='erase'; stamp=null; $('pat').value=''; syncMode(); });
+  function syncMode(){
+    $('mDraw').setAttribute('aria-pressed',String(mode==='draw'&&!stamp));
+    $('mErase').setAttribute('aria-pressed',String(mode==='erase'&&!stamp));
+    cv.style.cursor=stamp?'copy':'crosshair';
+  }
+  $('pat').addEventListener('change',function(e){
+    var i=e.target.value;
+    if(i===''){ stamp=null; mode='draw'; $('patInfo').textContent='Кисть: рисуйте клетки по полю.'; }
+    else { stamp=PATTERNS[+i]; mode='stamp';
+      $('patInfo').textContent=stamp.n+' · '+stamp.c+' · '+stamp.d+' Кликните по полю, чтобы поставить.'; }
+    syncMode(); render();
+  });
+  $('center').addEventListener('click',function(){
+    var p=stamp||PATTERNS[8];
+    place(p,Math.floor(cols/2),Math.floor(rows/2));
+  });
+  $('preset').addEventListener('change',function(e){ var p=PRESETS[+e.target.value]; setRules(p.b,p.s); hist=[]; updateStatus(); });
+  $('speed').addEventListener('input',function(e){ speed=+e.target.value; $('o_speed').textContent=speed+' покол/с'; });
+  $('cs').addEventListener('input',function(e){ cs=+e.target.value; $('o_cs').textContent=cs+' px'; rebuild(true); render(); });
+  $('dens').addEventListener('input',function(e){ dens=+e.target.value; $('o_dens').textContent=dens+' %'; });
+  $('wrap').addEventListener('change',function(e){ wrap=e.target.checked; hist=[]; updateStatus(); });
+  $('ageCol').addEventListener('change',function(e){ ageCol=e.target.checked; render(); });
+  $('trails').addEventListener('change',function(e){ trails=e.target.checked; if(!trails) fade.fill(0); render(); });
+  $('gridOn').addEventListener('change',function(e){ gridOn=e.target.checked; drawGridCache(); render(); });
+  window.addEventListener('keydown',function(e){
+    var t=e.target.tagName;
+    if(t==='INPUT'||t==='SELECT'||t==='TEXTAREA') return;
+    if(e.code==='Space'){ e.preventDefault(); setRunning(!running); }
+    else if(e.key==='s'||e.key==='S'||e.key==='ы'){ setRunning(false); step(); render(); }
+    else if(e.key==='c'||e.key==='C'||e.key==='с'){ setRunning(false); clearField(); }
+    else if(e.key==='r'||e.key==='R'||e.key==='к'){ randomField(); }
+  });
+  var rt=null;
+  window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(resize,150); });
+
+  /* ---------- СТАРТ ---------- */
+  buildRuleUI(); setRules([3],[2,3]);
+  PATTERNS.forEach(function(p,i){ $('pat').insertAdjacentHTML('beforeend','<option value="'+i+'">'+p.n+' — '+p.c+'</option>'); });
+  $('o_speed').textContent=speed+' покол/с'; $('o_cs').textContent=cs+' px'; $('o_dens').textContent=dens+' %';
+  resize(); syncMode(); randomField();
+  if(!reduce) setRunning(true);
+  lastT=performance.now(); raf=requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
