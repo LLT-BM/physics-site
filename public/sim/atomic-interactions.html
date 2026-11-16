@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Взаимодействие атомов и молекул</title>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+:root{
+  --bg:#070c15; --grid:rgba(120,190,255,.05); --surface:#0d1626; --ink:#eaf3fa; --muted:#8ba3b8; --line:rgba(130,200,255,.16);
+  --cyan:#5fe0ff; --amber:#ffb454; --pink:#ff7ab6; --ok:#4cc58d; --warn:#ff7a6e; --on:#07121c;
+  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);color:var(--ink);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:46px 46px;font:16px/1.5 var(--sans)}
+.wrap{max-width:960px;margin:0 auto;padding:20px 16px 40px}
+h1{font:800 1.7rem/1.15 var(--disp);margin:0 0 8px;letter-spacing:-.01em}
+.lead{margin:0 0 16px;color:var(--muted);max-width:72ch}
+.lead b{color:var(--ink);font-family:var(--mono)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+canvas{display:block;width:100%;border-radius:10px;background:#05080f;touch-action:none}
+#scene{cursor:grab}
+.note{margin:8px 2px 0;font-size:.85rem;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+button{font:inherit;font-family:var(--sans);min-height:44px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.pri{background:var(--cyan);color:var(--on);border-color:var(--cyan);font-weight:600}
+button.sm{min-height:36px;padding:6px 11px;font-size:.86rem}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips button{border-radius:999px;font-family:var(--mono);font-size:.8rem}
+.rd{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:8px;margin-top:12px}
+.rd div{background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
+.rd span{display:block;font-family:var(--mono);font-size:.72rem;color:var(--muted);letter-spacing:.02em}
+.rd b{font-family:var(--mono);font-size:1.02rem;font-weight:600;color:var(--ink)}
+.rd b.a{color:var(--amber)} .rd b.c{color:var(--cyan)} .rd b.p{color:var(--pink)}
+.status{margin-top:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-family:var(--mono);font-size:.88rem;font-weight:600}
+.status.ok{border-color:var(--ok);color:var(--ok)}
+.status.warn{border-color:var(--warn);color:var(--warn)}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:12px;margin-top:12px}
+.grp h2{font:600 1rem var(--disp);margin:0 0 6px;padding-left:10px;border-left:4px solid var(--cyan)}
+.grp.b h2{border-color:var(--amber)} .grp.c h2{border-color:var(--pink)} .grp.d h2{border-color:var(--ok)}
+label{display:flex;justify-content:space-between;align-items:baseline;font-size:.9rem;margin-top:10px;gap:8px}
+output{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;color:var(--cyan)}
+input[type=range]{width:100%;height:30px;margin:2px 0 0;-webkit-appearance:none;appearance:none;background:transparent;accent-color:var(--cyan)}
+select{font:inherit;font-family:var(--mono);font-size:.85rem;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);max-width:100%}
+.chk{display:flex;align-items:center;gap:8px;font-size:.88rem;margin-top:10px;cursor:pointer;user-select:none}
+.chk input{width:18px;height:18px;accent-color:var(--cyan);flex:none}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:.78rem;color:var(--muted);font-family:var(--mono)}
+.legend i{display:inline-block;width:20px;height:3px;border-radius:2px;vertical-align:3px;margin-right:5px}
+.hide{display:none}
+kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink)}
+#mix{font-family:var(--mono);font-size:.8rem;color:var(--amber);margin:8px 0 0}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Взаимодействие атомов и молекул</h1>
+  <p class="lead">Две частицы притягиваются на больших расстояниях и отталкиваются на малых. Причина притяжения — <b>силы Ван-дер-Ваальса</b> (флуктуации электронных облаков), отталкивания — <b>запрет Паули</b> при перекрытии облаков. Тяните частицы мышью или пальцем, отпускайте — и смотрите, как точка на графике потенциальной энергии катается по яме.</p>
+
+  <section class="card">
+    <canvas id="scene" aria-label="Две взаимодействующие частицы"></canvas>
+    <div class="bar">
+      <button class="pri" id="play">▶ Пуск</button>
+      <button id="eq">В равновесие</button>
+      <button id="pull">Растянуть</button>
+      <button id="heat">Нагреть до T</button>
+      <button id="reset">Сброс</button>
+    </div>
+    <div class="chips" id="quick"></div>
+    <div class="rd">
+      <div><span>расстояние r</span><b class="c" id="v_r">—</b></div>
+      <div><span>r / r равнов.</span><b id="v_rr">—</b></div>
+      <div><span>потенциал V</span><b class="a" id="v_V">—</b></div>
+      <div><span>сила F</span><b class="p" id="v_F">—</b></div>
+      <div><span>кинетическая Eк</span><b id="v_K">—</b></div>
+      <div><span>полная E</span><b class="a" id="v_E">—</b></div>
+      <div><span>V в кДж/моль</span><b id="v_kj">—</b></div>
+      <div><span>время</span><b id="v_t">—</b></div>
+    </div>
+    <div id="status" class="status" aria-live="polite"></div>
+    <p class="note">Тяните любую частицу по горизонтали. Лёгкая частица движется сильнее тяжёлой: движение считается через приведённую массу μ = m₁m₂/(m₁+m₂). Горячие клавиши: <kbd>Пробел</kbd> пуск/пауза, <kbd>E</kbd> в равновесие, <kbd>H</kbd> нагреть.</p>
+  </section>
+
+  <section class="card">
+    <canvas id="plot" aria-label="График потенциальной энергии"></canvas>
+    <div class="legend">
+      <span><i style="background:#5fe0ff"></i>полный потенциал V(r)</span>
+      <span><i style="background:#ff7ab6"></i>отталкивание</span>
+      <span><i style="background:#4cc58d"></i>притяжение</span>
+      <span><i style="background:#ffb454"></i>полная энергия E</span>
+      <span><i style="background:rgba(255,180,84,.35)"></i>зона кинетической энергии</span>
+    </div>
+    <div class="rd">
+      <div><span>глубина ямы</span><b class="a" id="v_D">—</b></div>
+      <div><span>равновесное r</span><b class="c" id="v_rm">—</b></div>
+      <div><span>привед. масса μ</span><b id="v_mu">—</b></div>
+      <div><span>период колебаний</span><b id="v_T">—</b></div>
+      <div><span>квант ħω</span><b class="p" id="v_hw">—</b></div>
+      <div><span>нулевая энергия</span><b class="p" id="v_zpe">—</b></div>
+      <div><span>связанных уровней</span><b id="v_n">—</b></div>
+      <div><span>kT при T</span><b id="v_kT">—</b></div>
+    </div>
+    <p class="note" id="qnote"></p>
+  </section>
+
+  <div class="ctl">
+    <section class="card grp">
+      <h2>Пара частиц</h2>
+      <label for="type">Тип связи
+        <select id="type">
+          <option value="lj">Ван-дер-Ваальс (12-6)</option>
+          <option value="exp6">Бакмингем exp-6</option>
+          <option value="morse">Ковалентная (Морзе)</option>
+          <option value="hbond">Водородная связь</option>
+          <option value="ionic">Ионная пара</option>
+        </select>
+      </label>
+      <div id="boxPair">
+        <label for="spA">Частица 1 <select id="spA"></select></label>
+        <label for="spB">Частица 2 <select id="spB"></select></label>
+        <p id="mix"></p>
+      </div>
+      <div id="boxCov" class="hide">
+        <label for="cov">Молекула <select id="cov"></select></label>
+      </div>
+      <div id="boxIon" class="hide">
+        <label for="ion">Пара ионов <select id="ion"></select></label>
+      </div>
+      <div id="boxH" class="hide">
+        <p class="note">Димер воды: связь O–H···O между двумя молекулами. Расстояние считается между атомами кислорода.</p>
+      </div>
+    </section>
+
+    <section class="card grp b">
+      <h2>Параметры потенциала</h2>
+      <div id="pLJ">
+        <label for="eps">Глубина ε/k<sub>B</sub> <output id="o_eps"></output></label>
+        <input type="range" id="eps" min="2" max="400" step="1">
+        <label for="sig">Диаметр σ <output id="o_sig"></output></label>
+        <input type="range" id="sig" min="2" max="5.5" step="0.01">
+      </div>
+      <div id="pA" class="hide">
+        <label for="alpha">Крутость α (exp-6) <output id="o_alpha"></output></label>
+        <input type="range" id="alpha" min="10" max="16" step="0.1" value="13">
+      </div>
+      <div id="pMorse" class="hide">
+        <label for="De">Энергия связи D<sub>e</sub> <output id="o_De"></output></label>
+        <input type="range" id="De" min="50" max="11000" step="10">
+        <label for="re">Равновесное r<sub>e</sub> <output id="o_re"></output></label>
+        <input type="range" id="re" min="0.6" max="3.4" step="0.005">
+        <label for="aa">Ширина a <output id="o_aa"></output></label>
+        <input type="range" id="aa" min="0.8" max="3.6" step="0.01">
+      </div>
+      <div id="pIon" class="hide">
+        <label for="nB">Показатель Борна n <output id="o_nB"></output></label>
+        <input type="range" id="nB" min="5" max="12" step="1">
+      </div>
+      <p class="note" id="pnote"></p>
+    </section>
+
+    <section class="card grp c">
+      <h2>Движение и температура</h2>
+      <label for="T">Температура T <output id="o_T"></output></label>
+      <input type="range" id="T" min="1" max="600" step="1" value="90">
+      <label for="spd">Скорость показа <output id="o_spd"></output></label>
+      <input type="range" id="spd" min="0.1" max="6" step="0.1" value="1">
+      <p class="note">Кнопка «Нагреть до T» даёт относительному движению кинетическую энергию k<sub>B</sub>T/2 — столько в среднем приходится на одну степень свободы. Если E ≥ 0, пара распадается.</p>
+    </section>
+
+    <section class="card grp d">
+      <h2>Что показывать</h2>
+      <label class="chk"><input type="checkbox" id="cForce" checked> Векторы сил на частицах</label>
+      <label class="chk"><input type="checkbox" id="cComp"> Отдельно отталкивание и притяжение</label>
+      <label class="chk"><input type="checkbox" id="cQuant"> Квантовые уровни в яме</label>
+      <label class="chk"><input type="checkbox" id="cRuler" checked> Линейка в ангстремах</label>
+      <label class="chk"><input type="checkbox" id="cCloud" checked> Электронные облака</label>
+      <p class="note">Уровни считаются в гармоническом приближении, а для связи Морзе — по точной ангармонической формуле. Составляющие доступны для 12-6, exp-6 и ионной модели.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var KB=0.08617333262, HBAR=2.0445, T0PS=0.3219359, KJ=0.0964853, PN=1.6022, CE=14399.6;
+  var R2=Math.pow(2,1/6);
+
+  var SP=[
+    {id:'He', n:'He · гелий',        m:4.0026, s:2.556, eK:10.22, Tb:4.22},
+    {id:'Ne', n:'Ne · неон',         m:20.180, s:2.789, eK:34.9,  Tb:27.10},
+    {id:'Ar', n:'Ar · аргон',        m:39.948, s:3.405, eK:119.8, Tb:87.30},
+    {id:'Kr', n:'Kr · криптон',      m:83.798, s:3.600, eK:171.0, Tb:119.93},
+    {id:'Xe', n:'Xe · ксенон',       m:131.29, s:4.100, eK:221.0, Tb:165.05},
+    {id:'H2', n:'H₂ · водород',      m:2.016,  s:2.960, eK:34.2,  Tb:20.28},
+    {id:'N2', n:'N₂ · азот',         m:28.014, s:3.798, eK:71.4,  Tb:77.36},
+    {id:'O2', n:'O₂ · кислород',     m:31.998, s:3.467, eK:106.7, Tb:90.19},
+    {id:'CH4',n:'CH₄ · метан',       m:16.043, s:3.730, eK:148.0, Tb:111.66},
+    {id:'CO2',n:'CO₂ · углекислый',  m:44.009, s:3.941, eK:195.2, Tb:194.65},
+    {id:'H2O',n:'H₂O · вода',        m:18.015, s:3.166, eK:78.2,  Tb:373.15}
+  ];
+  var COV=[
+    {id:'H2', n:'H–H · водород',   D:4747, re:0.7414, a:1.944, m1:1.008,  m2:1.008},
+    {id:'N2', n:'N≡N · азот',      D:9906, re:1.0977, a:2.689, m1:14.007, m2:14.007},
+    {id:'O2', n:'O=O · кислород',  D:5213, re:1.2075, a:2.654, m1:15.999, m2:15.999},
+    {id:'Cl2',n:'Cl–Cl · хлор',    D:2514, re:1.9880, a:2.001, m1:35.45,  m2:35.45}
+  ];
+  var ION=[
+    {id:'NaCl',n:'Na⁺ Cl⁻',  q:1, re:2.3606, nB:8, m1:22.990, m2:35.45},
+    {id:'KCl', n:'K⁺ Cl⁻',   q:1, re:2.6666, nB:9, m1:39.098, m2:35.45},
+    {id:'LiF', n:'Li⁺ F⁻',   q:1, re:1.5639, nB:6, m1:6.940,  m2:18.998},
+    {id:'MgO', n:'Mg²⁺ O²⁻', q:4, re:1.7490, nB:7, m1:24.305, m2:15.999}
+  ];
+  var QUICK=[
+    {t:'He–He',   f:function(){ setType('lj'); pair('He','He'); }},
+    {t:'Ar–Ar',   f:function(){ setType('lj'); pair('Ar','Ar'); }},
+    {t:'Xe–Xe',   f:function(){ setType('lj'); pair('Xe','Xe'); }},
+    {t:'N₂–O₂ (воздух)', f:function(){ setType('lj'); pair('N2','O2'); }},
+    {t:'Ar–CH₄',  f:function(){ setType('lj'); pair('Ar','CH4'); }},
+    {t:'H₂O–H₂O', f:function(){ setType('lj'); pair('H2O','H2O'); }},
+    {t:'exp-6 Ar', f:function(){ setType('exp6'); pair('Ar','Ar'); }},
+    {t:'H–H связь', f:function(){ setType('morse'); $('cov').value='H2'; applyCov(); }},
+    {t:'N≡N связь', f:function(){ setType('morse'); $('cov').value='N2'; applyCov(); }},
+    {t:'H-связь воды', f:function(){ setType('hbond'); }},
+    {t:'Na⁺Cl⁻',  f:function(){ setType('ionic'); $('ion').value='NaCl'; applyIon(); }},
+    {t:'Mg²⁺O²⁻', f:function(){ setType('ionic'); $('ion').value='MgO'; applyIon(); }}
+  ];
+
+  var P={type:'lj',a:2,b:2,eps:119.8*KB,sig:3.405,alpha:13,
+         De:4747,re:0.7414,aa:1.944,nB:8,T:90,spd:1};
+  var M=null, r=4, v=0, tps=0, running=false, drag=null, raf=null, lastT=0;
+  var W=900,H1=230,H2=320,dpr=1;
+  var sc=$('scene'), sx=sc.getContext('2d'), pl=$('plot'), px=pl.getContext('2d');
+
+  function fmt(x,n){ if(!isFinite(x)) return '∞'; return x.toFixed(n).replace('.',','); }
+  function clamp(x,a,b){ return Math.max(a,Math.min(b,x)); }
+
+  /* ---------- модель ---------- */
+  function build(){
+    var t=P.type, m={type:t};
+    if(t==='lj'||t==='exp6'){
+      var A=SP[P.a],B=SP[P.b];
+      m.n1=A.n; m.n2=B.n; m.m1=A.m; m.m2=B.m; m.sA=A.s; m.sB=B.s;
+      m.eps=P.eps; m.sig=P.sig; m.rm=R2*P.sig; m.L=P.sig; m.D=P.eps; m.alpha=P.alpha;
+      m.rA=0.5*A.s; m.rB=0.5*B.s; m.comp=true; m.Tb=Math.sqrt(A.Tb*B.Tb);
+    } else if(t==='morse'){
+      m.n1='атом 1'; m.n2='атом 2'; m.m1=P.m1; m.m2=P.m2;
+      m.D=P.De; m.re=P.re; m.a=P.aa; m.rm=P.re; m.L=P.re; m.rA=0.42*P.re; m.rB=0.42*P.re;
+      m.comp=false; m.Tb=null;
+    } else if(t==='hbond'){
+      m.n1='H₂O (донор)'; m.n2='H₂O (акцептор)'; m.m1=18.015; m.m2=18.015;
+      m.D=P.De; m.re=P.re; m.a=P.aa; m.rm=P.re; m.L=P.re; m.rA=0.40*P.re; m.rB=0.40*P.re;
+      m.comp=false; m.Tb=null;
+    } else {
+      var I=ION[P.ionIdx||0];
+      m.n1=I.n.split(' ')[0]; m.n2=I.n.split(' ')[1]; m.m1=I.m1; m.m2=I.m2;
+      m.C=CE*I.q; m.nB=P.nB; m.re=I.re; m.B=m.C*Math.pow(I.re,P.nB-1)/P.nB;
+      m.rm=I.re; m.L=I.re; m.D=m.C/I.re*(1-1/P.nB);
+      m.rA=0.36*I.re; m.rB=0.46*I.re; m.comp=true; m.Tb=null;
+    }
+    m.mu=m.m1*m.m2/(m.m1+m.m2);
+    M=m;
+    var h=0.002*M.rm;
+    M.Vpp=(Vof(M.rm+h)-2*Vof(M.rm)+Vof(M.rm-h))/(h*h);
+    M.w=Math.sqrt(Math.max(1e-9,M.Vpp)/M.mu);
+    M.hw=HBAR*M.w;
+    M.Tvib=2*Math.PI/M.w*T0PS;
+    if(t==='morse'||t==='hbond'){
+      M.hw=M.a*Math.sqrt(2*M.D/M.mu)*HBAR;
+      M.nLev=Math.max(0,Math.floor(2*M.D/M.hw-0.5)+1);
+      M.exact=true;
+    } else {
+      M.nLev=Math.max(0,Math.floor(M.D/M.hw-0.5)+1);
+      M.exact=false;
+    }
+    M.zpe=M.hw/2;
+    M.rClamp=(t==='exp6')?0.55*M.rm:(t==='morse'||t==='hbond')?0.40*M.rm:0.55*M.L;
+    M.rDrag=(t==='morse'||t==='hbond')?0.55*M.rm:0.72*M.L;
+    M.rMax=8*M.L;
+    r=clamp(r,M.rDrag,M.rMax);
+    readouts();
+  }
+  function Vof(x){
+    var m=M;
+    if(x<=0) return 1e12;
+    if(m.type==='lj'){ var s6=Math.pow(m.sig/x,6); return 4*m.eps*(s6*s6-s6); }
+    if(m.type==='exp6'){ var y=x/m.rm,a=m.alpha; return m.eps/(a-6)*(6*Math.exp(a*(1-y))-a*Math.pow(y,-6)); }
+    if(m.type==='morse'||m.type==='hbond'){ var u=1-Math.exp(-m.a*(x-m.re)); return m.D*(u*u-1); }
+    return -m.C/x+m.B/Math.pow(x,m.nB);
+  }
+  function Fof(x){
+    var m=M;
+    if(m.type==='lj'){ var s6=Math.pow(m.sig/x,6); return 24*m.eps/x*(2*s6*s6-s6); }
+    if(m.type==='exp6'){ var y=x/m.rm,a=m.alpha;
+      return m.eps/(a-6)*(6*a/m.rm*Math.exp(a*(1-y))-6*a*Math.pow(m.rm,6)/Math.pow(x,7)); }
+    if(m.type==='morse'||m.type==='hbond'){ var e=Math.exp(-m.a*(x-m.re)); return -2*m.a*m.D*(1-e)*e; }
+    return -m.C/(x*x)+m.nB*m.B/Math.pow(x,m.nB+1);
+  }
+  function parts(x){
+    var m=M;
+    if(m.type==='lj'){ var s6=Math.pow(m.sig/x,6); return [4*m.eps*s6*s6,-4*m.eps*s6]; }
+    if(m.type==='exp6'){ var y=x/m.rm,a=m.alpha;
+      return [m.eps/(a-6)*6*Math.exp(a*(1-y)), -m.eps/(a-6)*a*Math.pow(y,-6)]; }
+    if(m.comp) return [m.B/Math.pow(x,m.nB), -m.C/x];
+    return null;
+  }
+  function KE(){ return 0.5*M.mu*v*v; }
+  function Etot(){ return Vof(r)+KE(); }
+
+  /* ---------- интегрирование (velocity Verlet) ---------- */
+  function micro(h){
+    var a1=Fof(r)/M.mu;
+    var rn=r+v*h+0.5*a1*h*h;
+    if(rn<M.rClamp){ rn=M.rClamp; v=Math.abs(v)*0.98; return; }
+    var a2=Fof(rn)/M.mu;
+    v+=0.5*(a1+a2)*h;
+    v=clamp(v,-400,400);
+    r=rn;
+  }
+  function advance(dtReal){
+    var target=P.spd*dtReal/T0PS, h=0.001;
+    var n=Math.min(900,Math.max(1,Math.round(target/h)));
+    for(var i=0;i<n;i++){ micro(h); tps+=h*T0PS; if(r>M.rMax){ running=false; setPlay(); break; } }
+  }
+
+  /* ---------- сцена ---------- */
+  function resize(){
+    W=Math.max(300,Math.round(sc.parentNode.clientWidth-28));
+    dpr=Math.min(2,window.devicePixelRatio||1);
+    H1=Math.max(190,Math.round(W*0.26)); H2=Math.max(260,Math.round(W*0.36));
+    sc.width=W*dpr; sc.height=H1*dpr; sc.style.height=H1+'px'; sx.setTransform(dpr,0,0,dpr,0,0);
+    pl.width=W*dpr; pl.height=H2*dpr; pl.style.height=H2+'px'; px.setTransform(dpr,0,0,dpr,0,0);
+    draw();
+  }
+  function geom(){
+    var span=Math.max(3.1*M.L,r*1.12);
+    var k=(W*0.80)/span, cx=W/2, cy=H1*0.46;
+    return {k:k,cx:cx,cy:cy,
+      x1:cx-r*M.m2/(M.m1+M.m2)*k, x2:cx+r*M.m1/(M.m1+M.m2)*k,
+      r1:M.rA*k, r2:M.rB*k};
+  }
+  function draw(){
+    if(!M) return;
+    var g=geom();
+    sx.clearRect(0,0,W,H1);
+    sx.fillStyle='#05080f'; sx.fillRect(0,0,W,H1);
+    sx.strokeStyle='rgba(120,190,255,.10)'; sx.lineWidth=1;
+    sx.beginPath(); sx.moveTo(0,g.cy+.5); sx.lineTo(W,g.cy+.5); sx.stroke();
+
+    if($('cRuler').checked){
+      var step=M.L>2.6?1:0.5;
+      sx.font='11px JetBrains Mono, monospace'; sx.textAlign='center';
+      for(var d=0;d<=Math.ceil(4*M.L);d+=step){
+        [g.cx+d*g.k,g.cx-d*g.k].forEach(function(X){
+          if(X<8||X>W-8) return;
+          sx.strokeStyle='rgba(130,200,255,.20)';
+          sx.beginPath(); sx.moveTo(X,H1-26); sx.lineTo(X,H1-20); sx.stroke();
+          sx.fillStyle='rgba(139,163,184,.85)'; sx.fillText(fmt(d,d%1?1:0),X,H1-8);
+        });
+      }
+      sx.fillStyle='rgba(139,163,184,.7)'; sx.textAlign='left';
+      sx.fillText('Å от центра масс',8,H1-8);
+    }
+
+    var overlap=(g.r1+g.r2)-(g.x2-g.x1);
+    if($('cCloud').checked){
+      [[g.x1,g.r1,'#5fe0ff'],[g.x2,g.r2,'#ffb454']].forEach(function(o){
+        var gr=sx.createRadialGradient(o[0],g.cy,o[1]*0.15,o[0],g.cy,o[1]*1.5);
+        gr.addColorStop(0,o[2]+'55'); gr.addColorStop(.55,o[2]+'22'); gr.addColorStop(1,o[2]+'00');
+        sx.fillStyle=gr; sx.beginPath(); sx.arc(o[0],g.cy,o[1]*1.5,0,6.2832); sx.fill();
+      });
+    }
+    if(overlap>0){
+      sx.fillStyle='rgba(255,122,110,'+Math.min(.45,overlap/(g.r1+g.r2)*1.4).toFixed(3)+')';
+      sx.beginPath(); sx.ellipse((g.x1+g.x2)/2,g.cy,overlap/2,Math.min(g.r1,g.r2)*0.8,0,0,6.2832); sx.fill();
+    }
+    [[g.x1,g.r1,'#5fe0ff',M.n1],[g.x2,g.r2,'#ffb454',M.n2]].forEach(function(o){
+      var gr=sx.createRadialGradient(o[0]-o[1]*.3,g.cy-o[1]*.3,o[1]*.1,o[0],g.cy,o[1]);
+      gr.addColorStop(0,'#ffffff'); gr.addColorStop(.35,o[2]); gr.addColorStop(1,'#0a1420');
+      sx.fillStyle=gr; sx.beginPath(); sx.arc(o[0],g.cy,o[1],0,6.2832); sx.fill();
+      sx.strokeStyle=o[2]; sx.lineWidth=1.6; sx.stroke();
+      sx.fillStyle='#eaf3fa'; sx.font='600 12px JetBrains Mono, monospace'; sx.textAlign='center';
+      sx.fillText(o[3],o[0],g.cy-o[1]-10);
+    });
+
+    if($('cForce').checked){
+      var F=Fof(r), mag=Math.abs(F), s=Math.min(70,16*Math.log(1+mag/(0.02*M.D+1e-9)));
+      var col=F>0?'#ff7ab6':'#4cc58d', dir=F>0?-1:1;
+      [[g.x1,dir],[g.x2,-dir]].forEach(function(o){
+        var x0=o[0], sgn=o[1];
+        var xa=x0+sgn*s, xe=xa+sgn*0;
+        sx.strokeStyle=col; sx.lineWidth=3;
+        sx.beginPath(); sx.moveTo(x0,g.cy); sx.lineTo(x0+sgn*s,g.cy); sx.stroke();
+        sx.beginPath(); sx.moveTo(x0+sgn*s,g.cy);
+        sx.lineTo(x0+sgn*(s-9),g.cy-5); sx.lineTo(x0+sgn*(s-9),g.cy+5); sx.closePath();
+        sx.fillStyle=col; sx.fill();
+      });
+      sx.fillStyle=col; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='center';
+      sx.fillText(F>0?'отталкивание':'притяжение',W/2,20);
+    }
+    sx.fillStyle='rgba(139,163,184,.9)'; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='right';
+    sx.fillText('r = '+fmt(r,3)+' Å',W-8,20);
+    plot();
+  }
+
+  /* ---------- график ---------- */
+  function plot(){
+    var w=W,h=H2,L=44,Rr=12,Tp=14,B=30;
+    px.clearRect(0,0,w,h); px.fillStyle='#05080f'; px.fillRect(0,0,w,h);
+    var xLo=M.rDrag*0.92, xHi=Math.max(3.0*M.L,r*1.1);
+    var E=Etot(), D=M.D;
+    var yLo=-1.30*D, yHi=Math.max(1.7*D,E*1.05+0.2*D);
+    function X(x){ return L+(x-xLo)/(xHi-xLo)*(w-L-Rr); }
+    function Y(y){ return Tp+(yHi-y)/(yHi-yLo)*(h-Tp-B); }
+
+    px.strokeStyle='rgba(130,200,255,.10)'; px.lineWidth=1;
+    px.font='10px JetBrains Mono, monospace'; px.fillStyle='rgba(139,163,184,.8)';
+    var ys=[-D,-D/2,0,D,2*D];
+    ys.forEach(function(val){
+      if(val<yLo||val>yHi) return;
+      px.beginPath(); px.moveTo(L,Y(val)); px.lineTo(w-Rr,Y(val)); px.stroke();
+      px.textAlign='right'; px.fillText(fmt(val,val===0?0:1),L-6,Y(val)+3);
+    });
+    var st=M.L>2.6?1:0.5;
+    px.textAlign='center';
+    for(var xv=Math.ceil(xLo/st)*st; xv<=xHi; xv+=st){
+      px.strokeStyle='rgba(130,200,255,.07)';
+      px.beginPath(); px.moveTo(X(xv),Tp); px.lineTo(X(xv),h-B); px.stroke();
+      px.fillStyle='rgba(139,163,184,.8)'; px.fillText(fmt(xv,xv%1?1:0),X(xv),h-B+14);
+    }
+    px.fillStyle='rgba(139,163,184,.9)'; px.textAlign='left';
+    px.fillText('V, мэВ',6,Tp+2); px.textAlign='right'; px.fillText('r, Å',w-Rr,h-6);
+
+    px.strokeStyle='rgba(234,243,250,.35)'; px.lineWidth=1.2;
+    px.beginPath(); px.moveTo(L,Y(0)); px.lineTo(w-Rr,Y(0)); px.stroke();
+
+    var N=420, pts=[], rep=[], att=[];
+    for(var i=0;i<=N;i++){
+      var xx=xLo+(xHi-xLo)*i/N, vv=Vof(xx);
+      pts.push([X(xx),Y(clamp(vv,yLo-2*D,yHi+2*D))]);
+      if($('cComp').checked&&M.comp){ var c=parts(xx);
+        rep.push([X(xx),Y(clamp(c[0],yLo-2*D,yHi+2*D))]);
+        att.push([X(xx),Y(clamp(c[1],yLo-2*D,yHi+2*D))]); }
+    }
+    function line(arr,col,dash,wd){
+      px.save(); px.beginPath(); px.rect(L,Tp,w-L-Rr,h-Tp-B); px.clip();
+      px.setLineDash(dash||[]); px.strokeStyle=col; px.lineWidth=wd||2;
+      px.beginPath(); arr.forEach(function(p,j){ j?px.lineTo(p[0],p[1]):px.moveTo(p[0],p[1]); }); px.stroke();
+      px.restore();
+    }
+    if(rep.length){ line(rep,'rgba(255,122,182,.85)',[5,4],1.6); line(att,'rgba(76,197,141,.85)',[5,4],1.6); }
+
+    // зона кинетической энергии между V и E
+    px.save(); px.beginPath(); px.rect(L,Tp,w-L-Rr,h-Tp-B); px.clip();
+    px.beginPath(); var started=false;
+    for(var i2=0;i2<=N;i2++){
+      var xx2=xLo+(xHi-xLo)*i2/N, vv2=Vof(xx2);
+      if(vv2<E){ if(!started){ px.moveTo(X(xx2),Y(E)); started=true; } px.lineTo(X(xx2),Y(vv2)); }
+      else if(started){ px.lineTo(X(xx2),Y(E)); break; }
+    }
+    if(started){ px.lineTo(X(Math.min(xHi,r)),Y(E)); px.closePath();
+      px.fillStyle='rgba(255,180,84,.20)'; px.fill(); }
+    px.restore();
+
+    line(pts,'#5fe0ff',[],2.4);
+
+    if($('cQuant').checked){
+      var shown=Math.min(8,M.nLev);
+      px.save(); px.beginPath(); px.rect(L,Tp,w-L-Rr,h-Tp-B); px.clip();
+      for(var n=0;n<shown;n++){
+        var q=M.hw*(n+0.5);
+        var En=M.exact ? -M.D+q-q*q/(4*M.D) : -M.D+q;
+        if(En>=0) break;
+        var a1=null,a2=null;
+        for(var j=1;j<=N;j++){
+          var xa=xLo+(xHi-xLo)*(j-1)/N, xb=xLo+(xHi-xLo)*j/N;
+          if(Vof(xa)>=En&&Vof(xb)<En&&a1===null) a1=xb;
+          if(Vof(xa)<En&&Vof(xb)>=En) a2=xa;
+        }
+        if(a1===null||a2===null) continue;
+        px.strokeStyle=n===0?'rgba(255,122,182,.95)':'rgba(255,122,182,.45)';
+        px.lineWidth=n===0?2:1.3;
+        px.beginPath(); px.moveTo(X(a1),Y(En)); px.lineTo(X(a2),Y(En)); px.stroke();
+        px.fillStyle='rgba(255,122,182,.9)'; px.font='10px JetBrains Mono, monospace'; px.textAlign='left';
+        px.fillText('n='+n,X(a2)+4,Y(En)+3);
+      }
+      px.restore();
+    }
+
+    // полная энергия
+    px.save(); px.beginPath(); px.rect(L,Tp,w-L-Rr,h-Tp-B); px.clip();
+    px.setLineDash([7,5]); px.strokeStyle='#ffb454'; px.lineWidth=1.8;
+    px.beginPath(); px.moveTo(L,Y(E)); px.lineTo(w-Rr,Y(E)); px.stroke(); px.setLineDash([]);
+    // текущая точка
+    var Vr=Vof(r);
+    px.strokeStyle='rgba(255,180,84,.6)'; px.lineWidth=1.2;
+    px.beginPath(); px.moveTo(X(r),Y(Vr)); px.lineTo(X(r),Y(E)); px.stroke();
+    px.fillStyle='#fff'; px.beginPath(); px.arc(X(r),Y(clamp(Vr,yLo,yHi)),5,0,6.2832); px.fill();
+    px.strokeStyle='#5fe0ff'; px.lineWidth=2; px.stroke();
+    // равновесие
+    px.strokeStyle='rgba(95,224,255,.35)'; px.setLineDash([3,4]);
+    px.beginPath(); px.moveTo(X(M.rm),Tp); px.lineTo(X(M.rm),h-B); px.stroke(); px.setLineDash([]);
+    px.restore();
+    px.fillStyle='rgba(95,224,255,.85)'; px.font='10px JetBrains Mono, monospace'; px.textAlign='center';
+    px.fillText('r равн.',X(M.rm),h-B-4);
+  }
+
+  /* ---------- показания ---------- */
+  function readouts(){
+    if(!M) return;
+    var Vr=Vof(r), F=Fof(r), K=KE(), E=Vr+K;
+    $('v_r').textContent=fmt(r,3)+' Å';
+    $('v_rr').textContent=fmt(r/M.rm,3);
+    $('v_V').textContent=fmt(Vr,2)+' мэВ';
+    $('v_F').textContent=(F>0?'+':'')+fmt(F*PN,1)+' пН';
+    $('v_K').textContent=fmt(K,2)+' мэВ';
+    $('v_E').textContent=fmt(E,2)+' мэВ';
+    $('v_kj').textContent=fmt(Vr*KJ,2);
+    $('v_t').textContent=fmt(tps,2)+' пс';
+    $('v_D').textContent=fmt(M.D,2)+' мэВ';
+    $('v_rm').textContent=fmt(M.rm,3)+' Å';
+    $('v_mu').textContent=fmt(M.mu,3)+' u';
+    $('v_T').textContent=fmt(M.Tvib,3)+' пс';
+    $('v_hw').textContent=fmt(M.hw,3)+' мэВ';
+    $('v_zpe').textContent=fmt(M.zpe,3)+' мэВ';
+    $('v_n').textContent=(M.type==='morse'||M.type==='hbond')?M.nLev:(M.nLev+' (оценка)');
+    $('v_kT').textContent=fmt(KB*P.T,2)+' мэВ';
+
+    var st=$('status'); st.className='status';
+    if(r>=M.rMax*0.999){ st.classList.add('warn');
+      st.textContent='Связь разорвана: частицы разлетелись (E ≥ 0). Нажмите «В равновесие» или «Сброс».'; }
+    else if(E>=0){ st.classList.add('warn');
+      st.textContent='E = '+fmt(E,2)+' мэВ ≥ 0 — пара не связана: частицы уйдут на бесконечность.'; }
+    else if(Math.abs(F)<0.02*M.D/M.L&&Math.abs(v)<0.02){ st.classList.add('ok');
+      st.textContent='Равновесие: сила ≈ 0, r = r равнов. = '+fmt(M.rm,3)+' Å, V = −'+fmt(M.D,2)+' мэВ.'; }
+    else st.textContent='Связанное состояние: E = '+fmt(E,2)+' мэВ < 0. Частицы колеблются в яме глубиной '+fmt(M.D,2)+' мэВ.';
+
+    var q=[];
+    if(M.zpe>M.D) q.push('Нулевая энергия '+fmt(M.zpe,2)+' мэВ больше глубины ямы '+fmt(M.D,2)+' мэВ: гармоническая оценка не даёт связанных уровней. Реальная яма мельче и шире вблизи дна — здесь нужны точные квантовые расчёты (так устроены He₂ и H₂).');
+    else q.push('Нулевая энергия '+fmt(M.zpe,2)+' мэВ — это минимум, ниже которого энергия колебаний не опускается даже при T = 0.');
+    if(M.Tb) q.push('Оценка температуры кипения по правилу T_кип ≈ 0,7·ε/k_B: '+fmt(0.7*M.D/KB,0)+' K.');
+    if(P.type==='exp6') q.push('В exp-6 отталкивание экспоненциальное (физичнее, чем r⁻¹²), но при очень малых r модель нефизична, поэтому введён жёсткий кор.');
+    if(P.type==='hbond') q.push('Водородная связь примерно в 20–30 раз слабее ковалентной, но в 10–20 раз сильнее обычной ван-дер-ваальсовой.');
+    if(P.type==='ionic') q.push('Модель даёт глубину '+fmt(M.D/1000,2)+' эВ; опыт для NaCl ≈ 5,8 эВ — разница идёт от поляризации ионов и частичной ковалентности.');
+    if(P.type==='lj'&&(SP[P.a].id==='H2O'||SP[P.b].id==='H2O')) q.push('Внимание: сферический потенциал 12-6 для воды — грубое приближение. Реальная вода требует точечных зарядов и водородных связей; переключитесь на тип «Водородная связь».');
+    $('qnote').textContent=q.join(' ');
+  }
+
+  /* ---------- управление ---------- */
+  function setPlay(){ $('play').textContent=running?'❚❚ Пауза':'▶ Пуск'; $('play').classList.toggle('pri',!running); }
+  function setType(t){
+    P.type=t; $('type').value=t;
+    $('boxPair').classList.toggle('hide',!(t==='lj'||t==='exp6'));
+    $('boxCov').classList.toggle('hide',t!=='morse');
+    $('boxIon').classList.toggle('hide',t!=='ionic');
+    $('boxH').classList.toggle('hide',t!=='hbond');
+    $('pLJ').classList.toggle('hide',!(t==='lj'||t==='exp6'));
+    $('pA').classList.toggle('hide',t!=='exp6');
+    $('pMorse').classList.toggle('hide',!(t==='morse'||t==='hbond'));
+    $('pIon').classList.toggle('hide',t!=='ionic');
+    $('cComp').disabled=!((t==='lj'||t==='exp6'||t==='ionic'));
+    if(t==='morse') applyCov();
+    else if(t==='hbond'){ P.De=217.6; P.re=2.98; P.aa=1.57; P.m1=18.015; P.m2=18.015; syncSliders(); }
+    else if(t==='ionic') applyIon();
+    $('pnote').textContent = (t==='lj')?'Правила смешения Лоренца–Бертло: σ₁₂ = (σ₁+σ₂)/2, ε₁₂ = √(ε₁ε₂). Ползунки позволяют отойти от них.'
+      : (t==='exp6')?'Отталкивание ~ exp(−αr/r_m) вместо r⁻¹²: физичнее описывает перекрытие облаков.'
+      : (t==='morse')?'Потенциал Морзе точно описывает ангармонику ковалентной связи и её разрыв.'
+      : (t==='hbond')?'Эффективный потенциал Морзе для связи O–H···O в димере воды.'
+      : 'Кулон −q₁q₂e²/r плюс борновское отталкивание B/rⁿ.';
+    build(); r=M.rm; v=0; tps=0; draw(); readouts();
+  }
+  function pair(idA,idB){
+    P.a=SP.findIndex(function(s){return s.id===idA});
+    P.b=SP.findIndex(function(s){return s.id===idB});
+    $('spA').value=P.a; $('spB').value=P.b; applyPair();
+  }
+  function applyPair(){
+    var A=SP[P.a],B=SP[P.b];
+    P.sig=(A.s+B.s)/2; P.eps=Math.sqrt(A.eK*B.eK)*KB;
+    $('mix').textContent=(A.id===B.id)?'Одинаковые частицы: параметры взяты напрямую.'
+      :'Смешение: σ = ('+A.s+' + '+B.s+')/2 = '+fmt(P.sig,3)+' Å, ε/k_B = √('+A.eK+'·'+B.eK+') = '+fmt(P.eps/KB,1)+' K.';
+    syncSliders(); build(); r=M.rm; v=0; tps=0; draw(); readouts();
+  }
+  function applyCov(){
+    var c=COV.find(function(x){return x.id===$('cov').value})||COV[0];
+    P.De=c.D; P.re=c.re; P.aa=c.a; P.m1=c.m1; P.m2=c.m2;
+    syncSliders(); build(); r=M.rm; v=0; tps=0; draw(); readouts();
+  }
+  function applyIon(){
+    P.ionIdx=ION.findIndex(function(x){return x.id===$('ion').value});
+    if(P.ionIdx<0) P.ionIdx=0;
+    P.nB=ION[P.ionIdx].nB;
+    syncSliders(); build(); r=M.rm; v=0; tps=0; draw(); readouts();
+  }
+  function syncSliders(){
+    $('eps').value=Math.round(P.eps/KB); $('o_eps').textContent=Math.round(P.eps/KB)+' K';
+    $('sig').value=P.sig.toFixed(2); $('o_sig').textContent=fmt(P.sig,2)+' Å';
+    $('alpha').value=P.alpha; $('o_alpha').textContent=fmt(P.alpha,1);
+    $('De').value=Math.round(P.De); $('o_De').textContent=fmt(P.De/1000,3)+' эВ';
+    $('re').value=P.re.toFixed(3); $('o_re').textContent=fmt(P.re,3)+' Å';
+    $('aa').value=P.aa.toFixed(2); $('o_aa').textContent=fmt(P.aa,2)+' Å⁻¹';
+    $('nB').value=P.nB; $('o_nB').textContent=P.nB;
+    $('T').value=P.T; $('o_T').textContent=P.T+' K';
+    $('spd').value=P.spd; $('o_spd').textContent=fmt(P.spd,1)+' пс/с';
+  }
+
+  SP.forEach(function(s,i){
+    $('spA').insertAdjacentHTML('beforeend','<option value="'+i+'">'+s.n+'</option>');
+    $('spB').insertAdjacentHTML('beforeend','<option value="'+i+'">'+s.n+'</option>');
+  });
+  COV.forEach(function(c){ $('cov').insertAdjacentHTML('beforeend','<option value="'+c.id+'">'+c.n+'</option>'); });
+  ION.forEach(function(c){ $('ion').insertAdjacentHTML('beforeend','<option value="'+c.id+'">'+c.n+'</option>'); });
+  QUICK.forEach(function(q){
+    var b=document.createElement('button'); b.className='sm'; b.textContent=q.t;
+    b.addEventListener('click',function(){ q.f(); running=false; setPlay(); });
+    $('quick').appendChild(b);
+  });
+
+  $('type').addEventListener('change',function(e){ setType(e.target.value); });
+  $('spA').addEventListener('change',function(e){ P.a=+e.target.value; applyPair(); });
+  $('spB').addEventListener('change',function(e){ P.b=+e.target.value; applyPair(); });
+  $('cov').addEventListener('change',applyCov);
+  $('ion').addEventListener('change',applyIon);
+  $('eps').addEventListener('input',function(e){ P.eps=(+e.target.value)*KB; syncSliders(); build(); readouts(); draw(); });
+  $('sig').addEventListener('input',function(e){ P.sig=+e.target.value; syncSliders(); build(); readouts(); draw(); });
+  $('alpha').addEventListener('input',function(e){ P.alpha=+e.target.value; syncSliders(); build(); readouts(); draw(); });
+  $('De').addEventListener('input',function(e){ P.De=+e.target.value; syncSliders(); build(); readouts(); draw(); });
+  $('re').addEventListener('input',function(e){ P.re=+e.target.value; syncSliders(); build(); readouts(); draw(); });
+  $('aa').addEventListener('input',function(e){ P.aa=+e.target.value; syncSliders(); build(); readouts(); draw(); });
+  $('nB').addEventListener('input',function(e){ P.nB=+e.target.value; syncSliders(); build(); readouts(); draw(); });
+  $('T').addEventListener('input',function(e){ P.T=+e.target.value; syncSliders(); readouts(); });
+  $('spd').addEventListener('input',function(e){ P.spd=+e.target.value; syncSliders(); });
+  ['cForce','cComp','cQuant','cRuler','cCloud'].forEach(function(id){ $(id).addEventListener('change',draw); });
+
+  $('play').addEventListener('click',function(){ running=!running; setPlay(); });
+  $('eq').addEventListener('click',function(){ r=M.rm; v=0; tps=0; running=false; setPlay(); draw(); readouts(); });
+  $('pull').addEventListener('click',function(){ r=Math.min(M.rMax*0.95,2.6*M.L); v=0; running=true; setPlay(); draw(); readouts(); });
+  $('heat').addEventListener('click',function(){
+    var k=KB*P.T/2, sign=Math.random()<0.5?-1:1;
+    v=sign*Math.sqrt(2*k/M.mu); running=true; setPlay(); draw(); readouts();
+  });
+  $('reset').addEventListener('click',function(){ setType(P.type); running=false; setPlay(); });
+
+  function px2r(e){
+    var b=sc.getBoundingClientRect(), g=geom();
+    var X=(e.clientX-b.left)*(W/b.width);
+    if(drag===1) return (g.cx-X)*(M.m1+M.m2)/M.m2/g.k;
+    return (X-g.cx)*(M.m1+M.m2)/M.m1/g.k;
+  }
+  sc.addEventListener('pointerdown',function(e){
+    var b=sc.getBoundingClientRect(), g=geom();
+    var X=(e.clientX-b.left)*(W/b.width), Y=(e.clientY-b.top)*(H1/b.height);
+    var d1=Math.hypot(X-g.x1,Y-g.cy), d2=Math.hypot(X-g.x2,Y-g.cy);
+    if(Math.min(d1,d2)>Math.max(g.r1,g.r2)*1.8) return;
+    drag=d1<d2?1:2; e.preventDefault(); running=false; setPlay();
+    sc.style.cursor='grabbing';
+    if(sc.setPointerCapture){ try{sc.setPointerCapture(e.pointerId)}catch(_){} }
+  });
+  sc.addEventListener('pointermove',function(e){
+    if(!drag) return;
+    r=clamp(px2r(e),M.rDrag,M.rMax); v=0; tps=0; draw(); readouts();
+  });
+  function endDrag(){ if(drag){ drag=null; sc.style.cursor='grab'; running=true; setPlay(); } }
+  sc.addEventListener('pointerup',endDrag); sc.addEventListener('pointercancel',endDrag);
+  window.addEventListener('pointerup',endDrag);
+  sc.addEventListener('touchmove',function(e){ if(drag) e.preventDefault(); },{passive:false});
+  window.addEventListener('keydown',function(e){
+    var t=e.target.tagName; if(t==='INPUT'||t==='SELECT'||t==='TEXTAREA') return;
+    if(e.code==='Space'){ e.preventDefault(); running=!running; setPlay(); }
+    else if(e.key==='e'||e.key==='E'||e.key==='у'){ $('eq').click(); }
+    else if(e.key==='h'||e.key==='H'||e.key==='р'){ $('heat').click(); }
+  });
+  var rt=null; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(resize,150); });
+
+  function loop(t){
+    raf=requestAnimationFrame(loop);
+    var dt=Math.min(.05,(t-lastT)/1000||0); lastT=t;
+    if(running&&!drag) advance(dt);
+    draw(); readouts();
+  }
+
+  P.ionIdx=0; P.m1=1.008; P.m2=1.008;
+  syncSliders(); setType('lj'); pair('Ar','Ar'); resize(); setPlay();
+  lastT=performance.now(); raf=requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
