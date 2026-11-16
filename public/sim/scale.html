@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Масштабы Вселенной — логарифмическая шкала</title>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+:root{
+  --bg:#070c15; --grid:rgba(120,190,255,.05); --surface:#0d1626; --ink:#eaf3fa; --muted:#8ba3b8; --line:rgba(130,200,255,.16);
+  --cyan:#5fe0ff; --amber:#ffb454; --pink:#ff7ab6; --ok:#4cc58d; --warn:#ff7a6e; --on:#07121c;
+  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);color:var(--ink);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:46px 46px;font:16px/1.5 var(--sans)}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 16px 40px}
+h1{font:800 1.7rem/1.15 var(--disp);margin:0 0 8px}
+.lead{margin:0 0 16px;color:var(--muted);max-width:74ch}
+.lead b{color:var(--ink);font-family:var(--mono)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+canvas{display:block;width:100%;border-radius:10px;background:#05080f;touch-action:none}
+#stage{cursor:grab}
+#ladder{cursor:pointer;margin-top:10px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+button{font:inherit;font-family:var(--sans);min-height:42px;padding:8px 13px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.pri{background:var(--cyan);color:var(--on);border-color:var(--cyan);font-weight:600}
+button.sm{min-height:34px;padding:5px 10px;font-size:.84rem}
+button[aria-pressed="true"]{border-color:var(--cyan);color:var(--cyan)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+input[type=range]{width:100%;height:30px;margin:6px 0 0;-webkit-appearance:none;appearance:none;background:transparent;accent-color:var(--cyan)}
+input[type=text],input[type=number],select{font:inherit;font-family:var(--mono);font-size:.86rem;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.rd{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}
+.rd div{background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
+.rd span{display:block;font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.rd b{font-family:var(--mono);font-size:.98rem;color:var(--ink)}
+.rd b.a{color:var(--amber)} .rd b.c{color:var(--cyan)} .rd b.p{color:var(--pink)}
+.info{display:grid;grid-template-columns:1fr;gap:10px}
+.info h2{font:600 1.15rem var(--disp);margin:0}
+.tagline{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.tag{font-family:var(--mono);font-size:.74rem;padding:4px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.info p{margin:8px 0 0;font-size:.94rem}
+.how{margin:8px 0 0;padding:9px 11px;border-left:3px solid var(--ok);background:rgba(76,197,141,.07);border-radius:0 8px 8px 0;font-size:.88rem;color:#c9e6d8}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:12px}
+.grp h2{font:600 1rem var(--disp);margin:0 0 6px;padding-left:10px;border-left:4px solid var(--cyan)}
+.grp.b h2{border-color:var(--amber)} .grp.c h2{border-color:var(--pink)}
+label{display:block;font-size:.86rem;color:var(--muted);margin-top:9px}
+.note{margin:8px 2px 0;font-size:.84rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chips button{border-radius:999px;font-family:var(--mono);font-size:.76rem;min-height:32px;padding:4px 10px}
+.found{max-height:190px;overflow:auto;margin-top:8px;border:1px solid var(--line);border-radius:8px}
+.found button{display:block;width:100%;text-align:left;border:0;border-radius:0;border-bottom:1px solid var(--line);min-height:38px;font-size:.86rem}
+.found button:last-child{border-bottom:0}
+kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+.hide{display:none}
+#pinBox{font-family:var(--mono);font-size:.84rem;color:var(--amber);margin-top:8px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Масштабы Вселенной</h1>
+  <p class="lead">От планковской длины <b>1,6·10⁻³⁵ м</b> до наблюдаемой Вселенной <b>8,8·10²⁶ м</b> — <b>62 порядка</b> на одной логарифмической шкале. Каждый объект нарисован в честном относительном масштабе: сосед слева ровно в 10 раз меньше. Тяните сцену, крутите колесо, двигайте ползунок — и кликайте по объектам.</p>
+
+  <section class="card">
+    <canvas id="stage" aria-label="Сцена масштабов"></canvas>
+    <input type="range" id="zoom" min="-35" max="27" step="0.01" value="0.23" aria-label="Масштаб окна">
+    <div class="bar">
+      <button id="out" class="sm">− порядок</button>
+      <button id="in" class="sm">+ порядок</button>
+      <button id="prev" class="sm">← объект</button>
+      <button id="next" class="sm">объект →</button>
+      <button id="tour" class="pri">▶ Экскурсия</button>
+      <button id="toHuman" class="sm">К человеку</button>
+      <button id="pin" class="sm">Закрепить для сравнения</button>
+    </div>
+    <div id="pinBox"></div>
+    <div class="rd">
+      <div><span>ширина окна</span><b class="c" id="w_win">—</b></div>
+      <div><span>свет проходит окно за</span><b class="a" id="w_light">—</b></div>
+      <div><span>масса для горизонта событий</span><b class="p" id="w_bh">—</b></div>
+      <div><span>объектов в кадре</span><b id="w_cnt">—</b></div>
+    </div>
+    <canvas id="ladder" aria-label="Обзорная шкала всех масштабов"></canvas>
+    <p class="note">Лента внизу — все 62 порядка сразу; рамка показывает текущее окно, клик по ленте переносит туда. Клавиши: <kbd>←</kbd>/<kbd>→</kbd> масштаб, <kbd>↑</kbd>/<kbd>↓</kbd> объекты, <kbd>Пробел</kbd> экскурсия.</p>
+  </section>
+
+  <section class="card info" id="info"></section>
+
+  <div class="ctl">
+    <section class="card grp">
+      <h2>Найти объект</h2>
+      <input type="text" id="q" placeholder="например: протон, Земля, Андромеда">
+      <div class="found" id="found"></div>
+      <label>Категории</label>
+      <div class="chips" id="cats"></div>
+    </section>
+
+    <section class="card grp b">
+      <h2>Горизонт событий по массе</h2>
+      <label>Масса</label>
+      <div class="row2">
+        <input type="number" id="bhM" value="1" step="any" min="0">
+        <select id="bhU">
+          <option value="1.98847e30">масс Солнца</option>
+          <option value="5.9722e24">масс Земли</option>
+          <option value="1">килограмм</option>
+          <option value="70">человек (70 кг)</option>
+        </select>
+      </div>
+      <div class="bar"><button id="bhGo" class="sm">Показать на шкале</button></div>
+      <p class="note" id="bhOut">r_s = 2GM/c². Для Солнца это 2,95 км, для Земли — 8,87 мм.</p>
+    </section>
+
+    <section class="card grp c">
+      <h2>Волна де Бройля</h2>
+      <div class="row2">
+        <div><label>Масса, кг</label><input type="number" id="dbM" value="9.109e-31" step="any" min="0"></div>
+        <div><label>Скорость, м/с</label><input type="number" id="dbV" value="1000000" step="any" min="0"></div>
+      </div>
+      <div class="chips">
+        <button class="sm" data-m="9.109e-31" data-v="1e6">электрон</button>
+        <button class="sm" data-m="0.43" data-v="20">мяч</button>
+        <button class="sm" data-m="70" data-v="1">человек</button>
+      </div>
+      <div class="bar"><button id="dbGo" class="sm">Показать на шкале</button></div>
+      <p class="note" id="dbOut">λ = h/(mv). Именно поэтому квантовые эффекты заметны у электрона и незаметны у мяча.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var C=299792458, G=6.67430e-11, H=6.62607015e-34, MS=1.98847e30, AU=1.495978707e11, LY=9.4607304725808e15;
+  var LO=-35, HI=27, SPAN=3.0;
+
+  var CATS={
+    fund:['Фундаментальные пределы','#ff7ab6'],
+    part:['Частицы и ядра','#ff9ad0'],
+    atom:['Атомы и молекулы','#c9a0ff'],
+    nano:['Наномир','#9fb4ff'],
+    micro:['Микромир и клетки','#5fe0ff'],
+    life:['Живое и человек','#4cc58d'],
+    earth:['Земля и техника','#8fd66f'],
+    space:['Солнечная система','#ffb454'],
+    star:['Звёзды и туманности','#ffd479'],
+    gal:['Галактики','#ff9a6e'],
+    cosmo:['Структура Вселенной','#e0e6ff']
+  };
+
+  var D=[
+  ['planck','Планковская длина',1.616255e-35,'planck','fund','Масштаб, где квантовая гравитация должна переопределить само понятие расстояния. Ниже него современная физика не даёт проверяемых предсказаний.','Вычислена из ħ, G и c: √(ħG/c³). Экспериментально не достигнута.'],
+  ['string','Струна (гипотеза)',1e-34,'wave','fund','В теории струн частицы — колеблющиеся струны примерно планковского размера. Прямых подтверждений нет.','Теоретическая оценка, а не измерение.'],
+  ['lhc','Предел разрешения LHC',1e-19,'point','fund','Самый малый масштаб, который проверяют сегодня: здесь кварки и электроны всё ещё выглядят точечными.','Разрешение ≈ ħc/E при энергии столкновений 13 ТэВ.'],
+  ['quark','Кварк (верхний предел)',1e-19,'point','part','Размер кварка не измерен — есть только верхняя граница. В Стандартной модели он точечный.','Поиск отклонений в рассеянии на LHC.'],
+  ['electron','Электрон: классический радиус',2.8179e-15,'point','part','Условная величина из приравнивания энергии поля к mc². Реальный электрон в опытах точечен.','Вычисление e²/(4πε₀mc²), не измерение размера.'],
+  ['proton','Протон',1.683e-15,'nucleus','part','Зарядовый радиус 0,84 фм. Внутри три валентных кварка и кипящее глюонное поле.','Мюонный водород и упругое рассеяние электронов; «загадка радиуса» уточнена в 2019 г.'],
+  ['neutron','Нейтрон',1.6e-15,'nucleus','part','Почти как протон, но нейтрален. Свободный нейтрон живёт около 15 минут.','Рассеяние нейтронов и электронов на ядрах.'],
+  ['compP','Комптоновская длина протона',1.3214e-15,'wave','part','Квантовый масштаб протона h/(mc): ниже него положение частицы размывается рождением пар.','Вычисление h/(m_p·c).'],
+  ['alpha','Ядро гелия-4',3.81e-15,'nucleus','part','Альфа-частица: два протона и два нейтрона, исключительно прочная связка.','Оценка r ≈ 1,2·A^⅓ фм, уточняется рассеянием.'],
+  ['cN','Ядро углерода-12',5.5e-15,'nucleus','part','Эталон атомной массы: ровно 12 атомных единиц.','Рассеяние электронов на ядрах.'],
+  ['feN','Ядро железа-56',9.18e-15,'nucleus','part','Предел энерговыгодного синтеза: дальше синтез уже требует затрат энергии.','Рассеяние электронов; систематика r ≈ 1,2·A^⅓ фм.'],
+  ['uN','Ядро урана-238',1.487e-14,'nucleus','part','Самое тяжёлое природное ядро, склонное к делению и альфа-распаду.','Рассеяние электронов и спектроскопия мюонных атомов.'],
+  ['compE','Комптоновская длина электрона',2.4263e-12,'wave','part','Квантовый масштаб электрона. Задаёт предел локализации без рождения электрон-позитронных пар.','Вычисление h/(m_e·c).'],
+  ['heAtom','Атом гелия',1.0e-10,'atom','atom','Самый компактный атом: два электрона крепко держатся у ядра.','Газовая кинетика, спектроскопия, расчёт электронной плотности.'],
+  ['hAtom','Атом водорода',1.0584e-10,'atom','atom','Диаметр по боровскому радиусу 52,9 пм. Простейший атом, эталон квантовой теории.','Спектроскопия серии Бальмера и точный расчёт по уравнению Шрёдингера.'],
+  ['water','Молекула воды',2.8e-10,'molecule','atom','Две связи O–H под углом 104,5°. Полярность именно отсюда.','Рентгеновская и нейтронная дифракция, микроволновая спектроскопия.'],
+  ['cAtom','Атом углерода',1.4e-10,'atom','atom','Основа органической химии: четыре связи, бесконечное разнообразие.','Дифракция и длины ковалентных связей.'],
+  ['glucose','Молекула глюкозы',9e-10,'molecule','atom','Шесть атомов углерода в кольце — топливо почти всей биосферы.','Рентгеноструктурный анализ кристаллов.'],
+  ['csAtom','Атом цезия',5.3e-10,'atom','atom','Самый крупный нейтральный атом. Его переход задаёт определение секунды.','Атомные часы и спектроскопия сверхтонкой структуры.'],
+  ['c60','Фуллерен C₆₀',1.0e-9,'molecule','atom','Углеродный «футбольный мяч» из 60 атомов. Показал волновую интерференцию молекул.','Масс-спектрометрия, дифракция молекулярных пучков.'],
+  ['nanotube','Углеродная нанотрубка',1.0e-9,'rod','nano','Свёрнутый лист графена: прочность на растяжение выше стали в десятки раз.','Просвечивающая электронная микроскопия.'],
+  ['dnaW','Диаметр спирали ДНК',2.0e-9,'dna','nano','Двойная спираль шириной 2 нм — носитель наследственной информации почти всех живых организмов.','Рентгеновская дифракция (снимок 51 Франклин) и кристаллография.'],
+  ['dnaTurn','Виток ДНК',3.4e-9,'dna','nano','Один полный оборот спирали: 10 пар оснований с шагом 0,34 нм.','Дифракция и структурный анализ.'],
+  ['hemoglobin','Гемоглобин',5.5e-9,'molecule','nano','Белок из четырёх субъединиц, переносящий кислород в крови.','Рентгеноструктурный анализ; одна из первых расшифрованных структур белка.'],
+  ['membrane','Клеточная мембрана',8e-9,'rod','nano','Двойной слой липидов толщиной около 8 нм — граница любой клетки.','Электронная микроскопия и рассеяние рентгена.'],
+  ['ribosome','Рибосома',2.5e-8,'molecule','nano','Молекулярная машина, собирающая белок по мРНК.','Криоэлектронная микроскопия и кристаллография.'],
+  ['polio','Полиовирус',3e-8,'virus','nano','Один из самых мелких вирусов: только РНК и белковая оболочка.','Электронная микроскопия.'],
+  ['flu','Вирус гриппа',1e-7,'virus','micro','Сферическая оболочка с шипами гемагглютинина, около 100 нм.','Электронная микроскопия и криоэлектронная томография.'],
+  ['sars','SARS-CoV-2',1e-7,'virus','micro','Коронавирус диаметром 60–140 нм; шипы S-белка обеспечивают вход в клетку.','Криоэлектронная микроскопия.'],
+  ['mito','Митохондрия',1e-6,'rod','micro','Энергетическая станция клетки со своей ДНК — потомок древней бактерии.','Световая и электронная микроскопия.'],
+  ['pm25','Частица PM2.5',2.5e-6,'grain','micro','Мелкая пыль, проходящая глубоко в лёгкие; главный вредный компонент смога.','Фильтрация и лазерный счётчик частиц.'],
+  ['ecoli','Бактерия E. coli',2e-6,'rod','micro','Палочка длиной 2 мкм — рабочая лошадка молекулярной биологии.','Световая микроскопия.'],
+  ['rbc','Эритроцит',7.5e-6,'cell','micro','Двояковогнутый диск без ядра: максимальная площадь для газообмена.','Световая микроскопия, гематологические анализаторы.'],
+  ['ovum','Яйцеклетка человека',1.2e-4,'cell','micro','Самая крупная клетка человека — её почти видно невооружённым глазом.','Микроскопия в репродуктивной медицине.'],
+  ['paper','Толщина листа бумаги',1e-4,'rod','life','Около 0,1 мм — привычный ориентир между микромиром и макромиром.','Микрометр.'],
+  ['hair','Толщина волоса',7e-5,'hair','micro','От 17 до 180 мкм; 70 мкм — типичное среднее.','Микрометр и микроскопия.'],
+  ['amoeba','Амёба',5e-4,'cell','micro','Одноклеточное размером с половину миллиметра, меняющее форму.','Световая микроскопия.'],
+  ['sand','Песчинка',5e-4,'grain','life','Полмиллиметра — нижняя граница «песка» по геологической шкале.','Ситовой анализ и микроскопия.'],
+  ['ant','Муравей',4e-3,'ant','life','Четыре миллиметра. Поднимает груз в десятки раз тяжелее себя.','Прямое измерение.'],
+  ['bee','Пчела',1.5e-2,'ant','life','Полтора сантиметра; машет крыльями около 230 раз в секунду.','Прямое измерение и высокоскоростная съёмка.'],
+  ['coin','Монета 1 рубль',2.05e-2,'coin','life','Диаметр 20,5 мм — удобный карманный эталон.','Штангенциркуль.'],
+  ['ball','Футбольный мяч',2.2e-1,'ball','life','Диаметр 22 см по стандарту FIFA.','Прямое измерение.'],
+  ['cat','Кошка',5e-1,'whale','life','Полметра в длину — масштаб, на котором мы хорошо чувствуем размеры.','Прямое измерение.'],
+  ['human','Человек',1.7,'human','life','Точка отсчёта всей шкалы. Мы примерно посередине между планковской длиной и Вселенной в логарифмическом смысле.','Ростомер.'],
+  ['house','Дом',1e1,'tower','life','Десять метров — три этажа.','Прямое измерение.'],
+  ['whale','Синий кит',30,'whale','life','Крупнейшее животное за всю историю Земли: до 30 м и 150 т.','Фотограмметрия с дронов и лазерное измерение.'],
+  ['field','Футбольное поле',105,'rod','life','105 м в длину по стандарту.','Прямое измерение.'],
+  ['sequoia','Секвойя «Гиперион»',115.9,'tree','life','Самое высокое известное дерево: 115,9 м.','Лазерная дальнометрия и прямое измерение рулеткой.'],
+  ['eiffel','Эйфелева башня',330,'tower','earth','330 м с антенной; при жаре вырастает на несколько сантиметров.','Геодезия.'],
+  ['carrier','Авианосец',333,'rod','earth','Корпус длиной 333 м — плавучий город.','Прямое измерение.'],
+  ['ben','Астероид Бенну',490,'grain','earth','Угловатая «куча щебня» диаметром 490 м; с него доставили образец грунта.','Лазерный альтиметр OSIRIS-REx и радиолокация.'],
+  ['burj','Бурдж-Халифа',828,'tower','earth','Высочайшее сооружение мира: 828 м.','Геодезия и лазерное сканирование.'],
+  ['phobos','Фобос',2.2e4,'grain','space','Спутник Марса неправильной формы, 22 км; падает на планету.','Снимки аппаратов и лазерная альтиметрия.'],
+  ['lhcRing','Кольцо LHC',8600,'ring','earth','27 км окружности, то есть 8,6 км в поперечнике — крупнейшая машина человечества.','Геодезия туннеля.'],
+  ['everest','Эверест (высота)',8849,'mountain','earth','8848,86 м — согласованная высота по совместно объявленным данным Китая и Непала.','GNSS-приёмник на вершине и гравиметрия.'],
+  ['trench','Марианская впадина',10935,'trench','earth','Глубочайшая точка океана, около 10 935 м.','Многолучевой эхолот и батиметрия.'],
+  ['neutronStar','Нейтронная звезда',2.4e4,'sphere','star','Масса Солнца в шарике 24 км: ложка вещества весит миллиарды тонн.','Рентгеновская спектроскопия и NICER-моделирование профиля импульсов.'],
+  ['city','Город поперёк',3e4,'city','earth','30 км — типичный поперечник крупного города.','Спутниковые снимки.'],
+  ['bhEarth','Горизонт для массы Земли',1.774e-2,'bh','fund','Если сжать Землю до 17,7 мм в поперечнике, она станет чёрной дырой.','Вычисление 2GM/c² для массы Земли.'],
+  ['bhSun','Горизонт для массы Солнца',5907,'bh','star','Солнце стало бы чёрной дырой при сжатии до 5,9 км в поперечнике.','Вычисление 2GM/c²: 2,95 км на каждую массу Солнца.'],
+  ['ceres','Церера',9.4e5,'sphere','space','Крупнейший объект пояса астероидов, карликовая планета 940 км.','Снимки Dawn и лазерная альтиметрия.'],
+  ['pluto','Плутон',2.377e6,'sphere','space','2377 км; ледяные равнины и горы из водяного льда.','New Horizons: снимки и радиопокрытия.'],
+  ['moon','Луна',3.474e6,'sphere','space','3474 км. Всегда обращена к нам одной стороной.','Лазерная лоция по уголковым отражателям и снимки.'],
+  ['io','Ио',3.643e6,'sphere','space','Самое вулканически активное тело Солнечной системы.','Снимки Voyager и Galileo.'],
+  ['mercury','Меркурий',4.879e6,'sphere','space','4879 км; огромная железная ядра и почти нет атмосферы.','Радиолокация и MESSENGER.'],
+  ['ganymede','Ганимед',5.268e6,'sphere','space','Крупнейший спутник в системе: больше Меркурия.','Снимки и гравитационные измерения Galileo.'],
+  ['mars','Марс',6.779e6,'sphere','space','6779 км; Олимп высотой 22 км и каньоны длиной 4000 км.','Лазерная альтиметрия MOLA.'],
+  ['venus','Венера',1.2104e7,'sphere','space','12 104 км, почти близнец Земли, но с адской парниковой атмосферой.','Радиолокация сквозь облака (Magellan).'],
+  ['earth','Земля',1.2742e7,'sphere','space','12 742 км в поперечнике. Единственное известное место с жизнью.','Геодезия, GNSS и спутниковая гравиметрия.'],
+  ['wd','Белый карлик',1.4e7,'sphere','star','Остаток звезды размером с Землю, но массой с Солнце.','Спектроскопия и гравитационное красное смещение.'],
+  ['neptune','Нептун',4.9244e7,'sphere','space','49 244 км; ветры до 2000 км/ч — самые быстрые в системе.','Voyager 2 и телескопы.'],
+  ['uranus','Уран',5.0724e7,'sphere','space','50 724 км, вращается «лёжа на боку».','Voyager 2 и адаптивная оптика.'],
+  ['saturn','Сатурн',1.1646e8,'ringed','space','116 460 км; кольца толщиной всего десятки метров.','Cassini: снимки и радиопокрытия.'],
+  ['jupiter','Юпитер',1.3982e8,'sphere','space','139 820 км — больше всех остальных планет вместе.','Снимки и гравитационные измерения Juno.'],
+  ['sun','Солнце',1.3914e9,'star','space','1 391 400 км; 99,86 % массы всей Солнечной системы.','Гелиосейсмология и прямое измерение углового диаметра.'],
+  ['sirius','Сириус A',2.379e9,'star','star','Ярчайшая звезда нашего неба, в 1,7 раза крупнее Солнца.','Интерферометрия и спектроскопия.'],
+  ['lightSec','Световая секунда',2.998e8,'wave','space','300 тыс. км — предел скорости передачи любого сигнала.','Определение метра через c.'],
+  ['moonDist','Расстояние до Луны',3.844e8,'orbit','space','384 400 км. Свет идёт 1,28 с, «Аполлон» летел трое суток.','Лазерная лоция по отражателям с точностью до сантиметров.'],
+  ['bhSgr','Горизонт Sgr A*',2.538e10,'bh','star','Чёрная дыра в центре нашей Галактики: 4,3 млн масс Солнца, горизонт 25,4 млн км.','Event Horizon Telescope и орбиты звёзд S2 (Нобель 2020).'],
+  ['lightMin','Световая минута',1.799e10,'wave','space','18 млн км — масштаб задержки связи с межпланетными аппаратами.','Радиолокация и телеметрия.'],
+  ['au','Астрономическая единица',1.496e11,'orbit','space','149,6 млн км — среднее расстояние Земля–Солнце, базовая линейка астрономии.','Радиолокация планет и небесная механика.'],
+  ['marsOrbit','Орбита Марса (поперёк)',4.56e11,'orbit','space','456 млн км; отсюда окна запусков раз в 26 месяцев.','Небесная механика и радиолокация.'],
+  ['betelgeuse','Бетельгейзе',1.234e12,'star','star','Красный сверхгигант: если поместить в центр системы, поглотит орбиту Марса.','Интерферометрия и моделирование пульсаций.'],
+  ['lightHour','Световой час',1.079e12,'wave','space','1,08 млрд км — примерно радиус орбиты Сатурна.','Определение через c.'],
+  ['jupOrbit','Орбита Юпитера (поперёк)',1.556e12,'orbit','space','1,56 млрд км; год Юпитера длится 11,9 земного года.','Небесная механика.'],
+  ['uyScuti','UY Щита',2.377e12,'star','star','Одна из крупнейших звёзд: около 1700 радиусов Солнца.','Интерферометрия и спектральная оценка светимости.'],
+  ['steph218','Stephenson 2-18',2.99e12,'star','star','Кандидат в самые большие звёзды: около 2150 радиусов Солнца.','Инфракрасная спектроскопия и оценка расстояния до скопления.'],
+  ['nepOrbit','Орбита Нептуна (поперёк)',9.0e12,'orbit','space','9 млрд км — граница «классической» планетной системы.','Небесная механика.'],
+  ['kuiper','Пояс Койпера',1.5e13,'bubble','space','Ледяные тела за Нептуном, до 50 а.е. от Солнца.','Обзоры неба и поиск транснептуновых объектов.'],
+  ['helio','Гелиосфера',1.8e13,'bubble','space','Пузырь солнечного ветра; «Вояджеры» пересекли его границу.','Прямые измерения частиц и полей на «Вояджерах».'],
+  ['bhM87','Горизонт M87*',3.839e13,'bh','star','6,5 млрд масс Солнца. Первое сфотографированное «кольцо» чёрной дыры (2019).','Event Horizon Telescope: интерферометрия размером с Землю.'],
+  ['oort','Облако Оорта',1.5e16,'bubble','space','Гипотетическая сфера ледяных тел до 100 тыс. а.е. — источник долгопериодических комет.','Косвенно: по орбитам комет.'],
+  ['ly','Световой год',9.4607e15,'wave','star','9,46 трлн км — расстояние, которое свет проходит за год.','Определение через c и юлианский год.'],
+  ['pc','Парсек',3.0857e16,'wave','star','3,26 светового года; расстояние, с которого 1 а.е. видна под углом 1″.','Тригонометрический параллакс.'],
+  ['proxima','До Проксимы Центавра',4.014e16,'orbit','star','4,25 светового года — ближайшая к нам звезда.','Параллакс Gaia с точностью до микросекунд дуги.'],
+  ['crab','Крабовидная туманность',1.1e17,'nebula','star','Остаток сверхновой 1054 года, внутри пульсар с периодом 33 мс.','Снимки и измерение расширения по доплеровским скоростям.'],
+  ['orion','Туманность Ориона',2.3e17,'nebula','star','Ближайшая крупная «фабрика звёзд», видна невооружённым глазом.','Параллаксы Gaia и радионаблюдения молекулярных линий.'],
+  ['pleiades','Плеяды',4.0e17,'cluster','star','Молодое рассеянное скопление; его расстояние когда-то было предметом спора.','Параллакс Gaia разрешил противоречие с Hipparcos.'],
+  ['globular','Шаровое скопление',1.0e18,'cluster','star','Сотни тысяч старых звёзд в шаре диаметром ~100 световых лет.','Диаграмма Герцшпрунга–Рессела и цефеиды.'],
+  ['disk','Толщина диска Галактики',9.5e18,'rod','gal','Около 1000 световых лет — мы живём внутри этого тонкого слоя.','Подсчёты звёзд и данные Gaia.'],
+  ['milky','Млечный Путь',9.46e20,'galaxy','gal','100 тыс. световых лет, 100–400 млрд звёзд. Солнце делает оборот за 230 млн лет.','Радиоастрономия (линия 21 см), Gaia и мазеры.'],
+  ['andromeda','Андромеда',1.44e21,'galaxy','gal','Крупнейшая галактика Местной группы; столкнётся с нашей через ~4,5 млрд лет.','Цефеиды, собственные движения Hubble и Gaia.'],
+  ['toAnd','Расстояние до Андромеды',2.4e22,'orbit','gal','2,5 млн световых лет — самый далёкий объект, видимый невооружённым глазом.','Цефеиды и затменные двойные.'],
+  ['localGroup','Местная группа',9.5e22,'cluster','gal','Около 80 галактик в области 10 млн световых лет.','Красные смещения и стандартные свечи.'],
+  ['virgo','Сверхскопление Девы',1.04e24,'cluster','cosmo','110 млн световых лет; наша группа падает к его центру.','Обзоры красных смещений и цефеиды.'],
+  ['laniakea','Ланиакея',4.9e24,'web','cosmo','520 млн световых лет — «необъятные небеса», наша сверхструктура.','Картирование пекулярных скоростей галактик (Cosmicflows).'],
+  ['sloan','Великая стена Sloan',1.3e25,'web','cosmo','1,37 млрд световых лет — одна из крупнейших известных структур.','Обзор SDSS: миллионы красных смещений.'],
+  ['hubble','Радиус Хаббла',1.3725e26,'bubble','cosmo','c/H₀ ≈ 14,4 млрд световых лет: дальше скорость убегания превышает c.','Измерение H₀ по цефеидам, сверхновым и реликтовому излучению.'],
+  ['observable','Наблюдаемая Вселенная',8.8e26,'web','cosmo','93 млрд световых лет в поперечнике. Больше, чем 13,8 млрд лет × c, потому что пространство расширялось.','Реликтовое излучение (Planck) плюс модель ΛCDM.']
+  ];
+
+  var OB=D.map(function(a){ return {id:a[0],n:a[1],d:a[2],k:a[3],c:a[4],desc:a[5],how:a[6],L:Math.log10(a[2])}; })
+          .sort(function(x,y){ return x.d-y.d; });
+  var byId={}; OB.forEach(function(o){ byId[o.id]=o; });
+
+  var SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+  function sup(n){ return String(n).split('').map(function(ch){return SUP[ch]||ch}).join(''); }
+  function nf(x,n){ return x.toFixed(n).replace('.',','); }
+  function sci(x){ var e=Math.floor(Math.log10(Math.abs(x))); var m=x/Math.pow(10,e); return nf(m,2)+'·10'+sup(e); }
+  function len(m){
+    var a=Math.abs(m);
+    if(a<1e-15) return sci(m)+' м';
+    if(a<1e-12) return nf(m/1e-15,2)+' фм';
+    if(a<1e-9)  return nf(m/1e-12,2)+' пм';
+    if(a<1e-6)  return nf(m/1e-9,2)+' нм';
+    if(a<1e-3)  return nf(m/1e-6,2)+' мкм';
+    if(a<1)     return nf(m/1e-3,2)+' мм';
+    if(a<1e3)   return nf(m,2)+' м';
+    if(a<1e6)   return nf(m/1e3,2)+' км';
+    if(a<1e9)   return nf(m/1e6,2)+' тыс. км';
+    if(a<0.05*AU) return nf(m/1e9,2)+' млн км';
+    if(a<1e15)  return nf(m/AU,2)+' а.е.';
+    if(a<1e22)  return nf(m/LY,2)+' св. лет';
+    if(a<1e25)  return nf(m/LY/1e6,2)+' млн св. лет';
+    return nf(m/LY/1e9,2)+' млрд св. лет';
+  }
+  function tim(t){
+    var a=Math.abs(t);
+    if(a<1e-18) return sci(t)+' с';
+    if(a<1e-12) return nf(t/1e-15,2)+' фс';
+    if(a<1e-9)  return nf(t/1e-12,2)+' пс';
+    if(a<1e-6)  return nf(t/1e-9,2)+' нс';
+    if(a<1e-3)  return nf(t/1e-6,2)+' мкс';
+    if(a<1)     return nf(t/1e-3,2)+' мс';
+    if(a<60)    return nf(t,2)+' с';
+    if(a<3600)  return nf(t/60,2)+' мин';
+    if(a<86400) return nf(t/3600,2)+' ч';
+    if(a<3.156e7) return nf(t/86400,2)+' сут';
+    if(a<3.156e10) return nf(t/3.15576e7,2)+' лет';
+    if(a<3.156e13) return nf(t/3.15576e10,2)+' тыс. лет';
+    if(a<3.156e16) return nf(t/3.15576e13,2)+' млн лет';
+    return nf(t/3.15576e16,2)+' млрд лет';
+  }
+  function mass(kg){
+    if(kg<1e-6) return sci(kg)+' кг';
+    if(kg<1e3) return nf(kg,2)+' кг';
+    if(kg<1e27) return nf(kg/1e24,2)+'·10²⁴ кг';
+    if(kg<1e29) return nf(kg/5.9722e24,2)+' масс Земли';
+    if(kg<1e33) return nf(kg/MS,2)+' масс Солнца';
+    return sci(kg/MS)+' масс Солнца';
+  }
+  function ratio(a,b){
+    var r=a/b;
+    if(r>=1e4||r<1e-3) return sci(r);
+    if(r>=100) return nf(r,0);
+    if(r>=1) return nf(r,2);
+    return nf(r,4);
+  }
+
+  var logW=0.23, logT=0.23, sel=null, pinned=null, touring=false, drag=null, dragX=0, dragL=0;
+  var filt={}, anyFilt=false;
+  Object.keys(CATS).forEach(function(k){ filt[k]=true; });
+  var W=900,Hs=340,Hl=76,dpr=1,PAD=46;
+  var st=$('stage'), sx=st.getContext('2d'), la=$('ladder'), lx=la.getContext('2d');
+  var marks=[];
+
+  function usable(){ return W-2*PAD; }
+  function ax(L){ return PAD+(L-(logW-SPAN))/SPAN*usable(); }
+  function dsz(d){ return d/Math.pow(10,logW)*usable(); }
+  function jump(o){ logT=Math.min(HI,Math.max(LO,o.L+Math.log10(usable()/(Hs*0.66)))); sel=o; info(); }
+  function vis(o){ return filt[o.c] && o.L<=logW+0.02 && dsz(o.d)>=1.6; }
+
+  function resize(){
+    W=Math.max(300,Math.round(st.parentNode.clientWidth-28));
+    dpr=Math.min(2,window.devicePixelRatio||1);
+    Hs=Math.max(260,Math.round(Math.min(400,W*0.40))); Hl=76;
+    st.width=W*dpr; st.height=Hs*dpr; st.style.height=Hs+'px'; sx.setTransform(dpr,0,0,dpr,0,0);
+    la.width=W*dpr; la.height=Hl*dpr; la.style.height=Hl+'px'; lx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  /* ---------- рисование объектов ---------- */
+  function sph(x,y,r,col,hi){
+    var g=sx.createRadialGradient(x-r*.32,y-r*.34,r*.06,x,y,r);
+    g.addColorStop(0,hi||'#ffffff'); g.addColorStop(.34,col); g.addColorStop(1,'#060b12');
+    sx.fillStyle=g; sx.beginPath(); sx.arc(x,y,r,0,6.2832); sx.fill();
+  }
+  function glow(x,y,r,col){
+    var g=sx.createRadialGradient(x,y,r*.2,x,y,r*1.7);
+    g.addColorStop(0,col+'66'); g.addColorStop(1,col+'00');
+    sx.fillStyle=g; sx.beginPath(); sx.arc(x,y,r*1.7,0,6.2832); sx.fill();
+  }
+  function shape(o,x,y,s,col){
+    var r=s/2;
+    switch(o.k){
+      case 'planck':
+        sx.strokeStyle=col; sx.lineWidth=1;
+        for(var i=0;i<7;i++) for(var j=0;j<7;j++){
+          var px=x-r+ s*i/6, py=y-r+s*j/6, o2=Math.sin(i*1.7+j*2.3)*r*.12;
+          sx.beginPath(); sx.arc(px+o2,py-o2,Math.max(.6,s*.035),0,6.2832); sx.stroke();
+        } break;
+      case 'point':
+        glow(x,y,r,col); sph(x,y,Math.max(1.5,r*.42),col);
+        sx.strokeStyle=col+'88'; sx.lineWidth=1;
+        sx.beginPath(); sx.arc(x,y,r*.8,0,6.2832); sx.stroke(); break;
+      case 'nucleus':
+        glow(x,y,r,col);
+        var n=o.d<2e-15?3:(o.d<6e-15?7:12);
+        for(var i2=0;i2<n;i2++){
+          var a=i2*2.399, rr=r*.55*Math.sqrt(i2/n);
+          sph(x+Math.cos(a)*rr,y+Math.sin(a)*rr,Math.max(1.2,r*.34),i2%2?col:'#eaf3fa');
+        } break;
+      case 'atom':
+        glow(x,y,r*.7,'#ffb454');
+        sx.strokeStyle=col+'99'; sx.lineWidth=Math.max(.8,s*.014);
+        for(var k=0;k<3;k++){ sx.save(); sx.translate(x,y); sx.rotate(k*1.047);
+          sx.beginPath(); sx.ellipse(0,0,r*.92,r*.36,0,0,6.2832); sx.stroke(); sx.restore(); }
+        sph(x,y,Math.max(1.5,r*.2),'#ffb454');
+        for(var k2=0;k2<3;k2++){ var a2=k2*2.09+.6;
+          sph(x+Math.cos(a2)*r*.9,y+Math.sin(a2)*r*.34,Math.max(1,r*.1),col); } break;
+      case 'molecule':
+        var pts=[[0,-.5],[-.5,.2],[.5,.2],[0,.55],[-.75,-.35],[.75,-.35]];
+        sx.strokeStyle=col+'aa'; sx.lineWidth=Math.max(.8,s*.05);
+        pts.forEach(function(p,i3){ if(i3){ sx.beginPath(); sx.moveTo(x,y); sx.lineTo(x+p[0]*r,y+p[1]*r); sx.stroke(); } });
+        pts.forEach(function(p,i4){ sph(x+p[0]*r,y+p[1]*r,Math.max(1.2,r*.26),i4%2?col:'#eaf3fa'); }); break;
+      case 'dna':
+        sx.lineWidth=Math.max(.9,s*.05);
+        for(var t=0;t<=40;t++){
+          var u=t/40, yy=y-r+s*u, ph=u*6.2832*2;
+          var x1=x+Math.sin(ph)*r*.5, x2=x+Math.sin(ph+3.1416)*r*.5;
+          if(t%4===0){ sx.strokeStyle=col+'66'; sx.beginPath(); sx.moveTo(x1,yy); sx.lineTo(x2,yy); sx.stroke(); }
+          sx.fillStyle=col; sx.beginPath(); sx.arc(x1,yy,Math.max(.7,s*.035),0,6.2832); sx.fill();
+          sx.fillStyle='#ffb454'; sx.beginPath(); sx.arc(x2,yy,Math.max(.7,s*.035),0,6.2832); sx.fill();
+        } break;
+      case 'rod':
+        sx.fillStyle=col; sx.beginPath();
+        if(s>6){ sx.roundRect ? sx.roundRect(x-r*.22,y-r,r*.44,s,r*.22) : sx.rect(x-r*.22,y-r,r*.44,s); }
+        else sx.rect(x-r*.3,y-r*.5,r*.6,r);
+        sx.fill(); break;
+      case 'hair':
+        sx.strokeStyle=col; sx.lineWidth=Math.max(1,s*.16);
+        sx.beginPath(); sx.moveTo(x-r,y+r*.2); sx.quadraticCurveTo(x,y-r*.4,x+r,y+r*.1); sx.stroke(); break;
+      case 'virus':
+        glow(x,y,r*.8,col); sph(x,y,r*.66,col);
+        sx.strokeStyle=col; sx.lineWidth=Math.max(.8,s*.03);
+        for(var v=0;v<14;v++){ var av=v*.4488;
+          sx.beginPath(); sx.moveTo(x+Math.cos(av)*r*.66,y+Math.sin(av)*r*.66);
+          sx.lineTo(x+Math.cos(av)*r*.95,y+Math.sin(av)*r*.95); sx.stroke();
+          sx.beginPath(); sx.arc(x+Math.cos(av)*r*.95,y+Math.sin(av)*r*.95,Math.max(.8,s*.035),0,6.2832); sx.fillStyle=col; sx.fill(); } break;
+      case 'cell':
+        glow(x,y,r*.7,col); sph(x,y,r,col);
+        sph(x+r*.15,y-r*.1,Math.max(1,r*.34),'#ff7ab6');
+        for(var c2=0;c2<5;c2++){ var ac=c2*1.256;
+          sx.fillStyle=col+'aa'; sx.beginPath();
+          sx.ellipse(x+Math.cos(ac)*r*.6,y+Math.sin(ac)*r*.6,Math.max(.8,r*.14),Math.max(.6,r*.08),ac,0,6.2832); sx.fill(); } break;
+      case 'grain':
+        sx.fillStyle=col; sx.beginPath();
+        for(var g2=0;g2<9;g2++){ var ag=g2*.698, rg=r*(.7+.3*Math.abs(Math.sin(g2*2.1)));
+          var gx=x+Math.cos(ag)*rg, gy=y+Math.sin(ag)*rg; g2?sx.lineTo(gx,gy):sx.moveTo(gx,gy); }
+        sx.closePath(); sx.fill(); break;
+      case 'coin':
+        sx.fillStyle=col; sx.beginPath(); sx.ellipse(x,y,r,r*.94,0,0,6.2832); sx.fill();
+        sx.strokeStyle='#0a1420'; sx.lineWidth=Math.max(.6,s*.03); sx.stroke(); break;
+      case 'ball':
+        sph(x,y,r,'#eaf3fa'); sx.fillStyle='#0a1420';
+        for(var b=0;b<5;b++){ var ab=b*1.2566;
+          sx.beginPath(); sx.arc(x+Math.cos(ab)*r*.55,y+Math.sin(ab)*r*.55,Math.max(.8,r*.17),0,6.2832); sx.fill(); } break;
+      case 'ant':
+        sx.fillStyle=col;
+        [[-.55,.28],[-.05,.34],[.5,.42]].forEach(function(p){ sx.beginPath(); sx.ellipse(x+p[0]*r,y,r*p[1],r*p[1]*.8,0,0,6.2832); sx.fill(); });
+        sx.strokeStyle=col; sx.lineWidth=Math.max(.7,s*.03);
+        for(var l=0;l<3;l++){ var lx2=x-r*.1+l*r*.25;
+          sx.beginPath(); sx.moveTo(lx2,y); sx.lineTo(lx2-r*.2,y+r*.7); sx.stroke();
+          sx.beginPath(); sx.moveTo(lx2,y); sx.lineTo(lx2+r*.2,y+r*.7); sx.stroke(); } break;
+      case 'human':
+        sx.fillStyle=col;
+        sx.beginPath(); sx.arc(x,y-r*.78,r*.17,0,6.2832); sx.fill();
+        sx.beginPath(); sx.moveTo(x-r*.2,y-r*.55); sx.lineTo(x+r*.2,y-r*.55);
+        sx.lineTo(x+r*.16,y+r*.1); sx.lineTo(x-r*.16,y+r*.1); sx.closePath(); sx.fill();
+        sx.lineWidth=Math.max(1,r*.13); sx.strokeStyle=col;
+        sx.beginPath(); sx.moveTo(x-r*.1,y+r*.08); sx.lineTo(x-r*.16,y+r); sx.stroke();
+        sx.beginPath(); sx.moveTo(x+r*.1,y+r*.08); sx.lineTo(x+r*.16,y+r); sx.stroke();
+        sx.beginPath(); sx.moveTo(x-r*.18,y-r*.45); sx.lineTo(x-r*.42,y+r*.02); sx.stroke();
+        sx.beginPath(); sx.moveTo(x+r*.18,y-r*.45); sx.lineTo(x+r*.42,y+r*.02); sx.stroke(); break;
+      case 'whale':
+        sx.fillStyle=col; sx.beginPath();
+        sx.moveTo(x-r,y); sx.quadraticCurveTo(x-r*.3,y-r*.42,x+r*.6,y-r*.1);
+        sx.quadraticCurveTo(x+r*.85,y-r*.05,x+r,y-r*.35);
+        sx.lineTo(x+r*.8,y+r*.05); sx.quadraticCurveTo(x+r*.2,y+r*.4,x-r,y); sx.closePath(); sx.fill(); break;
+      case 'tree':
+        sx.strokeStyle='#7a5a34'; sx.lineWidth=Math.max(1.2,r*.18);
+        sx.beginPath(); sx.moveTo(x,y+r); sx.lineTo(x,y-r*.2); sx.stroke();
+        sx.fillStyle=col;
+        for(var t2=0;t2<3;t2++){ var ty=y-r*.15-t2*r*.3, tw=r*(.62-t2*.16);
+          sx.beginPath(); sx.moveTo(x-tw,ty); sx.lineTo(x+tw,ty); sx.lineTo(x,ty-r*.45); sx.closePath(); sx.fill(); } break;
+      case 'tower':
+        sx.fillStyle=col; sx.beginPath();
+        sx.moveTo(x-r*.34,y+r); sx.lineTo(x+r*.34,y+r); sx.lineTo(x+r*.07,y-r*.85);
+        sx.lineTo(x,y-r); sx.lineTo(x-r*.07,y-r*.85); sx.closePath(); sx.fill(); break;
+      case 'ring':
+        sx.strokeStyle=col; sx.lineWidth=Math.max(1.2,s*.055);
+        sx.beginPath(); sx.ellipse(x,y,r,r*.5,0,0,6.2832); sx.stroke();
+        sx.fillStyle='#ffb454';
+        for(var d2=0;d2<4;d2++){ var ad=d2*1.5708+.4;
+          sx.beginPath(); sx.arc(x+Math.cos(ad)*r,y+Math.sin(ad)*r*.5,Math.max(1,s*.035),0,6.2832); sx.fill(); } break;
+      case 'mountain':
+        sx.fillStyle=col; sx.beginPath(); sx.moveTo(x-r,y+r*.6); sx.lineTo(x-r*.1,y-r); sx.lineTo(x+r,y+r*.6); sx.closePath(); sx.fill();
+        sx.fillStyle='#eaf3fa'; sx.beginPath(); sx.moveTo(x-r*.32,y-r*.4); sx.lineTo(x-r*.1,y-r); sx.lineTo(x+r*.14,y-r*.4); sx.closePath(); sx.fill(); break;
+      case 'trench':
+        sx.fillStyle=col; sx.beginPath(); sx.moveTo(x-r,y-r*.6); sx.lineTo(x-r*.12,y+r); sx.lineTo(x+r*.1,y+r); sx.lineTo(x+r,y-r*.6);
+        sx.lineTo(x+r*.5,y-r*.3); sx.lineTo(x,y+r*.5); sx.lineTo(x-r*.5,y-r*.3); sx.closePath(); sx.fill(); break;
+      case 'city':
+        sx.fillStyle=col;
+        for(var b2=0;b2<9;b2++){ var bw=s/11, bh=r*(.35+.65*Math.abs(Math.sin(b2*1.9)));
+          sx.fillRect(x-r+b2*s/9,y+r-bh,bw,bh); } break;
+      case 'sphere': sph(x,y,r,col); break;
+      case 'ringed':
+        sx.strokeStyle=col+'cc'; sx.lineWidth=Math.max(1.2,s*.07);
+        sx.beginPath(); sx.ellipse(x,y,r*1.35,r*.34,-.22,0,6.2832); sx.stroke();
+        sph(x,y,r*.72,col); break;
+      case 'star':
+        glow(x,y,r,col); sph(x,y,r,col,'#fff8e6');
+        sx.strokeStyle=col+'55'; sx.lineWidth=Math.max(.8,s*.02);
+        sx.beginPath(); sx.arc(x,y,r*1.16,0,6.2832); sx.stroke(); break;
+      case 'orbit':
+        sx.strokeStyle=col+'88'; sx.lineWidth=Math.max(.8,s*.012);
+        sx.beginPath(); sx.ellipse(x,y,r,r*.42,0,0,6.2832); sx.stroke();
+        sph(x,y,Math.max(1.5,r*.12),'#ffb454');
+        sph(x+r*.92,y+r*.1,Math.max(1,r*.06),col); break;
+      case 'bubble':
+        sx.setLineDash([Math.max(3,s*.04),Math.max(3,s*.03)]);
+        sx.strokeStyle=col; sx.lineWidth=Math.max(1,s*.014);
+        sx.beginPath(); sx.arc(x,y,r,0,6.2832); sx.stroke(); sx.setLineDash([]);
+        glow(x,y,r*.35,col); break;
+      case 'nebula':
+        for(var n2=0;n2<7;n2++){ var an=n2*.897, rn=r*(.3+.6*Math.abs(Math.sin(n2*1.7)));
+          glow(x+Math.cos(an)*r*.4,y+Math.sin(an)*r*.4,rn,n2%2?col:'#ff7ab6'); }
+        for(var s2=0;s2<12;s2++){ var as=s2*.523;
+          sx.fillStyle='#eaf3fa'; sx.beginPath();
+          sx.arc(x+Math.cos(as)*r*.7*Math.abs(Math.sin(s2)),y+Math.sin(as)*r*.7*Math.abs(Math.cos(s2)),Math.max(.6,s*.012),0,6.2832); sx.fill(); } break;
+      case 'cluster':
+        for(var c3=0;c3<70;c3++){ var ac3=c3*2.399, rc3=r*Math.sqrt(c3/70);
+          sx.fillStyle=c3%7?'#eaf3fa':col; sx.beginPath();
+          sx.arc(x+Math.cos(ac3)*rc3,y+Math.sin(ac3)*rc3,Math.max(.6,s*.014),0,6.2832); sx.fill(); } break;
+      case 'galaxy':
+        glow(x,y,r*.5,'#ffd479');
+        for(var arm=0;arm<2;arm++) for(var p2=0;p2<130;p2++){
+          var u2=p2/130, ang=u2*4.2+arm*3.1416, rr2=r*(.12+.88*u2);
+          sx.fillStyle=u2<.3?'#ffe9b0':col;
+          sx.beginPath(); sx.arc(x+Math.cos(ang)*rr2,y+Math.sin(ang)*rr2*.42,Math.max(.5,s*.012*(1.4-u2)),0,6.2832); sx.fill(); }
+        sph(x,y,Math.max(1.5,r*.1),'#fff3d0'); break;
+      case 'web':
+        var nodes=[];
+        for(var w2=0;w2<26;w2++){ var aw=w2*2.399, rw=r*Math.sqrt(w2/26);
+          nodes.push([x+Math.cos(aw)*rw,y+Math.sin(aw)*rw*.85]); }
+        sx.strokeStyle=col+'55'; sx.lineWidth=Math.max(.5,s*.006);
+        nodes.forEach(function(p,i5){ for(var j2=i5+1;j2<nodes.length;j2++){
+          var dd=Math.hypot(p[0]-nodes[j2][0],p[1]-nodes[j2][1]);
+          if(dd<r*.42){ sx.beginPath(); sx.moveTo(p[0],p[1]); sx.lineTo(nodes[j2][0],nodes[j2][1]); sx.stroke(); } } });
+        nodes.forEach(function(p,i6){ glow(p[0],p[1],Math.max(1,s*.03),i6%4?col:'#ffb454'); }); break;
+      case 'bh':
+        glow(x,y,r*1.1,'#ffb454');
+        sx.strokeStyle='#ffd479'; sx.lineWidth=Math.max(1.2,s*.06);
+        sx.beginPath(); sx.arc(x,y,r*.86,0,6.2832); sx.stroke();
+        sx.fillStyle='#02040a'; sx.beginPath(); sx.arc(x,y,r*.78,0,6.2832); sx.fill(); break;
+      case 'wave':
+        sx.strokeStyle=col; sx.lineWidth=Math.max(1,s*.03); sx.beginPath();
+        for(var q=0;q<=60;q++){ var uq=q/60, xq=x-r+s*uq, yq=y+Math.sin(uq*12.566)*r*.32;
+          q?sx.lineTo(xq,yq):sx.moveTo(xq,yq); } sx.stroke(); break;
+      default: sph(x,y,r,col);
+    }
+  }
+
+  function stage(){
+    sx.clearRect(0,0,W,Hs); sx.fillStyle='#05080f'; sx.fillRect(0,0,W,Hs);
+    var cy=Hs*0.50;
+    sx.font='11px JetBrains Mono, monospace'; sx.textAlign='center';
+    for(var n=Math.ceil(logW-SPAN);n<=Math.floor(logW+0.001);n++){
+      var X=ax(n); if(X<PAD-2||X>W-PAD+2) continue;
+      sx.strokeStyle='rgba(130,200,255,.14)'; sx.lineWidth=1;
+      sx.beginPath(); sx.moveTo(X,26); sx.lineTo(X,Hs-30); sx.stroke();
+      sx.fillStyle='rgba(139,163,184,.85)'; sx.fillText(len(Math.pow(10,n)),X,18);
+    }
+    var list=OB.filter(vis);
+    list.slice().sort(function(a,b){ return b.d-a.d; }).forEach(function(o){
+      var s=dsz(o.d), X=ax(o.L), col=CATS[o.c][1];
+      sx.save(); sx.beginPath(); sx.rect(2,24,W-4,Hs-52); sx.clip();
+      shape(o,X,cy,Math.min(s,Hs*2.4),col); sx.restore();
+      if(o===sel){ sx.strokeStyle='#ffb454'; sx.lineWidth=1.5; sx.setLineDash([4,4]);
+        sx.beginPath(); sx.arc(X,cy,Math.min(Math.max(s*.62,12),Hs*.46),0,6.2832); sx.stroke(); sx.setLineDash([]); }
+    });
+    var lastR=-1e9;
+    sx.font='11px JetBrains Mono, monospace'; sx.textAlign='center';
+    list.forEach(function(o){
+      var X=ax(o.L), s=dsz(o.d), tw=sx.measureText(o.n).width;
+      if(X-tw/2<lastR+10 && o!==sel) return;
+      var yy=Math.min(Hs-16,cy+Math.min(s/2,Hs*.42)+16);
+      sx.fillStyle=o===sel?'#ffb454':'rgba(234,243,250,.92)';
+      sx.fillText(o.n,X,yy);
+      sx.fillStyle='rgba(139,163,184,.8)'; sx.fillText(len(o.d),X,yy+12);
+      lastR=X+tw/2;
+    });
+    marks.forEach(function(m){
+      if(m.L<logW-SPAN||m.L>logW+0.02) return;
+      var X=ax(m.L);
+      sx.strokeStyle='#ff7ab6'; sx.lineWidth=1.5; sx.setLineDash([5,4]);
+      sx.beginPath(); sx.moveTo(X,26); sx.lineTo(X,Hs-30); sx.stroke(); sx.setLineDash([]);
+      sx.fillStyle='#ff7ab6'; sx.font='10px JetBrains Mono, monospace';
+      sx.fillText(m.t,X,Hs-34);
+    });
+    var bw=usable()/Math.pow(10,0.7);
+    sx.strokeStyle='#5fe0ff'; sx.lineWidth=2;
+    sx.beginPath(); sx.moveTo(PAD,Hs-8); sx.lineTo(PAD+bw,Hs-8); sx.stroke();
+    sx.beginPath(); sx.moveTo(PAD,Hs-12); sx.lineTo(PAD,Hs-4); sx.moveTo(PAD+bw,Hs-12); sx.lineTo(PAD+bw,Hs-4); sx.stroke();
+    sx.fillStyle='#5fe0ff'; sx.textAlign='left'; sx.font='10px JetBrains Mono, monospace';
+    sx.fillText(len(Math.pow(10,logW-0.7)),PAD+bw+6,Hs-5);
+    $('w_cnt').textContent=list.length;
+    hitList=list;
+  }
+  var hitList=[];
+
+  function ladder(){
+    lx.clearRect(0,0,W,Hl); lx.fillStyle='#05080f'; lx.fillRect(0,0,W,Hl);
+    function X(L){ return 8+(L-LO)/(HI-LO)*(W-16); }
+    lx.strokeStyle='rgba(130,200,255,.18)'; lx.lineWidth=1;
+    lx.beginPath(); lx.moveTo(8,Hl-24); lx.lineTo(W-8,Hl-24); lx.stroke();
+    lx.font='9px JetBrains Mono, monospace'; lx.textAlign='center';
+    for(var n=LO;n<=HI;n+=5){
+      lx.strokeStyle='rgba(130,200,255,.22)';
+      lx.beginPath(); lx.moveTo(X(n),Hl-28); lx.lineTo(X(n),Hl-20); lx.stroke();
+      lx.fillStyle='rgba(139,163,184,.75)'; lx.fillText('10'+sup(n),X(n),Hl-8);
+    }
+    OB.forEach(function(o){
+      if(!filt[o.c]) return;
+      lx.fillStyle=CATS[o.c][1]+(o===sel?'ff':'aa');
+      var h=o===sel?26:14;
+      lx.fillRect(X(o.L)-1,Hl-28-h,2,h);
+    });
+    var x1=X(Math.max(LO,logW-SPAN)), x2=X(Math.min(HI,logW));
+    lx.fillStyle='rgba(255,180,84,.16)'; lx.fillRect(x1,6,x2-x1,Hl-32);
+    lx.strokeStyle='#ffb454'; lx.lineWidth=1.5; lx.strokeRect(x1,6,x2-x1,Hl-32);
+    ['planck','hAtom','human','earth','sun','milky','observable'].forEach(function(id){
+      var o=byId[id]; if(!o) return;
+      lx.fillStyle='rgba(234,243,250,.6)'; lx.font='9px JetBrains Mono, monospace';
+      lx.fillText(o.n.split(' ')[0],X(o.L),14);
+    });
+  }
+
+  function info(){
+    var o=sel;
+    if(!o){ $('info').innerHTML='<h2>Выберите объект</h2><p class="note">Кликните по объекту на сцене, по метке на обзорной ленте или найдите его через поиск. Тогда здесь появятся размер, описание и способ измерения.</p>'; return; }
+    var col=CATS[o.c][1], rr=o.d/1.7;
+    var cmp = rr>=1 ? ('в <b>'+ratio(o.d,1.7)+'</b> раз больше человека') : ('в <b>'+ratio(1.7,o.d)+'</b> раз меньше человека');
+    var pin='';
+    if(pinned&&pinned!==o){
+      pin='<p class="note">Сравнение с закреплённым «'+pinned.n+'»: этот объект в <b>'+ratio(o.d,pinned.d)+'</b> раз '+(o.d>=pinned.d?'крупнее':'мельче')+'.</p>';
+    }
+    $('info').innerHTML=
+      '<h2 style="color:'+col+'">'+o.n+'</h2>'+
+      '<div class="tagline"><span class="tag">'+CATS[o.c][0]+'</span><span class="tag">'+len(o.d)+'</span>'+
+      '<span class="tag">'+sci(o.d)+' м</span><span class="tag">10'+sup(Math.round(o.L*10)/10)+' м</span></div>'+
+      '<p>'+o.desc+'</p>'+
+      '<div class="how"><b>Как это узнали:</b> '+o.how+'</div>'+
+      '<p class="note">Это '+cmp+'. Свет пересекает такой размер за <b>'+tim(o.d/C)+'</b>.</p>'+pin;
+  }
+
+  function readouts(){
+    var Wm=Math.pow(10,logW);
+    $('w_win').textContent=len(Wm);
+    $('w_light').textContent=tim(Wm/C);
+    $('w_bh').textContent=mass((Wm/2)*C*C/(2*G));
+    $('zoom').value=logW.toFixed(2);
+  }
+
+  function loop(){
+    requestAnimationFrame(loop);
+    if(touring){ logT+=0.010; if(logT>=HI){ logT=HI; touring=false; setTour(); } }
+    logW+=(logT-logW)*0.2;
+    if(Math.abs(logT-logW)<1e-4) logW=logT;
+    logW=Math.max(LO,Math.min(HI,logW));
+    stage(); ladder(); readouts();
+  }
+  function setTour(){ $('tour').textContent=touring?'❚❚ Стоп':'▶ Экскурсия'; $('tour').classList.toggle('pri',!touring); }
+
+  /* ---------- ввод ---------- */
+  $('zoom').addEventListener('input',function(e){ logT=+e.target.value; touring=false; setTour(); });
+  $('in').addEventListener('click',function(){ logT=Math.min(HI,logT+1); });
+  $('out').addEventListener('click',function(){ logT=Math.max(LO,logT-1); });
+  $('prev').addEventListener('click',function(){ step(-1); });
+  $('next').addEventListener('click',function(){ step(1); });
+  function step(dir){
+    var cur=sel?sel.L:logW-0.5, best=null;
+    OB.forEach(function(o){ if(!filt[o.c]) return;
+      if(dir>0&&o.L>cur+0.02&&(!best||o.L<best.L)) best=o;
+      if(dir<0&&o.L<cur-0.02&&(!best||o.L>best.L)) best=o; });
+    if(best) jump(best);
+  }
+  $('tour').addEventListener('click',function(){ touring=!touring; if(touring&&logT>=HI-0.1) logT=LO; setTour(); });
+  $('toHuman').addEventListener('click',function(){ jump(byId.human); });
+  $('pin').addEventListener('click',function(){ pinned=sel; $('pinBox').textContent=pinned?('Закреплено: '+pinned.n+' · '+len(pinned.d)):''; info(); });
+
+  st.addEventListener('wheel',function(e){ e.preventDefault(); touring=false; setTour();
+    logT=Math.max(LO,Math.min(HI,logT+e.deltaY*0.0022)); },{passive:false});
+  st.addEventListener('pointerdown',function(e){
+    drag=true; dragX=e.clientX; dragL=logT; st.style.cursor='grabbing';
+    if(st.setPointerCapture){ try{st.setPointerCapture(e.pointerId)}catch(_){} }
+  });
+  st.addEventListener('pointermove',function(e){
+    if(!drag) return;
+    var b=st.getBoundingClientRect(), dx=(e.clientX-dragX)*(W/b.width);
+    if(Math.abs(dx)>3){ touring=false; setTour(); logT=Math.max(LO,Math.min(HI,dragL-dx*SPAN/usable())); logW=logT; }
+  });
+  st.addEventListener('pointerup',function(e){
+    var b=st.getBoundingClientRect(), dx=Math.abs(e.clientX-dragX);
+    drag=false; st.style.cursor='grab';
+    if(dx<4){
+      var X=(e.clientX-b.left)*(W/b.width), Y=(e.clientY-b.top)*(Hs/b.height), best=null, bd=1e9;
+      hitList.forEach(function(o){
+        var ox=ax(o.L), s=dsz(o.d);
+        var d=Math.hypot(X-ox,Y-Hs*0.5);
+        var reach=Math.max(18,Math.min(s/2,Hs*.45));
+        if(d<reach&&d<bd){ bd=d; best=o; }
+        if(Math.abs(X-ox)<40&&Y>Hs*0.5&&d<bd+40){ best=best||o; }
+      });
+      if(best){ sel=best; info(); }
+    }
+  });
+  st.addEventListener('pointercancel',function(){ drag=false; st.style.cursor='grab'; });
+  st.addEventListener('touchmove',function(e){ if(drag) e.preventDefault(); },{passive:false});
+
+  function ladderSet(e){
+    var b=la.getBoundingClientRect(), X=(e.clientX-b.left)*(W/b.width);
+    var L=LO+(X-8)/(W-16)*(HI-LO);
+    logT=Math.max(LO,Math.min(HI,L+SPAN*0.5)); touring=false; setTour();
+    var best=null,bd=1e9;
+    OB.forEach(function(o){ if(!filt[o.c])return; var d=Math.abs(o.L-(logT-0.5)); if(d<bd){bd=d;best=o;} });
+    if(best&&bd<0.6){ sel=best; info(); }
+  }
+  var ldrag=false;
+  la.addEventListener('pointerdown',function(e){ ldrag=true; ladderSet(e);
+    if(la.setPointerCapture){ try{la.setPointerCapture(e.pointerId)}catch(_){} } });
+  la.addEventListener('pointermove',function(e){ if(ldrag) ladderSet(e); });
+  la.addEventListener('pointerup',function(){ ldrag=false; });
+  la.addEventListener('pointercancel',function(){ ldrag=false; });
+
+  window.addEventListener('keydown',function(e){
+    var t=e.target.tagName; if(t==='INPUT'||t==='SELECT'||t==='TEXTAREA') return;
+    if(e.key==='ArrowRight'){ e.preventDefault(); logT=Math.min(HI,logT+0.25); }
+    else if(e.key==='ArrowLeft'){ e.preventDefault(); logT=Math.max(LO,logT-0.25); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); step(1); }
+    else if(e.key==='ArrowDown'){ e.preventDefault(); step(-1); }
+    else if(e.code==='Space'){ e.preventDefault(); $('tour').click(); }
+  });
+
+  function found(){
+    var q=$('q').value.trim().toLowerCase();
+    var list=OB.filter(function(o){ return filt[o.c] && (!q||o.n.toLowerCase().indexOf(q)>=0||o.id.indexOf(q)>=0); });
+    $('found').innerHTML=list.slice(0,60).map(function(o){
+      return '<button data-id="'+o.id+'"><span style="color:'+CATS[o.c][1]+'">●</span> '+o.n+' <span style="color:#8ba3b8">· '+len(o.d)+'</span></button>';
+    }).join('')||'<button disabled>Ничего не найдено</button>';
+    Array.prototype.forEach.call($('found').querySelectorAll('button[data-id]'),function(b){
+      b.addEventListener('click',function(){ jump(byId[b.dataset.id]); touring=false; setTour(); });
+    });
+  }
+  $('q').addEventListener('input',found);
+  Object.keys(CATS).forEach(function(k){
+    var b=document.createElement('button'); b.textContent=CATS[k][0]; b.setAttribute('aria-pressed','true');
+    b.style.borderColor=CATS[k][1]+'66';
+    b.addEventListener('click',function(){ filt[k]=!filt[k]; b.setAttribute('aria-pressed',String(filt[k]));
+      b.style.opacity=filt[k]?'1':'.4'; found(); });
+    $('cats').appendChild(b);
+  });
+
+  $('bhGo').addEventListener('click',function(){
+    var m=(+$('bhM').value)*(+$('bhU').value);
+    if(!(m>0)){ $('bhOut').textContent='Введите положительную массу.'; return; }
+    var rs=2*G*m/(C*C), d=2*rs;
+    $('bhOut').innerHTML='r_s = <b>'+len(rs)+'</b>, диаметр горизонта <b>'+len(d)+'</b>. Масса '+mass(m)+'.';
+    marks=[{L:Math.log10(d),t:'горизонт: '+len(d)}];
+    logT=Math.min(HI,Math.log10(d)+Math.log10(usable()/(Hs*0.66))); touring=false; setTour();
+  });
+  $('dbGo').addEventListener('click',function(){
+    var m=+$('dbM').value, v=+$('dbV').value;
+    if(!(m>0&&v>0)){ $('dbOut').textContent='Масса и скорость должны быть положительными.'; return; }
+    var lam=H/(m*v);
+    var extra = lam<1.616e-35 ? ' Это меньше планковской длины: формула здесь уже вне области применимости.' : '';
+    $('dbOut').innerHTML='λ = <b>'+len(lam)+'</b>.'+extra;
+    marks=[{L:Math.log10(lam),t:'λ де Бройля: '+len(lam)}];
+    logT=Math.max(LO,Math.min(HI,Math.log10(lam)+Math.log10(usable()/(Hs*0.66)))); touring=false; setTour();
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-m]'),function(b){
+    b.addEventListener('click',function(){ $('dbM').value=b.dataset.m; $('dbV').value=b.dataset.v; $('dbGo').click(); });
+  });
+
+  var rt=null; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(resize,150); });
+
+  resize(); found(); jump(byId.human); logW=logT; setTour(); loop();
+})();
+</script>
+</body>
+</html>
