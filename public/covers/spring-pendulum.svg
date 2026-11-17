@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E2226"/><stop offset=".55" stop-color="#0A171A"/><stop offset="1" stop-color="#050D0E"/>
+    </linearGradient>
+    <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
+      <path d="M46 0H0V46" fill="none" stroke="#7ED6C7" stroke-opacity=".06"/>
+    </pattern>
+    <radialGradient id="vig" cx=".5" cy=".45" r=".8">
+      <stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>
+    </radialGradient>
+    <radialGradient id="mass" cx=".35" cy=".32" r=".85">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".4" stop-color="#4FD8C4"/><stop offset="1" stop-color="#0A2A28"/>
+    </radialGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <rect width="1200" height="750" fill="url(#grid)"/>
+
+  <!-- подвес -->
+  <rect x="230" y="120" width="180" height="18" rx="4" fill="#16292B" stroke="#7ED6C7" stroke-opacity=".3"/>
+  <g stroke="#7ED6C7" stroke-opacity=".35">
+    <path d="M240 120l9-12"/><path d="M268 120l9-12"/><path d="M296 120l9-12"/><path d="M324 120l9-12"/><path d="M352 120l9-12"/><path d="M380 120l9-12"/>
+  </g>
+
+  <!-- пружина -->
+  <path d="M320 138 V 168 L 286 186 L 354 214 L 286 242 L 354 270 L 286 298 L 354 326 L 286 354 L 354 382 L 286 410 L 354 438 L 320 456 V 480"
+        fill="none" stroke="#4FD8C4" stroke-width="4" filter="url(#glow)"/>
+
+  <!-- линия равновесия -->
+  <path d="M180 430 H 620" stroke="#8FA8A6" stroke-dasharray="6 6" stroke-opacity=".6"/>
+  <text x="628" y="434" fill="#8FA8A6" font-size="14">равновесие</text>
+  <!-- статическое растяжение -->
+  <g stroke="#D9B98C" stroke-width="1.6">
+    <path d="M196 300 V 430"/><path d="M190 300h12"/><path d="M190 430h12"/>
+  </g>
+  <text x="184" y="368" fill="#D9B98C" font-size="15" text-anchor="end">mg/k</text>
+
+  <!-- груз -->
+  <rect x="284" y="480" width="72" height="72" rx="9" fill="url(#mass)" filter="url(#glow)"/>
+  <!-- смещение x -->
+  <g stroke="#4FD8C4" stroke-width="1.8">
+    <path d="M420 430 V 516"/><path d="M414 430h12"/><path d="M414 516h12"/>
+  </g>
+  <text x="432" y="480" fill="#4FD8C4" font-size="18">x</text>
+
+  <!-- призрак -->
+  <rect x="284" y="392" width="72" height="72" rx="9" fill="none" stroke="#ABA6DC" stroke-width="2" stroke-dasharray="6 5" stroke-opacity=".75"/>
+  <text x="268" y="384" fill="#ABA6DC" font-size="13" text-anchor="end">эталон</text>
+
+  <!-- векторы -->
+  <g stroke-width="3.5" fill="none">
+    <path d="M480 516 L 480 430" stroke="#4FD8C4"/><path d="M480 430 l-6 13 l12 0 z" fill="#4FD8C4" stroke="none"/>
+    <path d="M540 516 L 540 420" stroke="#D9B98C"/><path d="M540 420 l-6 13 l12 0 z" fill="#D9B98C" stroke="none"/>
+    <path d="M600 516 L 600 596" stroke="#8FA8A6"/><path d="M600 596 l-6 -13 l12 0 z" fill="#8FA8A6" stroke="none"/>
+  </g>
+  <g font-size="14">
+    <text x="480" y="414" fill="#4FD8C4" text-anchor="middle">v</text>
+    <text x="540" y="404" fill="#D9B98C" text-anchor="middle">Fупр</text>
+    <text x="600" y="616" fill="#8FA8A6" text-anchor="middle">mg</text>
+  </g>
+
+  <!-- график: совпадение и расхождение -->
+  <g transform="translate(700,180)">
+    <rect x="0" y="0" width="440" height="220" rx="10" fill="#071012" stroke="#7ED6C7" stroke-opacity=".22"/>
+    <path d="M20 110 H 420" stroke="#7ED6C7" stroke-opacity=".25"/>
+    <path d="M20 110 C 55 30, 90 30, 125 110 S 195 190, 230 110 S 300 30, 335 110 S 405 190, 420 130"
+          fill="none" stroke="#ABA6DC" stroke-width="2.2" stroke-dasharray="6 5"/>
+    <path d="M20 110 C 50 36, 80 36, 110 110 S 170 184, 200 110 S 260 36, 290 110 S 350 184, 380 110 S 415 44, 420 92"
+          fill="none" stroke="#4FD8C4" stroke-width="3"/>
+    <text x="20" y="26" fill="#8FA8A6" font-size="13">x(t): пружина и линейный эталон</text>
+    <text x="420" y="206" fill="#D9B98C" font-size="13" text-anchor="end">нелинейность уводит период</text>
+  </g>
+
+  <!-- резонансная кривая -->
+  <g transform="translate(700,430)">
+    <rect x="0" y="0" width="440" height="180" rx="10" fill="#071012" stroke="#7ED6C7" stroke-opacity=".22"/>
+    <path d="M20 150 H 420" stroke="#7ED6C7" stroke-opacity=".25"/>
+    <path d="M20 142 C 90 138, 130 130, 165 30 C 190 120, 240 138, 420 146"
+          fill="none" stroke="#D9B98C" stroke-width="3"/>
+    <path d="M165 30 V 150" stroke="#D69FA9" stroke-width="1.6" stroke-dasharray="5 4"/>
+    <circle cx="165" cy="30" r="6" fill="#D69FA9"/>
+    <text x="20" y="24" fill="#8FA8A6" font-size="13">A(ω): резонанс</text>
+    <text x="182" y="46" fill="#D69FA9" font-size="13">ω_r</text>
+  </g>
+
+  <!-- формулы -->
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 12</text>
+  <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">МЕХАНИКА · КОЛЕБАНИЯ · ЗАКОН ГУКА</text>
+  <text x="48" y="662" fill="#4FD8C4" font-size="26" font-family="Unbounded, sans-serif" font-weight="600">T = 2π√(m/k)</text>
+  <text x="48" y="700" fill="#8FA8A6" font-size="15">не зависит ни от амплитуды, ни от g · g сдвигает равновесие на mg/k</text>
+  <text x="1152" y="662" fill="#D9B98C" font-size="19" text-anchor="end">m·x″ = −k·x − β·x³ − c·x′ + F₀cos ωt</text>
+  <text x="1152" y="700" fill="#8FA8A6" font-size="15" text-anchor="end">масса пружины: mₛ/3 в динамике, mₛ/2 в статике</text>
+
+  <g stroke="#7ED6C7" stroke-opacity=".3" fill="none">
+    <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
+  </g>
+  <rect width="1200" height="750" fill="url(#vig)"/>
+</svg>

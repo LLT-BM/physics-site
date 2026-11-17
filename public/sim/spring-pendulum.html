@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Пружинный маятник</title>
+<link rel="canonical" href="https://liblabtab.ru/models/spring-pendulum/">
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+:root{
+  /* Единый источник цветов: меняется только этот блок. */
+  --bg:#0A1417; --surface:#102024; --canvas:#071012;
+  --line:rgba(126,214,199,.16); --ink:#E9F4F1; --muted:#8FA8A6;
+  --aqua:#4FD8C4; --sand:#D9B98C; --lilac:#ABA6DC; --rose:#D69FA9;
+  --ok:#3FC9AE; --on:#06110F;
+  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:46px 46px}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 40px}
+h1{font:800 1.65rem/1.15 var(--disp);margin:0 0 8px}
+.lead{margin:0 0 14px;color:var(--muted);max-width:78ch}
+.lead b{color:var(--ink);font-family:var(--mono)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+canvas{display:block;width:100%;border-radius:10px;background:var(--canvas);touch-action:none}
+#scene{cursor:grab}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+button{font:inherit;font-family:var(--sans);min-height:42px;padding:8px 13px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.pri{background:var(--aqua);color:var(--on);border-color:var(--aqua);font-weight:600}
+button.sm{min-height:34px;padding:5px 10px;font-size:.84rem}
+button[aria-pressed="true"]{border-color:var(--aqua);color:var(--aqua)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
+select{font:inherit;font-family:var(--mono);font-size:.85rem;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+input[type=range]{width:100%;height:28px;margin:2px 0 0;-webkit-appearance:none;appearance:none;background:transparent;accent-color:var(--aqua)}
+label{display:flex;justify-content:space-between;align-items:baseline;font-size:.86rem;color:var(--muted);margin-top:9px;gap:8px}
+output{font-family:var(--mono);font-weight:600;color:var(--sand)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.86rem;margin-top:9px;cursor:pointer;color:var(--ink)}
+.chk input{width:17px;height:17px;accent-color:var(--aqua);flex:none}
+.rd{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:8px;margin-top:10px}
+.rd div{background:rgba(0,0,0,.26);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
+.rd span{display:block;font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.rd b{font-family:var(--mono);font-size:1rem}
+.rd b.a{color:var(--aqua)} .rd b.s{color:var(--sand)} .rd b.l{color:var(--lilac)} .rd b.r{color:var(--rose)}
+.status{margin-top:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-family:var(--mono);font-size:.85rem}
+.status.ok{border-color:var(--ok);color:var(--ok)}
+.status.warn{border-color:var(--sand);color:var(--sand);border-style:dashed}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:12px;margin-top:12px}
+.grp h2{font:600 1rem var(--disp);margin:0 0 6px;padding-left:10px;border-left:4px solid var(--aqua)}
+.grp.b h2{border-color:var(--sand)} .grp.c h2{border-color:var(--lilac)} .grp.d h2{border-color:var(--rose)}
+.note{margin:8px 2px 0;font-size:.84rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chips button{border-radius:999px;font-family:var(--mono);font-size:.76rem;min-height:32px;padding:4px 10px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:.76rem;color:var(--muted);font-family:var(--mono)}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:3px;margin-right:5px}
+kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+.ebar{height:16px;border-radius:8px;overflow:hidden;display:flex;border:1px solid var(--line);margin-top:10px;background:rgba(0,0,0,.3)}
+.ebar i{display:block;height:100%}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Пружинный маятник</h1>
+  <p class="lead">Груз на пружине. Пока пружина гуковская, движение строго гармоническое: <b>m·x″ = −k·x</b>, а период <b>T = 2π√(m/k)</b> не зависит ни от амплитуды, ни от g — гравитация лишь сдвигает равновесие на <b>mg/k</b>. Добавьте нелинейность βx³, массу пружины, затухание или внешнюю силу — и увидите, как эта идеальная картина ломается.</p>
+
+  <section class="card">
+    <canvas id="scene" aria-label="Груз на пружине: равновесие, векторы и след"></canvas>
+    <div class="bar">
+      <button class="pri" id="run">▶ Пуск</button>
+      <button id="step">Шаг</button>
+      <button id="reset">Сброс</button>
+      <button id="kick">Толчок</button>
+      <span style="flex:1"></span>
+      <label style="margin:0;min-width:200px">Пример<select id="preset"></select></label>
+    </div>
+    <div class="chips" id="quick"></div>
+    <div class="rd">
+      <div><span>смещение x от равновесия</span><b class="a" id="v_x">—</b></div>
+      <div><span>скорость v</span><b id="v_v">—</b></div>
+      <div><span>ускорение a</span><b id="v_a">—</b></div>
+      <div><span>сила упругости</span><b class="s" id="v_F">—</b></div>
+      <div><span>период идеальный T₀</span><b class="l" id="v_T0">—</b></div>
+      <div><span>период с поправками</span><b class="s" id="v_T">—</b></div>
+      <div><span>период по нулям</span><b class="a" id="v_Tm">—</b></div>
+      <div><span>отличие от T₀</span><b class="r" id="v_dT">—</b></div>
+      <div><span>коэффициент ζ</span><b class="l" id="v_z">—</b></div>
+      <div><span>добротность Q</span><b id="v_Q">—</b></div>
+      <div><span>статическое растяжение</span><b class="s" id="v_sh">—</b></div>
+      <div><span>полная энергия E</span><b class="s" id="v_E">—</b></div>
+      <div><span>ω₀ = √(k/mэфф)</span><b id="v_w0">—</b></div>
+      <div><span>время модели</span><b id="v_t">—</b></div>
+    </div>
+    <div class="ebar" title="кинетическая и упругая энергия">
+      <i id="eb_k" style="background:var(--aqua);width:0"></i>
+      <i id="eb_p" style="background:var(--sand);width:0"></i>
+    </div>
+    <div class="status" id="stat" aria-live="polite"></div>
+    <p class="note">Тяните груз мышью или пальцем вдоль оси: положение задаёт начальное смещение, скорость обнуляется. Отпустили — пошёл. Клавиши: <kbd>Пробел</kbd> пуск/пауза, <kbd>S</kbd> шаг, <kbd>R</kbd> сброс.</p>
+  </section>
+
+  <div class="ctl">
+    <section class="card grp">
+      <h2>Пружина и груз</h2>
+      <label>Расположение<select id="p_orient"><option value="v">вертикально</option><option value="h">горизонтально</option></select></label>
+      <label>Жёсткость k <output id="o_k"></output></label>
+      <input type="range" id="p_k" min="2" max="200" step="0.5" value="20">
+      <label>Масса груза m <output id="o_m"></output></label>
+      <input type="range" id="p_m" min="0.05" max="3" step="0.01" value="0.5">
+      <label>Масса пружины mₛ <output id="o_ms"></output></label>
+      <input type="range" id="p_ms" min="0" max="0.6" step="0.005" value="0">
+      <label>Свободная длина L₀ <output id="o_L"></output></label>
+      <input type="range" id="p_L" min="0.1" max="0.6" step="0.005" value="0.3">
+      <label>Начальное смещение A <output id="o_A"></output></label>
+      <input type="range" id="p_A" min="0.005" max="0.3" step="0.001" value="0.08">
+      <p class="note">Масса пружины входит в динамику как mₛ/3, а в статическое растяжение — как mₛ/2. Это разные коэффициенты, и модель их различает.</p>
+    </section>
+
+    <section class="card grp b">
+      <h2>Нелинейность и трение</h2>
+      <label>Поправка β при x³ <output id="o_b"></output></label>
+      <input type="range" id="p_b" min="-1500" max="3000" step="10" value="0">
+      <label>Затухание c <output id="o_c"></output></label>
+      <input type="range" id="p_c" min="0" max="25" step="0.05" value="0">
+      <div class="chips" id="cpres"></div>
+      <label>Ускорение g <output id="o_g"></output></label>
+      <input type="range" id="p_g" min="0" max="25" step="0.01" value="9.81">
+      <div class="chips" id="gpres"></div>
+      <p class="note" id="bnote"></p>
+    </section>
+
+    <section class="card grp d">
+      <h2>Внешняя сила</h2>
+      <label class="chk"><input type="checkbox" id="p_don"> Включить периодическую силу</label>
+      <label>Амплитуда F₀ <output id="o_F0"></output></label>
+      <input type="range" id="p_F0" min="0.02" max="2" step="0.01" value="0.2">
+      <label>Частота f <output id="o_f"></output></label>
+      <input type="range" id="p_f" min="0.05" max="4" step="0.005" value="1">
+      <div class="bar"><button class="sm" id="toRes">Поставить на резонанс</button></div>
+      <p class="note" id="dnote"></p>
+    </section>
+
+    <section class="card grp c">
+      <h2>Что показывать</h2>
+      <label class="chk"><input type="checkbox" id="c_ghost" checked> Призрак: линейные свободные колебания</label>
+      <label class="chk"><input type="checkbox" id="c_vec"> Векторы скорости и сил</label>
+      <label class="chk"><input type="checkbox" id="c_trail" checked> След груза</label>
+      <label class="chk"><input type="checkbox" id="c_eq" checked> Линия равновесия и линейка</label>
+      <label class="chk"><input type="checkbox" id="c_zoom"> Крупно: только окрестность равновесия</label>
+      <label class="chk"><input type="checkbox" id="c_lab" checked> Подписи на сцене</label>
+      <label>Скорость показа <output id="o_sp"></output></label>
+      <input type="range" id="p_sp" min="0.1" max="3" step="0.05" value="1">
+      <p class="note">Призрак считается аналитически во всех трёх режимах затухания, без нелинейности и без внешней силы — это эталон, с которым сравнивается настоящее движение.</p>
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="bar" style="margin:0 0 10px">
+      <button class="sm" id="m_time" aria-pressed="true">Смещение от времени</button>
+      <button class="sm" id="m_phase" aria-pressed="false">Фазовый портрет</button>
+      <button class="sm" id="m_energy" aria-pressed="false">Энергия</button>
+      <button class="sm" id="m_res" aria-pressed="false">Резонанс</button>
+    </div>
+    <canvas id="plot" aria-label="График смещения, фазовый портрет, энергия или резонансная кривая"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--aqua)"></i>настоящий маятник</span>
+      <span><i style="background:var(--lilac)"></i>линейный эталон</span>
+      <span><i style="background:var(--sand)"></i>упругая энергия / резонансная кривая</span>
+      <span><i style="background:var(--rose)"></i>рабочая точка</span>
+    </div>
+    <p class="note" id="pnote"></p>
+  </section>
+</main>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id)};
+var FALLBACK={aqua:'#4FD8C4',sand:'#D9B98C',lilac:'#ABA6DC',rose:'#D69FA9',ok:'#3FC9AE',
+  ink:'#E9F4F1',muted:'#8FA8A6',line:'rgba(126,214,199,.16)',canvas:'#071012',surface:'#102024'};
+var PAL={};
+function readPal(){
+  var cs=getComputedStyle(document.documentElement);
+  Object.keys(FALLBACK).forEach(function(k){
+    var v=(cs.getPropertyValue('--'+k)||'').trim(); PAL[k]=v||FALLBACK[k];
+  });
+}
+readPal();
+
+var P={orient:'v',k:20,m:0.5,ms:0,L0:0.3,A:0.08,beta:0,c:0,g:9.81,
+       don:false,F0:0.2,f:1,sp:1};
+var x=P.A, v=0, t=0, running=false, drag=false, mode='time', escaped=false;
+var trail=[], samples=[], phase=[], cross=[], Tmeas=0, ampSeen=P.A;
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var H=0.0002;
+
+function meff(){ return P.m+P.ms/3; }
+function w0(){ return Math.sqrt(P.k/meff()); }
+function T0(){ return 2*Math.PI/w0(); }
+function ccrit(){ return 2*Math.sqrt(P.k*meff()); }
+function zeta(){ return P.c/ccrit(); }
+function shift(){ return P.orient==='v'?(P.m+P.ms/2)*P.g/P.k:0; }
+function xEscape(){ return P.beta<0?Math.sqrt(P.k/Math.abs(P.beta)):Infinity; }
+function energy(){ return 0.5*meff()*v*v+0.5*P.k*x*x+0.25*P.beta*Math.pow(x,4); }
+function ampNow(){
+  var E=energy();
+  if(P.beta===0) return Math.sqrt(Math.max(0,2*E/P.k));
+  var q=Math.max(0,(-P.k+Math.sqrt(P.k*P.k+4*P.beta*E))/(2*P.beta));
+  return Math.sqrt(q);
+}
+function K(kk){ var a=1,b=Math.sqrt(Math.max(0,1-kk*kk));
+  for(var i=0;i<40;i++){ var an=(a+b)/2,bn=Math.sqrt(a*b); a=an;b=bn; if(Math.abs(a-b)<1e-15) break; }
+  return Math.PI/(2*a); }
+function Tduff(A){
+  var e=P.beta/meff(), W=w0()*w0()+e*A*A;
+  if(W<=0) return NaN;
+  var q=e*A*A/(2*W);
+  if(q<0||q>=1) return NaN;
+  return 4*K(Math.sqrt(q))/Math.sqrt(W);
+}
+function Tcurrent(){
+  if(P.beta===0) return T0();
+  var A=ampNow(); return Tduff(A);
+}
+function ghost(tt){
+  var W=w0(), gam=P.c/(2*meff()), z=gam/W, A=P.A;
+  if(z<1-1e-9){ var wd=W*Math.sqrt(1-z*z);
+    return A*Math.exp(-gam*tt)*(Math.cos(wd*tt)+(gam/wd)*Math.sin(wd*tt)); }
+  if(z>1+1e-9){ var mu=W*Math.sqrt(z*z-1);
+    return A*Math.exp(-gam*tt)*(Math.cosh(mu*tt)+(gam/mu)*Math.sinh(mu*tt)); }
+  return A*(1+gam*tt)*Math.exp(-gam*tt);
+}
+function driveF(tt){ return P.don?P.F0*Math.cos(2*Math.PI*P.f*tt):0; }
+function acc(xx,vv,tt){ return (-P.k*xx-P.beta*xx*xx*xx-P.c*vv+driveF(tt))/meff(); }
+function rk4(h){
+  var a1=acc(x,v,t);
+  var x1=x+h/2*v, v1=v+h/2*a1, a2=acc(x1,v1,t+h/2);
+  var x2=x+h/2*v1, v2=v+h/2*a2, a3=acc(x2,v2,t+h/2);
+  var x3=x+h*v2, v3=v+h*a3, a4=acc(x3,v3,t+h);
+  x+=h/6*(v+2*v1+2*v2+v3);
+  v+=h/6*(a1+2*a2+2*a3+a4);
+  t+=h;
+}
+function advance(dt){
+  var n=Math.max(1,Math.min(600,Math.round(P.sp*dt/H)));
+  for(var i=0;i<n;i++){
+    var prev=x; rk4(H);
+    if(prev<0&&x>=0&&v>0){
+      cross.push(t); if(cross.length>7) cross.shift();
+      if(cross.length>1){ var s=0; for(var j=1;j<cross.length;j++) s+=cross[j]-cross[j-1];
+        Tmeas=s/(cross.length-1); }
+    }
+    ampSeen=Math.max(ampSeen,Math.abs(x));
+    if(isFinite(xEscape())&&Math.abs(x)>xEscape()*1.02){ escaped=true; running=false; setRun(); break; }
+    if(!isFinite(x)||Math.abs(x)>1e4){ escaped=true; running=false; setRun(); break; }
+  }
+  samples.push({t:t,x:x,g:ghost(t),ke:0.5*meff()*v*v,pe:0.5*P.k*x*x+0.25*P.beta*Math.pow(x,4)});
+  if(samples.length>1500) samples.shift();
+  phase.push([x,v]); if(phase.length>2400) phase.shift();
+  var gg=geom();
+  trail.push(P.orient==='v'?[gg.mx,gg.pos(x)]:[gg.pos(x),gg.my]);
+  if(trail.length>90) trail.shift();
+}
+function reset(){ x=P.A; v=0; t=0; trail=[]; samples=[]; phase=[]; cross=[]; Tmeas=0; ampSeen=P.A; escaped=false; }
+
+function nf(a,n){ if(!isFinite(a)) return '—'; return a.toFixed(n).replace('.',','); }
+function cm(a){ return nf(a*100,2)+' см'; }
+
+/* ---------- сцена ---------- */
+var sc=$('scene'),sx=sc.getContext('2d'),pl=$('plot'),px=pl.getContext('2d');
+var W=900,HS=400,HP=270,dpr=1;
+function resize(){
+  W=Math.max(300,Math.round(sc.parentNode.clientWidth-28));
+  dpr=Math.min(2,window.devicePixelRatio||1);
+  HS=Math.max(310,Math.round(Math.min(440,W*0.48)));
+  HP=Math.max(230,Math.round(Math.min(300,W*0.30)));
+  sc.width=W*dpr;sc.height=HS*dpr;sc.style.height=HS+'px';sx.setTransform(dpr,0,0,dpr,0,0);
+  pl.width=W*dpr;pl.height=HP*dpr;pl.style.height=HP+'px';px.setTransform(dpr,0,0,dpr,0,0);
+  trail=[];
+}
+function geom(){
+  var vert=P.orient==='v', anchor=vert?34:44;
+  var avail=(vert?HS-70:W-110);
+  var amp=Math.max(P.A,ampSeen,0.01);
+  var span=$('c_zoom').checked?(2.7*amp+0.02):(P.L0+shift()+1.3*amp);
+  var k=avail/Math.max(span,0.02);
+  var base=anchor+(P.L0+shift())*k;
+  return {vert:vert,anchor:anchor,k:k,mx:W/2,my:HS*0.52,
+    eq:vert?base:(44+(P.L0)*k),
+    pos:function(xx){ return ($('c_zoom').checked? (vert?HS*0.5:W*0.55) : base)+xx*k; },
+    anchorPos:anchor};
+}
+function spring(x1,y1,x2,y2,coils,wdt,col){
+  var dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);
+  if(len<4) return;
+  var ux=dx/len,uy=dy/len,nx=-uy,ny=ux,N=coils*2+1;
+  sx.strokeStyle=col; sx.lineWidth=2.4; sx.beginPath(); sx.moveTo(x1,y1);
+  var lead=Math.min(14,len*0.12);
+  sx.lineTo(x1+ux*lead,y1+uy*lead);
+  for(var i=1;i<=N;i++){
+    var s=lead+(len-2*lead)*i/(N+1);
+    var sg=(i%2?1:-1);
+    sx.lineTo(x1+ux*s+nx*wdt*sg,y1+uy*s+ny*wdt*sg);
+  }
+  sx.lineTo(x2-ux*lead,y2-uy*lead); sx.lineTo(x2,y2); sx.stroke();
+}
+function arrow(x,y,dx,dy,col,label){
+  var len=Math.hypot(dx,dy); if(len<2) return;
+  var mm=Math.min(len,96); dx=dx/len*mm; dy=dy/len*mm;
+  sx.strokeStyle=col; sx.fillStyle=col; sx.lineWidth=2.4;
+  sx.beginPath(); sx.moveTo(x,y); sx.lineTo(x+dx,y+dy); sx.stroke();
+  var a=Math.atan2(dy,dx);
+  sx.beginPath(); sx.moveTo(x+dx,y+dy);
+  sx.lineTo(x+dx-9*Math.cos(a-.4),y+dy-9*Math.sin(a-.4));
+  sx.lineTo(x+dx-9*Math.cos(a+.4),y+dy-9*Math.sin(a+.4));
+  sx.closePath(); sx.fill();
+  if(label){ sx.font='11px JetBrains Mono, monospace'; sx.textAlign='center';
+    sx.fillText(label,x+dx*1.14,y+dy*1.14); }
+}
+function drawScene(){
+  var g=geom(), vert=g.vert;
+  sx.clearRect(0,0,W,HS); sx.fillStyle=PAL.canvas; sx.fillRect(0,0,W,HS);
+  var p=g.pos(x), eq=g.eq, amp=Math.max(P.A,ampSeen);
+  var strain=Math.min(1,Math.abs(x)/Math.max(amp,0.01));
+  var scol=P.beta<0&&Math.abs(x)>xEscape()*0.8?PAL.rose:(strain>0.6?PAL.sand:PAL.aqua);
+
+  if($('c_eq').checked){
+    sx.strokeStyle=PAL.line; sx.lineWidth=1; sx.setLineDash([5,5]);
+    sx.beginPath();
+    if(vert){ sx.moveTo(30,eq); sx.lineTo(W-30,eq); } else { sx.moveTo(eq,30); sx.lineTo(eq,HS-40); }
+    sx.stroke(); sx.setLineDash([]);
+    sx.fillStyle=PAL.muted; sx.font='10px JetBrains Mono, monospace';
+    sx.textAlign=vert?'left':'center';
+    sx.fillText('равновесие',vert?34:eq,vert?eq-6:26);
+    var step=amp>0.12?0.05:(amp>0.04?0.02:0.01);
+    for(var d=-6;d<=6;d++){
+      var val=d*step, pp=g.pos(val);
+      if(vert){ if(pp<20||pp>HS-16) continue;
+        sx.strokeStyle=PAL.line; sx.beginPath(); sx.moveTo(W-46,pp); sx.lineTo(W-38,pp); sx.stroke();
+        if(d%2===0){ sx.fillStyle=PAL.muted; sx.textAlign='right'; sx.fillText(nf(val*100,0)+' см',W-50,pp+3); }
+      } else { if(pp<24||pp>W-24) continue;
+        sx.strokeStyle=PAL.line; sx.beginPath(); sx.moveTo(pp,HS-46); sx.lineTo(pp,HS-38); sx.stroke();
+        if(d%2===0){ sx.fillStyle=PAL.muted; sx.textAlign='center'; sx.fillText(nf(val*100,0),pp,HS-28); }
+      }
+    }
+  }
+
+  if(vert){
+    if(g.anchorPos>0&&eq-P.L0*g.k>-40){
+      var ay=g.pos(0)-(P.L0+shift())*g.k;
+      sx.fillStyle=PAL.surface; sx.strokeStyle=PAL.line; sx.lineWidth=1.5;
+      sx.fillRect(g.mx-46,ay-14,92,14); sx.strokeRect(g.mx-46,ay-14,92,14);
+      sx.strokeStyle=PAL.muted;
+      for(var h=0;h<7;h++){ sx.beginPath(); sx.moveTo(g.mx-42+h*13,ay-14); sx.lineTo(g.mx-36+h*13,ay-23); sx.stroke(); }
+      spring(g.mx,ay,g.mx,p,12,15,scol);
+    } else {
+      spring(g.mx,-10,g.mx,p,12,15,scol);
+      sx.fillStyle=PAL.muted; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='left';
+      sx.fillText('подвес вне кадра',g.mx+24,16);
+    }
+  } else {
+    sx.fillStyle=PAL.surface; sx.strokeStyle=PAL.line; sx.lineWidth=1.5;
+    sx.fillRect(20,g.my-56,20,112); sx.strokeRect(20,g.my-56,20,112);
+    sx.strokeStyle=PAL.muted;
+    for(var h2=0;h2<8;h2++){ sx.beginPath(); sx.moveTo(20,g.my-52+h2*14); sx.lineTo(11,g.my-44+h2*14); sx.stroke(); }
+    sx.strokeStyle=PAL.line; sx.beginPath(); sx.moveTo(40,g.my+30); sx.lineTo(W-20,g.my+30); sx.stroke();
+    spring(40,g.my,p,g.my,12,15,scol);
+  }
+
+  if($('c_trail').checked&&trail.length>2){
+    for(var i=0;i<trail.length;i++){
+      sx.globalAlpha=(i/trail.length)*0.3; sx.fillStyle=PAL.aqua;
+      sx.beginPath(); sx.arc(trail[i][0],trail[i][1],5,0,6.2832); sx.fill();
+    }
+    sx.globalAlpha=1;
+  }
+
+  if($('c_ghost').checked){
+    var gp=g.pos(ghost(t));
+    sx.strokeStyle=PAL.lilac; sx.globalAlpha=.6; sx.lineWidth=1.8; sx.setLineDash([5,4]);
+    if(vert) sx.strokeRect(g.mx-19,gp-19,38,38); else sx.strokeRect(gp-19,g.my-19,38,38);
+    sx.setLineDash([]); sx.globalAlpha=1;
+    if($('c_lab').checked){ sx.fillStyle=PAL.lilac; sx.font='10px JetBrains Mono, monospace';
+      sx.textAlign=vert?'left':'center';
+      sx.fillText('эталон',vert?g.mx+26:gp,vert?gp+4:g.my-26); }
+  }
+
+  var r=19;
+  var cx0=vert?g.mx:p, cy0=vert?p:g.my;
+  var gr=sx.createRadialGradient(cx0-r*.35,cy0-r*.35,r*.1,cx0,cy0,r*1.2);
+  gr.addColorStop(0,'#ffffff'); gr.addColorStop(.4,PAL.aqua); gr.addColorStop(1,PAL.canvas);
+  sx.fillStyle=gr; sx.strokeStyle=PAL.aqua; sx.lineWidth=1.6;
+  sx.beginPath();
+  if(sx.roundRect) sx.roundRect(cx0-r,cy0-r,2*r,2*r,5); else sx.rect(cx0-r,cy0-r,2*r,2*r);
+  sx.fill(); sx.stroke();
+
+  if($('c_vec').checked){
+    var Fs=-P.k*x-P.beta*x*x*x, Fd=-P.c*v, Fg=vert?P.m*P.g:0, Fe=driveF(t);
+    var kf=40/Math.max(0.4,P.k*Math.max(P.A,0.02)), kv=40/Math.max(0.2,P.A*w0());
+    if(vert){
+      arrow(cx0-72,cy0,0,v*kv,PAL.aqua,'v');
+      arrow(cx0-30,cy0,0,Fs*kf,PAL.sand,'Fупр');
+      arrow(cx0+30,cy0,0,Fg*kf,PAL.muted,'mg');
+      arrow(cx0+72,cy0,0,Fd*kf,PAL.lilac,'Fтр');
+      if(P.don) arrow(cx0+112,cy0,0,Fe*kf,PAL.rose,'Fвнеш');
+    } else {
+      arrow(cx0,cy0-72,v*kv,0,PAL.aqua,'v');
+      arrow(cx0,cy0-30,Fs*kf,0,PAL.sand,'Fупр');
+      arrow(cx0,cy0+34,Fd*kf,0,PAL.lilac,'Fтр');
+      if(P.don) arrow(cx0,cy0+74,Fe*kf,0,PAL.rose,'Fвнеш');
+    }
+  }
+
+  if($('c_lab').checked){
+    sx.fillStyle=PAL.muted; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='left';
+    sx.fillText('k = '+nf(P.k,1)+' Н/м   m = '+nf(P.m,2)+' кг   mₛ = '+nf(P.ms,3)+' кг',8,16);
+    sx.textAlign='right'; sx.fillText('t = '+nf(t,2)+' с',W-8,16);
+    sx.fillStyle=PAL.sand; sx.textAlign='left';
+    sx.fillText('x = '+cm(x),8,HS-10);
+    if(vert){ sx.textAlign='right'; sx.fillText('mg/k = '+cm(shift()),W-8,HS-10); }
+  }
+}
+
+/* ---------- график ---------- */
+function drawPlot(){
+  px.clearRect(0,0,W,HP); px.fillStyle=PAL.canvas; px.fillRect(0,0,W,HP);
+  var L=56,R=14,T=14,B=26;
+  px.strokeStyle=PAL.line; px.lineWidth=1;
+  for(var i=0;i<=8;i++){ var X=L+(W-L-R)*i/8; px.beginPath(); px.moveTo(X,T); px.lineTo(X,HP-B); px.stroke(); }
+  for(var j=0;j<=6;j++){ var Y=T+(HP-T-B)*j/6; px.beginPath(); px.moveTo(L,Y); px.lineTo(W-R,Y); px.stroke(); }
+  px.font='10px JetBrains Mono, monospace'; px.fillStyle=PAL.muted;
+
+  if(mode==='res'){
+    var W0=w0(), c=P.c, me=meff(), wmax=2.5*W0;
+    function Aof(w){ return P.F0/Math.sqrt(Math.pow(P.k-me*w*w,2)+Math.pow(c*w,2)); }
+    var N=260, pts=[], mx=1e-9;
+    for(var q=0;q<=N;q++){ var w=wmax*q/N, a=Aof(w); pts.push([w,a]); mx=Math.max(mx,a); }
+    function Xr(w){ return L+w/wmax*(W-L-R); }
+    function Yr(a){ return HP-B-(a/mx)*(HP-T-B)*0.92; }
+    px.strokeStyle=PAL.sand; px.lineWidth=2.4; px.beginPath();
+    pts.forEach(function(p,k){ var xx=Xr(p[0]),yy=Yr(p[1]); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
+    var z=zeta(), wr=W0*Math.sqrt(Math.max(0,1-2*z*z));
+    px.strokeStyle=PAL.line; px.setLineDash([5,4]);
+    px.beginPath(); px.moveTo(Xr(W0),T); px.lineTo(Xr(W0),HP-B); px.stroke(); px.setLineDash([]);
+    px.fillStyle=PAL.muted; px.textAlign='center'; px.fillText('ω₀',Xr(W0),T+12);
+    if(P.don){
+      var wd=2*Math.PI*P.f;
+      px.strokeStyle=PAL.rose; px.lineWidth=2;
+      px.beginPath(); px.moveTo(Xr(wd),T); px.lineTo(Xr(wd),HP-B); px.stroke();
+      px.fillStyle=PAL.rose; px.beginPath(); px.arc(Xr(wd),Yr(Aof(wd)),5,0,6.2832); px.fill();
+      px.textAlign='left'; px.fillText('рабочая точка',Xr(wd)+8,Yr(Aof(wd))-8);
+    }
+    px.fillStyle=PAL.sand; px.textAlign='left'; px.fillText('A(ω), максимум '+cm(mx),L+4,T+12);
+    px.fillStyle=PAL.muted; px.textAlign='right'; px.fillText('ω: 0…'+nf(wmax,2)+' рад/с',W-R,HP-8);
+    px.textAlign='left'; px.fillText('ω_r = '+nf(wr,3)+' рад/с',L,HP-8);
+    return;
+  }
+
+  if(samples.length<3){ px.fillStyle=PAL.muted; px.fillText('Нажмите «Пуск» — график начнёт писаться',L+8,HP/2); return; }
+
+  if(mode==='time'){
+    var win=Math.max(4*T0(),2), t1=samples[samples.length-1].t, t0=Math.max(0,t1-win);
+    var ps=samples.filter(function(s){ return s.t>=t0; });
+    if(ps.length<2) ps=ps.concat(samples.slice(-2));
+    var mx1=Math.max(P.A,0.005);
+    ps.forEach(function(s){ mx1=Math.max(mx1,Math.abs(s.x),Math.abs(s.g)); });
+    function Xt(tt){ return L+(tt-t0)/win*(W-L-R); }
+    function Yt(vv){ return T+(HP-T-B)*(0.5-0.44*vv/mx1); }
+    px.strokeStyle=PAL.line; px.beginPath(); px.moveTo(L,Yt(0)); px.lineTo(W-R,Yt(0)); px.stroke();
+    px.strokeStyle=PAL.lilac; px.lineWidth=1.8; px.setLineDash([5,4]); px.beginPath();
+    ps.forEach(function(s,k){ var xx=Xt(s.t),yy=Yt(s.g); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke(); px.setLineDash([]);
+    px.strokeStyle=PAL.aqua; px.lineWidth=2.4; px.beginPath();
+    ps.forEach(function(s,k){ var xx=Xt(s.t),yy=Yt(s.x); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
+    px.fillStyle=PAL.aqua; px.textAlign='left'; px.fillText('x: ±'+cm(mx1),L+4,T+12);
+    px.fillStyle=PAL.muted; px.textAlign='right'; px.fillText('окно '+nf(win,1)+' с',W-R,HP-8);
+  } else if(mode==='phase'){
+    var am=Math.max(P.A,ampSeen,0.005)*1.15, vm=am*w0()*1.25;
+    function Xp(a){ return L+(a+am)/(2*am)*(W-L-R); }
+    function Yp(b){ return T+(HP-T-B)*(0.5-0.44*b/vm); }
+    px.strokeStyle=PAL.sand; px.lineWidth=1.5; px.setLineDash([6,5]); px.beginPath();
+    for(var q2=0;q2<=180;q2++){ var an=2*Math.PI*q2/180;
+      var xx=Xp(P.A*Math.cos(an)),yy=Yp(-P.A*w0()*Math.sin(an));
+      q2?px.lineTo(xx,yy):px.moveTo(xx,yy); }
+    px.closePath(); px.stroke(); px.setLineDash([]);
+    px.strokeStyle=PAL.line; px.beginPath(); px.moveTo(L,Yp(0)); px.lineTo(W-R,Yp(0)); px.stroke();
+    px.beginPath(); px.moveTo(Xp(0),T); px.lineTo(Xp(0),HP-B); px.stroke();
+    px.strokeStyle=PAL.aqua; px.lineWidth=2; px.beginPath();
+    phase.forEach(function(p,k){ var xx=Xp(p[0]),yy=Yp(p[1]); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
+    var lp=phase[phase.length-1];
+    px.fillStyle='#ffffff'; px.beginPath(); px.arc(Xp(lp[0]),Yp(lp[1]),4.5,0,6.2832); px.fill();
+    px.strokeStyle=PAL.aqua; px.lineWidth=2; px.stroke();
+    px.fillStyle=PAL.sand; px.textAlign='left'; px.fillText('пунктир — идеальный эллипс линейного осциллятора',L+4,T+12);
+    px.fillStyle=PAL.muted; px.textAlign='right'; px.fillText('v: ±'+nf(vm,2)+' м/с',W-R,HP-8);
+    px.textAlign='left'; px.fillText('x: ±'+cm(am),L,HP-8);
+  } else {
+    var win2=Math.max(4*T0(),2), t12=samples[samples.length-1].t, t02=Math.max(0,t12-win2);
+    var ps2=samples.filter(function(s){ return s.t>=t02; });
+    if(ps2.length<2) ps2=samples.slice(-2);
+    var em=1e-9; ps2.forEach(function(s){ em=Math.max(em,s.ke+s.pe); });
+    function Xe(tt){ return L+(tt-t02)/win2*(W-L-R); }
+    function Ye(vv){ return HP-B-(vv/em)*(HP-T-B)*0.94; }
+    px.strokeStyle=PAL.sand; px.lineWidth=2; px.beginPath();
+    ps2.forEach(function(s,k){ var xx=Xe(s.t),yy=Ye(s.pe); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
+    px.strokeStyle=PAL.aqua; px.lineWidth=2; px.beginPath();
+    ps2.forEach(function(s,k){ var xx=Xe(s.t),yy=Ye(s.ke); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
+    px.strokeStyle=PAL.ink; px.lineWidth=1.4; px.setLineDash([5,4]); px.beginPath();
+    ps2.forEach(function(s,k){ var xx=Xe(s.t),yy=Ye(s.ke+s.pe); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke(); px.setLineDash([]);
+    px.fillStyle=PAL.aqua; px.textAlign='left'; px.fillText('Eк',L+4,T+12);
+    px.fillStyle=PAL.sand; px.fillText('Eп',L+40,T+12);
+    px.fillStyle=PAL.ink; px.fillText('E полная',L+76,T+12);
+    px.fillStyle=PAL.muted; px.textAlign='right'; px.fillText('макс '+nf(em,4)+' Дж',W-R,HP-8);
+  }
+}
+
+/* ---------- показания ---------- */
+function readouts(){
+  var me=meff(), W0=w0(), z=zeta(), a=acc(x,v,t), Fs=-P.k*x-P.beta*x*x*x;
+  var ke=0.5*me*v*v, pe=0.5*P.k*x*x+0.25*P.beta*Math.pow(x,4), E=ke+pe;
+  $('v_x').textContent=cm(x);
+  $('v_v').textContent=nf(v,3)+' м/с';
+  $('v_a').textContent=nf(a,3)+' м/с²';
+  $('v_F').textContent=nf(Fs,3)+' Н';
+  $('v_T0').textContent=nf(T0(),4)+' с';
+  var Tc=Tcurrent();
+  $('v_T').textContent=isFinite(Tc)?nf(Tc,4)+' с':'—';
+  $('v_Tm').textContent=Tmeas?nf(Tmeas,4)+' с':'—';
+  $('v_dT').textContent=isFinite(Tc)?((Tc/T0()-1)>=0?'+':'')+nf((Tc/T0()-1)*100,2)+' %':'—';
+  $('v_z').textContent=nf(z,3);
+  $('v_Q').textContent=z>0?nf(1/(2*z),2):'∞';
+  $('v_sh').textContent=cm(shift());
+  $('v_E').textContent=nf(E,4)+' Дж';
+  $('v_w0').textContent=nf(W0,4)+' рад/с';
+  $('v_t').textContent=nf(t,2)+' с';
+  var tot=Math.max(E,1e-12);
+  $('eb_k').style.width=(ke/tot*100)+'%';
+  $('eb_p').style.width=(pe/tot*100)+'%';
+
+  var st=$('stat'); st.className='status'; var m=[];
+  if(escaped){ st.classList.add('warn');
+    m.push('Мягкая пружина потеряла устойчивость: смещение перевалило барьер x = √(k/|β|) = '+cm(xEscape())+'. Дальше сила упругости не возвращает груз — модель остановлена. Нажмите «Сброс».'); }
+  else if(z>=1.001){ st.classList.add('warn');
+    m.push('Закритическое затухание ζ = '+nf(z,3)+': колебаний нет, груз апериодически возвращается к равновесию — и тем медленнее, чем больше c.'); }
+  else if(z>=0.999){ st.classList.add('warn');
+    m.push('Критическое затухание ζ = 1, c = c_c = '+nf(ccrit(),3)+' Н·с/м: самое быстрое возвращение без проскока.'); }
+  else {
+    st.classList.add('ok');
+    if(P.beta===0&&!P.don&&P.c===0) m.push('Идеальный случай: период '+nf(T0(),4)+' с не зависит от амплитуды. Это точная изохронность, которой у математического маятника нет.');
+    else m.push('Период с поправками '+(isFinite(Tc)?nf(Tc,4)+' с':'—')+', отличие от T₀ '+nf((Tc/T0()-1)*100,2)+' %.');
+    if(z>0) m.push('Затухание ζ = '+nf(z,3)+', добротность Q = '+nf(1/(2*z),2)+'.');
+  }
+  if(P.orient==='v') m.push('Гравитация сдвинула равновесие на '+cm(shift())+', но период не изменила.');
+  if(P.don){
+    var wr=W0*Math.sqrt(Math.max(0,1-2*z*z));
+    var Ar=P.F0/Math.sqrt(Math.pow(P.k-me*wr*wr,2)+Math.pow(P.c*wr,2));
+    m.push('Внешняя сила: f = '+nf(P.f,3)+' Гц, резонанс на '+nf(wr/(2*Math.PI),3)+' Гц с амплитудой '+cm(Ar)+'.');
+  }
+  st.textContent=m.join(' ');
+
+  $('bnote').textContent = P.beta===0
+    ? 'β = 0: закон Гука точен, период не зависит от амплитуды.'
+    : (P.beta>0
+      ? 'Жёсткая нелинейность: сила растёт быстрее линейной, период укорачивается с амплитудой.'
+      : 'Мягкая нелинейность: период удлиняется, а при |x| > '+cm(xEscape())+' равновесие теряется. Барьер энергии '+nf(P.k*P.k/(4*Math.abs(P.beta)),4)+' Дж.');
+  $('dnote').textContent = 'Статическое отклонение F₀/k = '+cm(P.F0/P.k)+'. На резонансе амплитуда больше него примерно в Q раз.';
+  var pn={
+    time:'Сплошная линия — настоящее движение, пунктир — аналитическое решение линейного уравнения с тем же затуханием. Без нелинейности и внешней силы они совпадают точно.',
+    phase:'Фазовая плоскость (x, v). Идеальный линейный осциллятор без трения рисует эллипс (пунктир). Затухание закручивает траекторию в спираль, нелинейность сплющивает эллипс, внешняя сила выводит на предельный цикл.',
+    energy:'Кинетическая и упругая энергия перекачиваются друг в друга дважды за период. Пунктир — полная: без трения и внешней силы постоянна, с трением убывает, на резонансе растёт до установившегося уровня.',
+    res:'Амплитуда установившихся колебаний A(ω) = F₀/√((k−mω²)²+(cω)²). Пик тем острее, чем меньше затухание; при ζ ≥ 1/√2 пика нет вовсе.'
+  }[mode];
+  $('pnote').textContent=pn;
+}
+function sync(){
+  $('p_orient').value=P.orient;
+  $('p_k').value=P.k; $('o_k').textContent=nf(P.k,1)+' Н/м';
+  $('p_m').value=P.m; $('o_m').textContent=nf(P.m,2)+' кг';
+  $('p_ms').value=P.ms; $('o_ms').textContent=nf(P.ms,3)+' кг';
+  $('p_L').value=P.L0; $('o_L').textContent=cm(P.L0);
+  $('p_A').value=P.A; $('o_A').textContent=cm(P.A);
+  $('p_b').value=P.beta; $('o_b').textContent=nf(P.beta,0)+' Н/м³';
+  $('p_c').value=P.c; $('o_c').textContent=nf(P.c,2)+' Н·с/м';
+  $('p_g').value=P.g; $('o_g').textContent=nf(P.g,2)+' м/с²';
+  $('p_don').checked=P.don;
+  $('p_F0').value=P.F0; $('o_F0').textContent=nf(P.F0,2)+' Н';
+  $('p_f').value=P.f; $('o_f').textContent=nf(P.f,3)+' Гц';
+  $('p_sp').value=P.sp; $('o_sp').textContent=nf(P.sp,2)+'× реального';
+}
+function setRun(){ $('run').textContent=running?'❚❚ Пауза':'▶ Пуск'; $('run').classList.toggle('pri',!running); }
+function setAll(o){ Object.keys(o).forEach(function(k){ P[k]=o[k]; }); sync(); reset(); }
+
+var QUICK=[
+ ['Идеальная пружина',function(){ setAll({beta:0,c:0,don:false,ms:0,m:0.5,k:20,A:0.08,orient:'v',g:9.81}); }],
+ ['Большая амплитуда',function(){ setAll({beta:0,c:0,don:false,A:0.28}); }],
+ ['Жёсткая нелинейность',function(){ setAll({beta:1500,c:0,don:false,A:0.15}); }],
+ ['Мягкая нелинейность',function(){ setAll({beta:-600,c:0,don:false,A:0.12}); }],
+ ['Масса пружины 0,3 кг',function(){ setAll({beta:0,c:0,don:false,ms:0.3,A:0.08}); }],
+ ['Недокритическое',function(){ setAll({beta:0,don:false,c:0.3*ccrit()}); }],
+ ['Критическое',function(){ setAll({beta:0,don:false,c:ccrit()}); }],
+ ['Закритическое',function(){ setAll({beta:0,don:false,c:2*ccrit()}); }],
+ ['Резонанс',function(){ setAll({beta:0,c:0.5,don:true,F0:0.2,A:0.005}); toRes(); }],
+ ['Горизонтально',function(){ setAll({orient:'h',beta:0,c:0,don:false,A:0.08}); }],
+ ['Луна: g меньше',function(){ setAll({orient:'v',g:1.62,beta:0,c:0,don:false}); }],
+ ['Невесомость',function(){ setAll({orient:'v',g:0,beta:0,c:0,don:false}); }]
+];
+function toRes(){ var z=zeta(); P.f=w0()*Math.sqrt(Math.max(0.01,1-2*z*z))/(2*Math.PI); sync(); }
+QUICK.forEach(function(q){
+  var b=document.createElement('button'); b.textContent=q[0];
+  b.addEventListener('click',function(){ q[1](); running=!reduce; setRun(); });
+  $('quick').appendChild(b);
+  $('preset').insertAdjacentHTML('beforeend','<option>'+q[0]+'</option>');
+});
+$('preset').addEventListener('change',function(e){ var i=e.target.selectedIndex; if(QUICK[i]){ QUICK[i][1](); running=!reduce; setRun(); } });
+[['0,3 c_c',0.3],['c_c',1],['2 c_c',2]].forEach(function(p){
+  var b=document.createElement('button'); b.className='sm'; b.textContent=p[0];
+  b.addEventListener('click',function(){ P.c=p[1]*ccrit(); sync(); });
+  $('cpres').appendChild(b);
+});
+[['Земля',9.81],['Луна',1.62],['Марс',3.71],['Юпитер',24.79],['0',0]].forEach(function(p){
+  var b=document.createElement('button'); b.className='sm'; b.textContent=p[0];
+  b.addEventListener('click',function(){ P.g=p[1]; sync(); });
+  $('gpres').appendChild(b);
+});
+$('p_orient').addEventListener('change',function(e){ P.orient=e.target.value; trail=[]; sync(); });
+$('p_k').addEventListener('input',function(e){ P.k=+e.target.value; sync(); });
+$('p_m').addEventListener('input',function(e){ P.m=+e.target.value; sync(); });
+$('p_ms').addEventListener('input',function(e){ P.ms=+e.target.value; sync(); });
+$('p_L').addEventListener('input',function(e){ P.L0=+e.target.value; trail=[]; sync(); });
+$('p_A').addEventListener('input',function(e){ P.A=+e.target.value; sync(); reset(); });
+$('p_b').addEventListener('input',function(e){ P.beta=+e.target.value; escaped=false; sync(); });
+$('p_c').addEventListener('input',function(e){ P.c=+e.target.value; sync(); });
+$('p_g').addEventListener('input',function(e){ P.g=+e.target.value; trail=[]; sync(); });
+$('p_don').addEventListener('change',function(e){ P.don=e.target.checked; sync(); });
+$('p_F0').addEventListener('input',function(e){ P.F0=+e.target.value; sync(); });
+$('p_f').addEventListener('input',function(e){ P.f=+e.target.value; sync(); });
+$('p_sp').addEventListener('input',function(e){ P.sp=+e.target.value; sync(); });
+$('toRes').addEventListener('click',function(){ toRes(); });
+$('run').addEventListener('click',function(){ if(escaped) reset(); running=!running; setRun(); });
+$('step').addEventListener('click',function(){ running=false; setRun(); advance(1/60); });
+$('reset').addEventListener('click',function(){ reset(); });
+$('kick').addEventListener('click',function(){ v+=0.6*P.A*w0(); running=true; setRun(); });
+[['m_time','time'],['m_phase','phase'],['m_energy','energy'],['m_res','res']].forEach(function(p){
+  $(p[0]).addEventListener('click',function(){ mode=p[1];
+    [['m_time','time'],['m_phase','phase'],['m_energy','energy'],['m_res','res']].forEach(function(q){
+      $(q[0]).setAttribute('aria-pressed',String(mode===q[1])); });
+  });
+});
+['c_ghost','c_vec','c_trail','c_eq','c_zoom','c_lab'].forEach(function(id){
+  $(id).addEventListener('change',function(){ trail=[]; });
+});
+
+function ptr(ev){ var b=sc.getBoundingClientRect();
+  return {x:(ev.clientX-b.left)*(W/b.width),y:(ev.clientY-b.top)*(HS/b.height)}; }
+sc.addEventListener('pointerdown',function(ev){
+  var g=geom(),p=ptr(ev), cx0=g.vert?g.mx:g.pos(x), cy0=g.vert?g.pos(x):g.my;
+  if(Math.hypot(p.x-cx0,p.y-cy0)>52) return;
+  drag=true; running=false; setRun(); sc.style.cursor='grabbing'; ev.preventDefault();
+  if(sc.setPointerCapture){ try{sc.setPointerCapture(ev.pointerId)}catch(_){} }
+});
+sc.addEventListener('pointermove',function(ev){
+  if(!drag) return;
+  var g=geom(),p=ptr(ev), base=$('c_zoom').checked?(g.vert?HS*0.5:W*0.55):(g.vert?g.anchor+(P.L0+shift())*g.k:44+P.L0*g.k);
+  var val=((g.vert?p.y:p.x)-base)/g.k;
+  P.A=Math.max(0.005,Math.min(0.3,Math.abs(val)));
+  x=val<0?-P.A:P.A; v=0; t=0; cross=[]; Tmeas=0; ampSeen=P.A;
+  trail=[]; samples=[]; phase=[]; escaped=false; sync();
+});
+function endDrag(){ if(drag){ drag=false; sc.style.cursor='grab'; running=true; setRun(); } }
+sc.addEventListener('pointerup',endDrag); sc.addEventListener('pointercancel',endDrag);
+window.addEventListener('pointerup',endDrag);
+sc.addEventListener('touchmove',function(ev){ if(drag) ev.preventDefault(); },{passive:false});
+window.addEventListener('keydown',function(ev){
+  var tg=ev.target.tagName; if(tg==='INPUT'||tg==='SELECT'||tg==='TEXTAREA') return;
+  if(ev.code==='Space'){ ev.preventDefault(); if(escaped) reset(); running=!running; setRun(); }
+  else if(ev.key==='s'||ev.key==='S'||ev.key==='ы') $('step').click();
+  else if(ev.key==='r'||ev.key==='R'||ev.key==='к') reset();
+});
+var rt=null; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ readPal(); resize(); },150); });
+
+var lastT=0;
+function loop(ts){
+  requestAnimationFrame(loop);
+  var dt=Math.min(.05,(ts-lastT)/1000||0); lastT=ts;
+  if(running&&!drag) advance(dt);
+  drawScene(); drawPlot(); readouts();
+}
+sync(); resize(); reset(); running=!reduce; setRun();
+lastT=performance.now(); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
