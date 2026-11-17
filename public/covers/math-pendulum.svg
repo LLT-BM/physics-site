@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E2226"/><stop offset=".55" stop-color="#0A171A"/><stop offset="1" stop-color="#050D0E"/>
+    </linearGradient>
+    <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
+      <path d="M46 0H0V46" fill="none" stroke="#7ED6C7" stroke-opacity=".06"/>
+    </pattern>
+    <radialGradient id="vig" cx=".5" cy=".45" r=".8">
+      <stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>
+    </radialGradient>
+    <radialGradient id="bob" cx=".35" cy=".32" r=".85">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".4" stop-color="#4FD8C4"/><stop offset="1" stop-color="#0A2A28"/>
+    </radialGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <rect width="1200" height="750" fill="url(#grid)"/>
+
+  <!-- подвес -->
+  <rect x="330" y="150" width="140" height="18" rx="4" fill="#16292B" stroke="#7ED6C7" stroke-opacity=".3"/>
+  <g stroke="#7ED6C7" stroke-opacity=".35">
+    <path d="M338 150l8-11"/><path d="M362 150l8-11"/><path d="M386 150l8-11"/><path d="M410 150l8-11"/><path d="M434 150l8-11"/><path d="M458 150l8-11"/>
+  </g>
+
+  <!-- транспортир -->
+  <g fill="none" stroke="#7ED6C7" stroke-opacity=".28">
+    <path d="M270 168 A 130 130 0 0 0 530 168"/>
+  </g>
+  <g stroke="#7ED6C7" stroke-opacity=".35">
+    <path d="M400 168 V 310"/>
+  </g>
+  <g fill="#8FA8A6" font-size="13" text-anchor="middle">
+    <text x="400" y="330">0°</text><text x="286" y="200">90°</text><text x="514" y="200">90°</text>
+  </g>
+  <path d="M400 168 V 300" stroke="#8FA8A6" stroke-dasharray="5 6" stroke-opacity=".5"/>
+
+  <!-- призрачный гармонический маятник -->
+  <g stroke="#ABA6DC" stroke-opacity=".6" fill="none" stroke-dasharray="6 5">
+    <path d="M400 168 L 268 480"/>
+    <circle cx="268" cy="480" r="22"/>
+  </g>
+  <text x="248" y="524" fill="#ABA6DC" font-size="14" text-anchor="middle">гармонический</text>
+
+  <!-- настоящая нить и груз -->
+  <path d="M400 168 L 556 452" stroke="#E9F4F1" stroke-width="3"/>
+  <path d="M400 168 A 96 96 0 0 0 448 254" fill="none" stroke="#4FD8C4" stroke-width="4"/>
+  <text x="424" y="286" fill="#4FD8C4" font-size="20">θ</text>
+  <circle cx="556" cy="452" r="34" fill="url(#bob)" filter="url(#glow)"/>
+  <text x="556" y="510" fill="#4FD8C4" font-size="14" text-anchor="middle">настоящий</text>
+  <text x="490" y="300" fill="#D9B98C" font-size="17">L</text>
+
+  <!-- векторы -->
+  <g stroke-width="3.5" fill="none">
+    <path d="M556 452 L 640 407" stroke="#4FD8C4"/>
+    <path d="M640 407 l-14 1 l7 12 z" fill="#4FD8C4" stroke="none"/>
+    <path d="M556 452 L 512 372" stroke="#D69FA9"/>
+    <path d="M512 372 l1 14 l12 -7 z" fill="#D69FA9" stroke="none"/>
+    <path d="M556 452 L 556 540" stroke="#8FA8A6"/>
+    <path d="M556 540 l-6 -13 l12 0 z" fill="#8FA8A6" stroke="none"/>
+  </g>
+  <g font-size="14">
+    <text x="654" y="400" fill="#4FD8C4">v</text>
+    <text x="496" y="360" fill="#D69FA9">N</text>
+    <text x="566" y="556" fill="#8FA8A6">mg</text>
+  </g>
+
+  <!-- график расхождения -->
+  <g transform="translate(720,200)">
+    <rect x="0" y="0" width="420" height="230" rx="10" fill="#071012" stroke="#7ED6C7" stroke-opacity=".22"/>
+    <path d="M20 115 H 400" stroke="#7ED6C7" stroke-opacity=".25"/>
+    <path d="M20 115 C 60 30, 100 30, 140 115 S 220 200, 260 115 S 340 30, 380 115"
+          fill="none" stroke="#ABA6DC" stroke-width="2.4" stroke-dasharray="6 5"/>
+    <path d="M20 115 C 66 34, 112 34, 152 115 S 244 196, 284 115 S 372 36, 400 108"
+          fill="none" stroke="#4FD8C4" stroke-width="3"/>
+    <text x="20" y="26" fill="#8FA8A6" font-size="13">θ(t): точный и гармонический</text>
+    <text x="400" y="216" fill="#D9B98C" font-size="13" text-anchor="end">расходятся по фазе</text>
+  </g>
+
+  <!-- формулы -->
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 11</text>
+  <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">МЕХАНИКА · КОЛЕБАНИЯ · НЕЛИНЕЙНОСТЬ</text>
+  <text x="720" y="520" fill="#4FD8C4" font-size="26" font-family="Unbounded, sans-serif" font-weight="600">T₀ = 2π√(L/g)</text>
+  <text x="720" y="562" fill="#D9B98C" font-size="19">T = 4√(L/g)·K(sin θ₀/2)</text>
+  <text x="720" y="600" fill="#8FA8A6" font-size="15">90° → T = 1,1803·T₀ · 170° → 2,4394·T₀</text>
+  <text x="48" y="700" fill="#8FA8A6" font-size="15">θ″ = −(g/L)·sin θ · натяжение в нижней точке при 90° ровно 3mg</text>
+
+  <g stroke="#7ED6C7" stroke-opacity=".3" fill="none">
+    <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
+  </g>
+  <rect width="1200" height="750" fill="url(#vig)"/>
+</svg>
