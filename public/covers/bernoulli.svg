@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E2226"/><stop offset=".55" stop-color="#0A171A"/><stop offset="1" stop-color="#050D0E"/>
+    </linearGradient>
+    <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
+      <path d="M46 0H0V46" fill="none" stroke="#7ED6C7" stroke-opacity=".06"/>
+    </pattern>
+    <linearGradient id="flow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4FD8C4" stop-opacity=".22"/>
+      <stop offset=".5" stop-color="#4FD8C4" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#4FD8C4" stop-opacity=".22"/>
+    </linearGradient>
+    <radialGradient id="vig" cx=".5" cy=".45" r=".8">
+      <stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>
+    </radialGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <rect width="1200" height="750" fill="url(#grid)"/>
+
+  <!-- труба Вентури: широкий вход, горловина, диффузор -->
+  <path d="M90 430 H 400 L 520 476 H 660 L 860 430 H 1120 L 1120 530 H 860 L 660 484 H 520 L 400 530 H 90 Z"
+        fill="url(#flow)" stroke="#4FD8C4" stroke-width="3"/>
+
+  <!-- EGL горизонтальна -->
+  <path d="M90 190 H 1120" stroke="#ABA6DC" stroke-width="2.5"/>
+  <text x="96" y="182" fill="#ABA6DC" font-size="14">EGL — полный напор постоянен</text>
+  <!-- HGL проваливается в горловине -->
+  <path d="M90 214 H 400 L 520 470 H 660 L 860 214 H 1120"
+        fill="none" stroke="#D9B98C" stroke-width="2.2" stroke-dasharray="7 5"/>
+  <text x="1000" y="206" fill="#D9B98C" font-size="14" text-anchor="end">HGL</text>
+
+  <!-- пьезометры -->
+  <g stroke="#7ED6C7" stroke-opacity=".35" stroke-width="1.6" fill="none">
+    <path d="M228 430 V 214"/><path d="M252 430 V 214"/>
+    <path d="M578 476 V 470"/><path d="M602 476 V 470"/>
+    <path d="M978 430 V 214"/><path d="M1002 430 V 214"/>
+  </g>
+  <rect x="230" y="214" width="20" height="216" fill="#D9B98C" fill-opacity=".5"/>
+  <rect x="580" y="470" width="20" height="6" fill="#D9B98C" fill-opacity=".5"/>
+  <rect x="980" y="214" width="20" height="216" fill="#D9B98C" fill-opacity=".5"/>
+  <g stroke="#D9B98C" stroke-width="3">
+    <path d="M224 214 H 256"/><path d="M574 470 H 606"/><path d="M974 214 H 1006"/>
+  </g>
+  <g fill="#D9B98C" font-size="15" text-anchor="middle">
+    <text x="240" y="204">30 кПа</text>
+    <text x="590" y="460">≈ 60 Па</text>
+    <text x="990" y="204">30 кПа</text>
+  </g>
+
+  <!-- частицы: разгон в горловине -->
+  <g fill="#E9F4F1" fill-opacity=".75">
+    <circle cx="130" cy="462" r="4"/><circle cx="190" cy="492" r="4"/><circle cx="260" cy="470" r="4"/>
+    <circle cx="330" cy="500" r="4"/><circle cx="390" cy="466" r="4"/>
+    <circle cx="470" cy="480" r="4"/><circle cx="540" cy="478" r="4"/><circle cx="600" cy="482" r="4"/>
+    <circle cx="650" cy="479" r="4"/><circle cx="740" cy="470" r="4"/><circle cx="820" cy="492" r="4"/>
+    <circle cx="900" cy="466" r="4"/><circle cx="980" cy="498" r="4"/><circle cx="1060" cy="472" r="4"/>
+  </g>
+  <g stroke="#4FD8C4" stroke-width="3" fill="#4FD8C4">
+    <path d="M140 560 H 210"/><path d="M210 560 l-13 -6 l0 12 z"/>
+    <path d="M540 560 H 690"/><path d="M690 560 l-13 -6 l0 12 z"/>
+    <path d="M940 560 H 1010"/><path d="M1010 560 l-13 -6 l0 12 z"/>
+  </g>
+  <g fill="#4FD8C4" font-size="16" text-anchor="middle">
+    <text x="175" y="586">v₁ = 2 м/с</text>
+    <text x="615" y="586">v₂ = 8 м/с</text>
+    <text x="975" y="586">v₃ = 2 м/с</text>
+  </g>
+  <g fill="#8FA8A6" font-size="14" text-anchor="middle">
+    <text x="240" y="612">D₁ = 100 мм</text>
+    <text x="590" y="612">D₂ = 50 мм</text>
+    <text x="990" y="612">D₁ = 100 мм</text>
+  </g>
+
+  <!-- формулы -->
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 13</text>
+  <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">ГИДРОДИНАМИКА · НЕРАЗРЫВНОСТЬ · БЕРНУЛЛИ</text>
+  <text x="48" y="132" fill="#4FD8C4" font-size="25" font-family="Unbounded, sans-serif" font-weight="600">p + ½ρv² + ρgz = const</text>
+  <text x="1152" y="676" fill="#D9B98C" font-size="20" text-anchor="end">A₁v₁ = A₂v₂</text>
+  <text x="1152" y="706" fill="#8FA8A6" font-size="15" text-anchor="end">площадь в 4 раза меньше → скорость в 4 раза больше → давление ниже на 29,94 кПа</text>
+  <text x="48" y="706" fill="#8FA8A6" font-size="15">Торричелли: v = √(2gh) · дальность струи 2√(h·y), максимум равен H</text>
+
+  <g stroke="#7ED6C7" stroke-opacity=".3" fill="none">
+    <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
+  </g>
+  <rect width="1200" height="750" fill="url(#vig)"/>
+</svg>

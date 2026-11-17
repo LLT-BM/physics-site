@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Закон Бернулли для жидкостей</title>
+<link rel="canonical" href="https://liblabtab.ru/models/bernoulli/">
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+:root{
+  /* Единый источник цветов: меняется только этот блок. */
+  --bg:#0A1417; --surface:#102024; --canvas:#071012;
+  --line:rgba(126,214,199,.16); --ink:#E9F4F1; --muted:#8FA8A6;
+  --aqua:#4FD8C4; --sand:#D9B98C; --lilac:#ABA6DC; --rose:#D69FA9;
+  --ok:#3FC9AE; --on:#06110F;
+  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:46px 46px}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 16px 40px}
+h1{font:800 1.65rem/1.15 var(--disp);margin:0 0 8px}
+.lead{margin:0 0 14px;color:var(--muted);max-width:80ch}
+.lead b{color:var(--ink);font-family:var(--mono)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+canvas{display:block;width:100%;border-radius:10px;background:var(--canvas);touch-action:none}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+button{font:inherit;font-family:var(--sans);min-height:42px;padding:8px 13px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.pri{background:var(--aqua);color:var(--on);border-color:var(--aqua);font-weight:600}
+button.sm{min-height:34px;padding:5px 10px;font-size:.84rem}
+button[aria-pressed="true"]{border-color:var(--aqua);color:var(--aqua)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
+select{font:inherit;font-family:var(--mono);font-size:.85rem;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+input[type=range]{width:100%;height:28px;margin:2px 0 0;-webkit-appearance:none;appearance:none;background:transparent;accent-color:var(--aqua)}
+label{display:flex;justify-content:space-between;align-items:baseline;font-size:.86rem;color:var(--muted);margin-top:9px;gap:8px}
+output{font-family:var(--mono);font-weight:600;color:var(--sand)}
+.chk{display:flex;align-items:center;gap:8px;font-size:.86rem;margin-top:9px;cursor:pointer;color:var(--ink)}
+.chk input{width:17px;height:17px;accent-color:var(--aqua);flex:none}
+.rd{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+.rd div{background:rgba(0,0,0,.26);border:1px solid var(--line);border-radius:9px;padding:9px 10px}
+.rd span{display:block;font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.rd b{font-family:var(--mono);font-size:1rem}
+.rd b.a{color:var(--aqua)} .rd b.s{color:var(--sand)} .rd b.l{color:var(--lilac)} .rd b.r{color:var(--rose)}
+.status{margin-top:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-family:var(--mono);font-size:.85rem}
+.status.ok{border-color:var(--ok);color:var(--ok)}
+.status.warn{border-color:var(--sand);color:var(--sand);border-style:dashed}
+.status.bad{border-color:var(--rose);color:var(--rose)}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(266px,1fr));gap:12px;margin-top:12px}
+.grp h2{font:600 1rem var(--disp);margin:0 0 6px;padding-left:10px;border-left:4px solid var(--aqua)}
+.grp.b h2{border-color:var(--sand)} .grp.c h2{border-color:var(--lilac)} .grp.d h2{border-color:var(--rose)}
+.note{margin:8px 2px 0;font-size:.84rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chips button{border-radius:999px;font-family:var(--mono);font-size:.76rem;min-height:32px;padding:4px 10px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:.76rem;color:var(--muted);font-family:var(--mono)}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:3px;margin-right:5px}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.8rem;margin-top:10px}
+th,td{padding:6px 7px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:600}
+.tw{overflow-x:auto}
+.hide{display:none}
+kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Закон Бернулли</h1>
+  <p class="lead">Для установившегося течения несжимаемой жидкости без трения вдоль линии тока <b>p + ½ρv² + ρgz = const</b>. Вместе с уравнением неразрывности <b>A₁v₁ = A₂v₂</b> это объясняет, почему в узком сечении трубы давление падает. Включите реальную жидкость — и увидите, как трение и местные потери ломают это равенство.</p>
+
+  <section class="card">
+    <div class="bar" style="margin:0 0 10px">
+      <button class="sm" id="s_ven" aria-pressed="true">Труба Вентури</button>
+      <button class="sm" id="s_tor" aria-pressed="false">Истечение из бака</button>
+      <span style="flex:1"></span>
+      <button class="pri" id="run">▶ Пуск</button>
+      <button id="reset">Сброс</button>
+    </div>
+    <canvas id="scene" aria-label="Течение жидкости: труба Вентури или истечение из бака"></canvas>
+    <div class="chips" id="quick"></div>
+    <div class="rd" id="rdv">
+      <div><span>расход Q</span><b class="a" id="v_Q">—</b></div>
+      <div><span>перепад p₁ − p₂</span><b class="s" id="v_dp">—</b></div>
+      <div><span>минимальное давление</span><b class="r" id="v_pmin">—</b></div>
+      <div><span>запас до кавитации</span><b class="l" id="v_cav">—</b></div>
+      <div><span>безвозвратная потеря</span><b class="s" id="v_loss">—</b></div>
+      <div><span>сумма Бернулли</span><b class="a" id="v_H">—</b></div>
+      <div><span>число Маха</span><b id="v_M">—</b></div>
+      <div><span>режим течения</span><b class="l" id="v_reg">—</b></div>
+    </div>
+    <div class="rd hide" id="rdt">
+      <div><span>глубина дырки h</span><b class="a" id="t_h">—</b></div>
+      <div><span>скорость истечения</span><b class="s" id="t_v">—</b></div>
+      <div><span>с учётом сжатия струи</span><b id="t_vr">—</b></div>
+      <div><span>дальность струи</span><b class="a" id="t_R">—</b></div>
+      <div><span>максимальная дальность</span><b class="l" id="t_Rmax">—</b></div>
+      <div><span>расход</span><b class="s" id="t_Q">—</b></div>
+      <div><span>время опорожнения</span><b class="l" id="t_time">—</b></div>
+      <div><span>уровень сейчас</span><b id="t_lvl">—</b></div>
+    </div>
+    <div class="status" id="stat" aria-live="polite"></div>
+    <p class="note" id="snote"></p>
+  </section>
+
+  <div class="ctl">
+    <section class="card grp">
+      <h2>Жидкость</h2>
+      <label>Среда<select id="p_fluid"></select></label>
+      <label>Плотность ρ <output id="o_rho"></output></label>
+      <input type="range" id="p_rho" min="0.5" max="14000" step="0.5" value="998">
+      <label>Вязкость μ <output id="o_mu"></output></label>
+      <input type="range" id="p_mu" min="0" max="1" step="0.001" value="0.5">
+      <p class="note" id="fnote"></p>
+    </section>
+
+    <section class="card grp b" id="boxVen">
+      <h2>Труба</h2>
+      <label>Скорость на входе v₁ <output id="o_v1"></output></label>
+      <input type="range" id="p_v1" min="0.2" max="12" step="0.05" value="2">
+      <label>Диаметр D₁ <output id="o_D1"></output></label>
+      <input type="range" id="p_D1" min="20" max="200" step="1" value="100">
+      <label>Диаметр горловины D₂ <output id="o_D2"></output></label>
+      <input type="range" id="p_D2" min="10" max="150" step="1" value="50">
+      <label>Давление на входе p₁ <output id="o_p1"></output></label>
+      <input type="range" id="p_p1" min="-60" max="300" step="1" value="30">
+      <label>Перепад высот z₃ − z₁ <output id="o_dz"></output></label>
+      <input type="range" id="p_dz" min="-2" max="2" step="0.05" value="0">
+      <p class="note">Давление отсчитывается от атмосферного (избыточное). Отрицательное значение — разрежение.</p>
+    </section>
+
+    <section class="card grp d" id="boxReal">
+      <h2>Реальность</h2>
+      <label class="chk"><input type="checkbox" id="p_real"> Реальная жидкость: трение и местные потери</label>
+      <label>Шероховатость ε <output id="o_eps"></output></label>
+      <input type="range" id="p_eps" min="0.0005" max="0.5" step="0.0005" value="0.0015">
+      <label>Потери в сужении K <output id="o_K"></output></label>
+      <input type="range" id="p_K" min="0" max="0.5" step="0.01" value="0.05">
+      <label class="chk"><input type="checkbox" id="p_diff" checked> Плавный диффузор (иначе внезапное расширение)</label>
+      <p class="note">Трение считается по Дарси–Вейсбаху: ламинарно f = 64/Re, турбулентно — по Свами–Джейну. Внезапное расширение — потеря Борда–Карно (v₂−v₃)²/2g.</p>
+    </section>
+
+    <section class="card grp c" id="boxTor" class="hide">
+      <h2>Бак и отверстие</h2>
+      <label>Глубина воды H <output id="o_H"></output></label>
+      <input type="range" id="p_H" min="0.2" max="3" step="0.02" value="1">
+      <label>Глубина дырки под поверхностью h <output id="o_hh"></output></label>
+      <input type="range" id="p_hh" min="0.02" max="2.98" step="0.01" value="0.5">
+      <label>Диаметр отверстия d <output id="o_d"></output></label>
+      <input type="range" id="p_d" min="2" max="40" step="0.5" value="11.3">
+      <label>Площадь бака Aₜ <output id="o_At"></output></label>
+      <input type="range" id="p_At" min="0.05" max="3" step="0.01" value="0.5">
+      <label>Коэффициент расхода C_d <output id="o_Cd"></output></label>
+      <input type="range" id="p_Cd" min="0.5" max="1" step="0.01" value="0.62">
+      <label class="chk"><input type="checkbox" id="p_drain"> Опорожнять бак (уровень падает)</label>
+      <p class="note">Идеальная скорость √(2gh) не зависит от плотности. Реальная струя сжимается за отверстием, поэтому расход меньше: C_d ≈ 0,62 для острого отверстия.</p>
+    </section>
+
+    <section class="card grp c">
+      <h2>Что показывать</h2>
+      <label class="chk"><input type="checkbox" id="c_part" checked> Частицы потока</label>
+      <label class="chk"><input type="checkbox" id="c_piez" checked> Пьезометры (столбы давления)</label>
+      <label class="chk"><input type="checkbox" id="c_pitot"> Трубки Пито (полный напор)</label>
+      <label class="chk"><input type="checkbox" id="c_lines" checked> Линии напора EGL и HGL</label>
+      <label class="chk"><input type="checkbox" id="c_lab" checked> Подписи значений</label>
+      <label>Скорость показа <output id="o_sp"></output></label>
+      <input type="range" id="p_sp" min="0.1" max="3" step="0.05" value="1">
+      <p class="note">EGL — линия полного напора, HGL — пьезометрическая линия. Разница между ними равна скоростному напору v²/2g. У идеальной жидкости EGL горизонтальна.</p>
+    </section>
+  </div>
+
+  <section class="card" id="cardTable">
+    <div class="tw"><table id="tbl"></table></div>
+    <p class="note" id="tnote"></p>
+  </section>
+
+  <section class="card">
+    <div class="bar" style="margin:0 0 10px">
+      <button class="sm" id="m_pv" aria-pressed="true">Давление и скорость</button>
+      <button class="sm" id="m_head" aria-pressed="false">Линии напора</button>
+      <button class="sm" id="m_terms" aria-pressed="false">Слагаемые Бернулли</button>
+    </div>
+    <canvas id="plot" aria-label="График давления, напоров или слагаемых Бернулли"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--sand)"></i>давление / пьезометрический напор</span>
+      <span><i style="background:var(--aqua)"></i>скорость / скоростной напор</span>
+      <span><i style="background:var(--lilac)"></i>полный напор EGL</span>
+      <span><i style="background:var(--rose)"></i>геометрический напор z</span>
+    </div>
+    <p class="note" id="pnote"></p>
+  </section>
+</main>
+
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id)};
+var FB={aqua:'#4FD8C4',sand:'#D9B98C',lilac:'#ABA6DC',rose:'#D69FA9',ok:'#3FC9AE',
+  ink:'#E9F4F1',muted:'#8FA8A6',line:'rgba(126,214,199,.16)',canvas:'#071012',surface:'#102024'};
+var PAL={};
+function readPal(){ var cs=getComputedStyle(document.documentElement);
+  Object.keys(FB).forEach(function(k){ PAL[k]=(cs.getPropertyValue('--'+k)||'').trim()||FB[k]; }); }
+readPal();
+
+var G=9.81, PATM=101325, RW=998;
+var FL=[
+ {n:'Вода 20 °C',rho:998,mu:1.002e-3,pv:2340,a:null},
+ {n:'Вода 80 °C',rho:972,mu:3.55e-4,pv:47400,a:null},
+ {n:'Этанол',rho:789,mu:1.2e-3,pv:5950,a:null},
+ {n:'Масло SAE 30',rho:891,mu:0.29,pv:100,a:null},
+ {n:'Глицерин',rho:1261,mu:1.412,pv:20,a:null},
+ {n:'Ртуть',rho:13546,mu:1.526e-3,pv:0.17,a:null},
+ {n:'Воздух 20 °C',rho:1.204,mu:1.813e-5,pv:1e9,a:343}
+];
+var P={fl:0,rho:998,mu:1.002e-3,v1:2,D1:0.1,D2:0.05,p1:30000,dz:0,
+  real:false,eps:1.5e-6,K:0.05,diff:true,
+  H:1,hh:0.5,d:0.0113,At:0.5,Cd:0.62,drain:false,sp:1};
+var scene='ven', plotMode='pv', running=false;
+var parts=[], drops=[], lvl=1, tSim=0, prof=null;
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function muFromSlider(s){ return 1e-6*Math.pow(2e6,s); }
+function muToSlider(mu){ return Math.log(mu/1e-6)/Math.log(2e6); }
+function isGas(){ return P.rho<10; }
+function rhoRef(){ return isGas()?RW:P.rho; }
+function headUnit(){ return isGas()?' мм в.ст.':' м'; }
+function hScale(){ return isGas()?1000:1; }
+function area(D){ return Math.PI*D*D/4; }
+function nf(x,n){ if(!isFinite(x)) return '—'; return x.toFixed(n).replace('.',','); }
+function press(x){
+  var a=Math.abs(x);
+  if(isGas()) return nf(x,1)+' Па';
+  if(a<1000) return nf(x,0)+' Па';
+  return nf(x/1000,2)+' кПа';
+}
+function head(x){ return nf(x*hScale(),isGas()?1:4)+headUnit(); }
+function fr(Re,D){
+  if(Re<1) return 0;
+  if(Re<2300) return 64/Re;
+  return 0.25/Math.pow(Math.log10(P.eps/(3.7*D)+5.74/Math.pow(Re,0.9)),2);
+}
+function regime(Re){ return Re<2300?'ламинарный':(Re<4000?'переходный':'турбулентный'); }
+
+/* ---------- гидравлика Вентури ---------- */
+function geomPipe(){
+  var Lc=0.15, Ld=P.diff?0.4:0.02;
+  var segs=[
+    {t:'p',L:0.6,D:P.D1},
+    {t:'c',L:Lc,Da:P.D1,Db:P.D2},
+    {t:'p',L:0.3,D:P.D2},
+    {t:'d',L:Ld,Da:P.D2,Db:P.D1},
+    {t:'p',L:0.5,D:P.D1}
+  ];
+  var x=0; segs.forEach(function(s){ s.x0=x; x+=s.L; s.x1=x; });
+  return {segs:segs,L:x};
+}
+function dat(gp,x){
+  for(var i=0;i<gp.segs.length;i++){ var s=gp.segs[i];
+    if(x<=s.x1+1e-9||i===gp.segs.length-1){
+      if(s.t==='p') return s.D;
+      var u=(x-s.x0)/s.L; u=Math.max(0,Math.min(1,u));
+      return s.Da+(s.Db-s.Da)*u;
+    } }
+  return P.D1;
+}
+function compute(){
+  var gp=geomPipe(), N=320, dx=gp.L/N;
+  var A1=area(P.D1), Q=P.v1*A1;
+  var xs=[],Ds=[],vs=[],ps=[],Hs=[],zs=[],Res=[];
+  varHref=rhoRef()*G;
+  var H=(P.p1+0.5*P.rho*P.v1*P.v1)/(P.rho*G);
+  var lossTot=0, pmin=Infinity, xmin=0;
+  for(var i=0;i<=N;i++){
+    var x=i*dx, D=dat(gp,x), A=area(D), v=Q/A, z=P.dz*x/gp.L;
+    var Re=P.rho*v*D/P.mu;
+    if(i>0){
+      var Dm=dat(gp,x-dx/2), vm=Q/area(Dm), Rem=P.rho*vm*Dm/P.mu;
+      var dh=P.real?fr(Rem,Dm)*(dx/Dm)*vm*vm/(2*G):0;
+      var sPrev=gp.segs.filter(function(s){ return s.x1<=x-dx/2+1e-9; });
+      gp.segs.forEach(function(s){
+        if(Math.abs(s.x1-(x-dx/2))<dx/2+1e-9){
+          if(s.t==='c'&&P.real) dh+=P.K*vm*vm/(2*G);
+          if(s.t==='d'&&P.real){
+            var v2=Q/area(P.D2), v3=Q/area(P.D1);
+            dh+=(P.diff?0.15:1)*Math.pow(v2-v3,2)/(2*G);
+          }
+        }
+      });
+      H-=dh; lossTot+=dh;
+    }
+    var p=(H-v*v/(2*G)-z)*P.rho*G;
+    xs.push(x);Ds.push(D);vs.push(v);ps.push(p);Hs.push(H);zs.push(z);Res.push(Re);
+    if(p<pmin){ pmin=p; xmin=x; }
+  }
+  var st=[0.3,gp.segs[2].x0+0.15,gp.L-0.25].map(function(x){
+    var i=Math.round(x/dx); i=Math.max(0,Math.min(N,i));
+    return {x:xs[i],D:Ds[i],A:area(Ds[i]),v:vs[i],p:ps[i],H:Hs[i],z:zs[i],Re:Res[i]};
+  });
+  prof={gp:gp,N:N,dx:dx,xs:xs,Ds:Ds,vs:vs,ps:ps,Hs:Hs,zs:zs,Res:Res,Q:Q,
+    st:st,pmin:pmin,xmin:xmin,loss:lossTot,H0:(P.p1+0.5*P.rho*P.v1*P.v1)/(P.rho*G)};
+  return prof;
+}
+
+/* ---------- Торричелли ---------- */
+function tor(){
+  var h=P.drain?Math.max(0,lvl-(P.H-P.hh)):P.hh;
+  h=Math.max(0,Math.min(h,lvl));
+  var v=Math.sqrt(2*G*h), a=area(P.d);
+  var y=Math.max(0,lvl-h);
+  var R=v*Math.sqrt(2*y/G);
+  var Rmax=lvl;
+  var Q=P.Cd*a*v;
+  var tt=(P.At/(P.Cd*a))*Math.sqrt(2*P.H/G);
+  return {h:h,v:v,vr:P.Cd*v,y:y,R:R,Rmax:Rmax,Q:Q,tt:tt,a:a};
+}
+
+/* ---------- сцена ---------- */
+var sc=$('scene'),sx=sc.getContext('2d'),pl=$('plot'),px=pl.getContext('2d');
+var W=900,HS=420,HP=280,dpr=1;
+function resize(){
+  W=Math.max(300,Math.round(sc.parentNode.clientWidth-28));
+  dpr=Math.min(2,window.devicePixelRatio||1);
+  HS=Math.max(320,Math.round(Math.min(470,W*0.50)));
+  HP=Math.max(240,Math.round(Math.min(310,W*0.31)));
+  sc.width=W*dpr;sc.height=HS*dpr;sc.style.height=HS+'px';sx.setTransform(dpr,0,0,dpr,0,0);
+  pl.width=W*dpr;pl.height=HP*dpr;pl.style.height=HP+'px';px.setTransform(dpr,0,0,dpr,0,0);
+}
+function pipeGeom(){
+  var pad=46, wid=W-2*pad, cy=HS*0.66;
+  var maxD=Math.max(P.D1,P.D2);
+  var kD=Math.min(HS*0.16/maxD,150);
+  var hMax=0;
+  for(var i=0;i<prof.Hs.length;i++){
+    hMax=Math.max(hMax,Math.abs(prof.Hs[i]),Math.abs(prof.ps[i]/(P.rho*G))+Math.abs(prof.vs[i]*prof.vs[i]/(2*G)));
+  }
+  hMax=Math.max(hMax,0.2)*1.12;
+  var kH=(HS*0.52)/hMax;
+  return {pad:pad,wid:wid,cy:cy,kD:kD,kH:kH,
+    X:function(x){ return pad+x/prof.gp.L*wid; },
+    Y:function(h){ return cy-h*kH; },
+    r:function(D){ return D*kD/2; }};
+}
+function drawVenturi(){
+  var g=pipeGeom(), gp=prof.gp;
+  sx.clearRect(0,0,W,HS); sx.fillStyle=PAL.canvas; sx.fillRect(0,0,W,HS);
+  // труба
+  sx.beginPath();
+  for(var i=0;i<=prof.N;i++){ var X=g.X(prof.xs[i]), Y=g.cy-g.r(prof.Ds[i])-prof.zs[i]*g.kH;
+    i?sx.lineTo(X,Y):sx.moveTo(X,Y); }
+  for(var j=prof.N;j>=0;j--){ var X2=g.X(prof.xs[j]), Y2=g.cy+g.r(prof.Ds[j])-prof.zs[j]*g.kH; sx.lineTo(X2,Y2); }
+  sx.closePath();
+  var grd=sx.createLinearGradient(0,g.cy-HS*0.1,0,g.cy+HS*0.1);
+  grd.addColorStop(0,'rgba(79,216,196,.16)'); grd.addColorStop(.5,'rgba(79,216,196,.07)'); grd.addColorStop(1,'rgba(79,216,196,.16)');
+  sx.fillStyle=grd; sx.fill();
+  sx.strokeStyle=PAL.aqua; sx.lineWidth=2.2; sx.stroke();
+
+  // кавитационная зона
+  var fl=FL[P.fl];
+  if(fl.pv<1e8){
+    sx.fillStyle='rgba(214,159,169,.22)';
+    for(var k=0;k<=prof.N;k++){
+      if(prof.ps[k]+PATM<fl.pv){
+        var X3=g.X(prof.xs[k]), r3=g.r(prof.Ds[k]), z3=prof.zs[k]*g.kH;
+        sx.fillRect(X3-g.wid/prof.N/2-1,g.cy-r3-z3,g.wid/prof.N+2,2*r3);
+      }
+    }
+  }
+  // частицы
+  if($('c_part').checked){
+    sx.fillStyle=PAL.ink;
+    parts.forEach(function(p){
+      var D=dat(gp,p.s), A=area(D), v=prof.Q/A;
+      var X=g.X(p.s), z=P.dz*p.s/gp.L*g.kH;
+      var Y=g.cy+p.o*g.r(D)*0.78-z;
+      sx.globalAlpha=.55; sx.beginPath(); sx.arc(X,Y,2.1,0,6.2832); sx.fill();
+    });
+    sx.globalAlpha=1;
+  }
+  // пьезометры и Пито
+  var stations=prof.st;
+  stations.forEach(function(s,i){
+    var X=g.X(s.x), z=s.z*g.kH, top=g.cy-g.r(s.D)-z;
+    if($('c_piez').checked){
+      var hp=s.p/(rhoRef()*G), Y=g.Y(hp)-z;
+      var w=13;
+      sx.strokeStyle=PAL.line; sx.lineWidth=1.4;
+      sx.beginPath(); sx.moveTo(X-w/2,top); sx.lineTo(X-w/2,Math.min(Y,g.cy-z)-4);
+      sx.moveTo(X+w/2,top); sx.lineTo(X+w/2,Math.min(Y,g.cy-z)-4); sx.stroke();
+      var y0=g.cy-z;
+      if(hp>=0){ sx.fillStyle='rgba(217,185,140,.55)'; sx.fillRect(X-w/2+1,Y,w-2,y0-Y); }
+      else { sx.fillStyle='rgba(214,159,169,.5)'; sx.fillRect(X-w/2+1,y0,w-2,Y-y0);
+        sx.strokeStyle=PAL.rose; sx.setLineDash([3,3]); sx.strokeRect(X-w/2+1,y0,w-2,Y-y0); sx.setLineDash([]); }
+      sx.strokeStyle=hp>=0?PAL.sand:PAL.rose; sx.lineWidth=2;
+      sx.beginPath(); sx.moveTo(X-w/2-3,Y); sx.lineTo(X+w/2+3,Y); sx.stroke();
+      if($('c_lab').checked){ sx.fillStyle=hp>=0?PAL.sand:PAL.rose; sx.font='10px JetBrains Mono, monospace';
+        sx.textAlign='center'; sx.fillText(press(s.p),X,Y-6); }
+    }
+    if($('c_pitot').checked){
+      var h0=s.p/(rhoRef()*G)+(P.rho/rhoRef())*s.v*s.v/(2*G), Y0=g.Y(h0)-z;
+      sx.strokeStyle=PAL.lilac; sx.lineWidth=2; sx.setLineDash([4,3]);
+      sx.beginPath(); sx.moveTo(X+22,g.cy-z); sx.lineTo(X+22,Y0); sx.stroke(); sx.setLineDash([]);
+      sx.beginPath(); sx.moveTo(X+16,Y0); sx.lineTo(X+28,Y0); sx.stroke();
+      if($('c_lab').checked){ sx.fillStyle=PAL.lilac; sx.font='10px JetBrains Mono, monospace';
+        sx.textAlign='left'; sx.fillText('Пито',X+31,Y0+3); }
+    }
+    if($('c_lab').checked){
+      sx.fillStyle=PAL.aqua; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='center';
+      sx.fillText('v'+(i+1)+' = '+nf(s.v,2)+' м/с',X,g.cy+g.r(s.D)-z+18);
+      sx.fillStyle=PAL.muted; sx.font='10px JetBrains Mono, monospace';
+      sx.fillText('D = '+nf(s.D*1000,0)+' мм',X,g.cy+g.r(s.D)-z+31);
+    }
+  });
+  // EGL / HGL
+  if($('c_lines').checked){
+    sx.strokeStyle=PAL.lilac; sx.lineWidth=2; sx.beginPath();
+    for(var q=0;q<=prof.N;q++){ var X=g.X(prof.xs[q]), Y=g.Y(prof.Hs[q]*(P.rho/rhoRef()))-prof.zs[q]*g.kH*0;
+      q?sx.lineTo(X,Y):sx.moveTo(X,Y); }
+    sx.stroke();
+    sx.strokeStyle=PAL.sand; sx.lineWidth=1.8; sx.setLineDash([6,4]); sx.beginPath();
+    for(var q2=0;q2<=prof.N;q2++){
+      var hh=prof.ps[q2]/(rhoRef()*G)+(P.rho/rhoRef())*prof.zs[q2];
+      var X2=g.X(prof.xs[q2]), Y2=g.Y(hh);
+      q2?sx.lineTo(X2,Y2):sx.moveTo(X2,Y2); }
+    sx.stroke(); sx.setLineDash([]);
+    if($('c_lab').checked){
+      sx.fillStyle=PAL.lilac; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='left';
+      sx.fillText('EGL — полный напор',g.pad+4,g.Y(prof.Hs[0]*(P.rho/rhoRef()))-6);
+      sx.fillStyle=PAL.sand; sx.fillText('HGL — пьезометрическая линия',g.pad+4,g.Y(prof.ps[0]/(rhoRef()*G))-6);
+    }
+  }
+  if($('c_lab').checked){
+    sx.fillStyle=PAL.muted; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='left';
+    sx.fillText(FL[P.fl].n+' · ρ = '+nf(P.rho,1)+' кг/м³ · Q = '+nf(prof.Q*1000,2)+' л/с',8,16);
+    sx.textAlign='right'; sx.fillText(P.real?'реальная жидкость':'идеальная жидкость',W-8,16);
+    sx.textAlign='left'; sx.fillStyle=PAL.muted; sx.font='10px JetBrains Mono, monospace';
+    sx.fillText('столбы: 1 м = '+nf(g.kH,0)+' px'+(isGas()?' (в мм вод. ст.)':''),8,HS-8);
+  }
+}
+function drawTor(){
+  var t=tor();
+  sx.clearRect(0,0,W,HS); sx.fillStyle=PAL.canvas; sx.fillRect(0,0,W,HS);
+  var pad=50, ground=HS-40;
+  var k=Math.min((HS-90)/Math.max(P.H,0.3),(W*0.42)/Math.max(t.Rmax,0.3));
+  var tx=pad, tw=Math.min(W*0.26,180), tH=P.H*k;
+  var lvlH=lvl*k, holeY=ground-(lvl-t.h)*k;
+  sx.strokeStyle=PAL.line; sx.lineWidth=2;
+  sx.beginPath(); sx.moveTo(tx,ground-tH-10); sx.lineTo(tx,ground); sx.lineTo(tx+tw,ground); sx.lineTo(tx+tw,ground-tH-10); sx.stroke();
+  var grd=sx.createLinearGradient(0,ground-lvlH,0,ground);
+  grd.addColorStop(0,'rgba(79,216,196,.28)'); grd.addColorStop(1,'rgba(79,216,196,.12)');
+  sx.fillStyle=grd; sx.fillRect(tx+1,ground-lvlH,tw-2,lvlH);
+  sx.strokeStyle=PAL.aqua; sx.lineWidth=2;
+  sx.beginPath(); sx.moveTo(tx+1,ground-lvlH); sx.lineTo(tx+tw-1,ground-lvlH); sx.stroke();
+  sx.strokeStyle=PAL.muted; sx.lineWidth=1; sx.beginPath();
+  sx.moveTo(tx-14,ground); sx.lineTo(W-16,ground); sx.stroke();
+  for(var i=0;i<Math.floor((W-tx)/16);i++){ sx.beginPath(); sx.moveTo(tx+i*16,ground); sx.lineTo(tx+i*16-7,ground+8); sx.stroke(); }
+  // отверстие
+  sx.fillStyle=PAL.canvas; sx.fillRect(tx+tw-3,holeY-Math.max(3,P.d*k/2),6,Math.max(6,P.d*k));
+  // струя
+  var v=t.v, x0=tx+tw, y0=holeY;
+  sx.strokeStyle=PAL.aqua; sx.lineWidth=3; sx.beginPath();
+  var tEnd=v>1e-6?Math.sqrt(2*Math.max(t.y,0)/G):0;
+  for(var q=0;q<=60;q++){
+    var tt=tEnd*q/60, X=x0+v*tt*k, Y=y0+0.5*G*tt*tt*k;
+    q?sx.lineTo(X,Y):sx.moveTo(X,Y);
+  }
+  sx.stroke();
+  if($('c_part').checked){
+    sx.fillStyle=PAL.ink;
+    drops.forEach(function(dd){
+      if(tEnd<=0) return;
+      var tt=(dd%1)*tEnd, X=x0+v*tt*k, Y=y0+0.5*G*tt*tt*k;
+      sx.globalAlpha=.7; sx.beginPath(); sx.arc(X,Y,2.4,0,6.2832); sx.fill();
+    });
+    sx.globalAlpha=1;
+  }
+  var XR=x0+t.R*k;
+  sx.strokeStyle=PAL.sand; sx.lineWidth=1.6; sx.setLineDash([5,4]);
+  sx.beginPath(); sx.moveTo(XR,ground); sx.lineTo(XR,ground-26); sx.stroke(); sx.setLineDash([]);
+  sx.beginPath(); sx.moveTo(x0,ground-14); sx.lineTo(XR,ground-14); sx.stroke();
+  sx.fillStyle=PAL.sand; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='center';
+  sx.fillText('дальность '+nf(t.R,3)+' м',(x0+XR)/2,ground-20);
+  // размеры h и y
+  sx.strokeStyle=PAL.lilac; sx.lineWidth=1.4;
+  sx.beginPath(); sx.moveTo(tx-22,ground-lvlH); sx.lineTo(tx-22,holeY); sx.stroke();
+  sx.fillStyle=PAL.lilac; sx.textAlign='right'; sx.fillText('h = '+nf(t.h,2)+' м',tx-26,(ground-lvlH+holeY)/2);
+  sx.strokeStyle=PAL.rose;
+  sx.beginPath(); sx.moveTo(tx-22,holeY); sx.lineTo(tx-22,ground); sx.stroke();
+  sx.fillStyle=PAL.rose; sx.fillText('y = '+nf(t.y,2)+' м',tx-26,(holeY+ground)/2);
+  if($('c_lab').checked){
+    sx.fillStyle=PAL.aqua; sx.font='12px JetBrains Mono, monospace'; sx.textAlign='left';
+    sx.fillText('v = √(2gh) = '+nf(t.v,4)+' м/с',x0+8,y0-14);
+    sx.fillStyle=PAL.muted; sx.font='11px JetBrains Mono, monospace';
+    sx.fillText('максимум дальности = H = '+nf(t.Rmax,3)+' м при h = H/2',8,16);
+    sx.textAlign='right'; sx.fillText(P.drain?'бак опорожняется':'уровень постоянный',W-8,16);
+  }
+}
+
+/* ---------- график ---------- */
+function drawPlot(){
+  px.clearRect(0,0,W,HP); px.fillStyle=PAL.canvas; px.fillRect(0,0,W,HP);
+  var L=60,R=52,T=16,B=28;
+  px.strokeStyle=PAL.line; px.lineWidth=1;
+  for(var i=0;i<=8;i++){ var X=L+(W-L-R)*i/8; px.beginPath(); px.moveTo(X,T); px.lineTo(X,HP-B); px.stroke(); }
+  for(var j=0;j<=6;j++){ var Y=T+(HP-T-B)*j/6; px.beginPath(); px.moveTo(L,Y); px.lineTo(W-R,Y); px.stroke(); }
+  px.font='10px JetBrains Mono, monospace'; px.fillStyle=PAL.muted;
+  if(scene==='tor'){
+    var t=tor(), N=120, mx=Math.max(P.H,0.1);
+    px.strokeStyle=PAL.sand; px.lineWidth=2.4; px.beginPath();
+    for(var q=0;q<=N;q++){ var h=mx*q/N, Rr=2*Math.sqrt(h*Math.max(0,mx-h));
+      var X=L+q/N*(W-L-R), Y=HP-B-(Rr/mx)*(HP-T-B)*0.94;
+      q?px.lineTo(X,Y):px.moveTo(X,Y); }
+    px.stroke();
+    var Xc=L+(t.h/mx)*(W-L-R), Yc=HP-B-(t.R/mx)*(HP-T-B)*0.94;
+    px.strokeStyle=PAL.rose; px.lineWidth=1.6; px.setLineDash([5,4]);
+    px.beginPath(); px.moveTo(Xc,T); px.lineTo(Xc,HP-B); px.stroke(); px.setLineDash([]);
+    px.fillStyle=PAL.rose; px.beginPath(); px.arc(Xc,Yc,5,0,6.2832); px.fill();
+    px.fillStyle=PAL.sand; px.textAlign='left'; px.fillText('дальность струи R(h) = 2√(h(H−h))',L+4,T+12);
+    px.fillStyle=PAL.muted; px.textAlign='right'; px.fillText('h: 0…'+nf(mx,2)+' м',W-R,HP-8);
+    px.textAlign='left'; px.fillText('пик при h = H/2 = '+nf(mx/2,2)+' м, R = H',L,HP-8);
+    return;
+  }
+  var gp=prof.gp;
+  function X(x){ return L+x/gp.L*(W-L-R); }
+  if(plotMode==='pv'){
+    var pmin=Math.min.apply(null,prof.ps), pmax=Math.max.apply(null,prof.ps);
+    var vmax=Math.max.apply(null,prof.vs), vmin=Math.min.apply(null,prof.vs);
+    var pad=(pmax-pmin)*0.12+1;
+    function Yp(p){ return T+(HP-T-B)*(1-(p-(pmin-pad))/((pmax+pad)-(pmin-pad))); }
+    function Yv(v){ return T+(HP-T-B)*(1-(v-vmin*0.8)/((vmax*1.1)-vmin*0.8)); }
+    px.strokeStyle=PAL.sand; px.lineWidth=2.4; px.beginPath();
+    prof.ps.forEach(function(p,k){ var xx=X(prof.xs[k]),yy=Yp(p); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
+    px.strokeStyle=PAL.aqua; px.lineWidth=2.2; px.beginPath();
+    prof.vs.forEach(function(v,k){ var xx=X(prof.xs[k]),yy=Yv(v); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
+    px.fillStyle=PAL.sand; px.textAlign='left'; px.fillText('p: '+press(pmin)+' … '+press(pmax),L+4,T+12);
+    px.fillStyle=PAL.aqua; px.fillText('v: '+nf(vmin,2)+' … '+nf(vmax,2)+' м/с',L+4,T+25);
+    px.fillStyle=PAL.muted; px.textAlign='right'; px.fillText('x: 0…'+nf(gp.L,2)+' м',W-R,HP-8);
+  } else if(plotMode==='head'){
+    var k=rhoRef(), hr=[];
+    for(var q2=0;q2<=prof.N;q2++){
+      hr.push({H:prof.Hs[q2]*(P.rho/k),
+        pz:prof.ps[q2]/(k*G)+(P.rho/k)*prof.zs[q2],
+        z:(P.rho/k)*prof.zs[q2]});
+    }
+    var mx=Math.max.apply(null,hr.map(function(o){ return Math.max(o.H,o.pz,o.z); }));
+    var mn=Math.min.apply(null,hr.map(function(o){ return Math.min(o.H,o.pz,o.z); }));
+    var pd=(mx-mn)*0.15+0.02;
+    function Yh(h){ return T+(HP-T-B)*(1-(h-(mn-pd))/((mx+pd)-(mn-pd))); }
+    px.strokeStyle=PAL.rose; px.lineWidth=1.8; px.beginPath();
+    hr.forEach(function(o,q3){ var xx=X(prof.xs[q3]),yy=Yh(o.z); q3?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
+    px.strokeStyle=PAL.sand; px.lineWidth=2.2; px.setLineDash([6,4]); px.beginPath();
+    hr.forEach(function(o,q4){ var xx=X(prof.xs[q4]),yy=Yh(o.pz); q4?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke(); px.setLineDash([]);
+    px.strokeStyle=PAL.lilac; px.lineWidth=2.4; px.beginPath();
+    hr.forEach(function(o,q5){ var xx=X(prof.xs[q5]),yy=Yh(o.H); q5?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
+    px.fillStyle=PAL.lilac; px.textAlign='left'; px.fillText('EGL',L+4,T+12);
+    px.fillStyle=PAL.sand; px.fillText('HGL',L+42,T+12);
+    px.fillStyle=PAL.rose; px.fillText('z',L+82,T+12);
+    px.fillStyle=PAL.muted; px.textAlign='right'; px.fillText(head(mx),W-R,HP-8);
+  } else {
+    var st=prof.st, k2=rhoRef(), bw=(W-L-R)/5;
+    var mx2=Math.max.apply(null,st.map(function(s){ return s.p/(k2*G)+(P.rho/k2)*(s.v*s.v/(2*G)+s.z); }));
+    mx2=Math.max(mx2,0.1)*1.15;
+    function Yb(h){ return HP-B-(h/mx2)*(HP-T-B); }
+    st.forEach(function(s,i){
+      var hp=s.p/(k2*G), hv=(P.rho/k2)*s.v*s.v/(2*G), hz=(P.rho/k2)*s.z;
+      var xc=L+bw*(i+0.9), w=bw*0.55, y=HP-B;
+      [['z',hz,PAL.rose],['p',hp,PAL.sand],['v',hv,PAL.aqua]].forEach(function(it){
+        var h=it[1]; if(Math.abs(h)<1e-9) return;
+        var y2=y-h/mx2*(HP-T-B);
+        px.fillStyle=it[2]; px.globalAlpha=.75;
+        px.fillRect(xc-w/2,Math.min(y,y2),w,Math.abs(y2-y)); px.globalAlpha=1;
+        y=y2;
+      });
+      px.strokeStyle=PAL.lilac; px.lineWidth=2;
+      px.beginPath(); px.moveTo(xc-w/2-4,y); px.lineTo(xc+w/2+4,y); px.stroke();
+      px.fillStyle=PAL.muted; px.textAlign='center'; px.font='10px JetBrains Mono, monospace';
+      px.fillText('сечение '+(i+1),xc,HP-8);
+      px.fillStyle=PAL.lilac; px.fillText(head(hp+hv+hz),xc,y-6);
+    });
+    px.fillStyle=PAL.muted; px.textAlign='left';
+    px.fillText('снизу вверх: z, p/ρg, v²/2g; черта — полный напор',L+4,T+12);
+  }
+}
+
+/* ---------- показания ---------- */
+function readouts(){
+  var st=$('stat'); st.className='status'; var msg=[];
+  if(scene==='tor'){
+    var t=tor();
+    $('t_h').textContent=nf(t.h,3)+' м';
+    $('t_v').textContent=nf(t.v,4)+' м/с';
+    $('t_vr').textContent=nf(t.vr,4)+' м/с';
+    $('t_R').textContent=nf(t.R,4)+' м';
+    $('t_Rmax').textContent=nf(t.Rmax,3)+' м';
+    $('t_Q').textContent=nf(t.Q*1000,3)+' л/с';
+    $('t_time').textContent=nf(t.tt,0)+' с ('+nf(t.tt/60,2)+' мин)';
+    $('t_lvl').textContent=nf(lvl,3)+' м';
+    st.classList.add('ok');
+    msg.push('Торричелли: v = √(2gh) = '+nf(t.v,4)+' м/с — та же скорость, что у тела, свободно упавшего с высоты h. Плотность в формулу не входит.');
+    if(Math.abs(t.h-lvl/2)<0.02) msg.push('Дырка на середине глубины: дальность максимальна и равна ровно H = '+nf(t.Rmax,3)+' м.');
+    else msg.push('Максимум дальности был бы при h = H/2 = '+nf(lvl/2,3)+' м и составил бы '+nf(t.Rmax,3)+' м.');
+    if(P.drain) msg.push('Уровень падает, скорость и дальность уменьшаются; полное опорожнение займёт '+nf(t.tt/60,2)+' мин.');
+    st.textContent=msg.join(' ');
+    $('snote').textContent='Дальность считается как R = v·√(2y/g) = 2√(h·y), где y — высота отверстия над полом. При fixed уровне H максимум R равен H. Коэффициент C_d учитывает сжатие струи за отверстием: реальная скорость и расход меньше идеальных.'
+      .replace(' fixed ',' постоянном ');
+    $('tbl').innerHTML=''; $('tnote').textContent='';
+    return;
+  }
+  var fl=FL[P.fl], s=prof.st;
+  $('v_Q').textContent=nf(prof.Q*1000,3)+' л/с';
+  $('v_dp').textContent=press(s[0].p-s[1].p);
+  $('v_pmin').textContent=press(prof.pmin)+' (изб.)';
+  var margin=(prof.pmin+PATM)-fl.pv;
+  $('v_cav').textContent=fl.pv>1e8?'—':press(margin);
+  $('v_loss').textContent=P.real?press(prof.loss*P.rho*G):'0 Па';
+  $('v_H').textContent=head(prof.H0*(P.rho/rhoRef()));
+  var M=fl.a?Math.max.apply(null,prof.vs)/fl.a:0;
+  $('v_M').textContent=fl.a?nf(M,4):'—';
+  $('v_reg').textContent=regime(s[1].Re)+' (Re '+nf(s[1].Re,0)+')';
+
+  if(fl.pv<1e8&&margin<0){ st.classList.add('bad');
+    msg.push('Кавитация: абсолютное давление в горловине упало ниже давления насыщенных паров ('+press(fl.pv)+'). Жидкость вскипает, течение разрывается — уравнение Бернулли здесь уже неприменимо.'); }
+  else if(fl.a&&M>0.3){ st.classList.add('warn');
+    msg.push('Число Маха '+nf(M,3)+' > 0,3: сжимаемость существенна, несжимаемая форма Бернулли даёт заметную ошибку.'); }
+  else if(!P.real){ st.classList.add('ok');
+    msg.push('Идеальная жидкость: сумма p/ρg + v²/2g + z одинакова во всех сечениях и равна '+head(prof.H0*(P.rho/rhoRef()))+'. Столбы Пито стоят на одном уровне.'); }
+  else { st.classList.add('ok');
+    msg.push('Реальная жидкость: полный напор падает на '+head(prof.loss*(P.rho/rhoRef()))+', безвозвратная потеря давления '+press(prof.loss*P.rho*G)+'. EGL наклонена вниз.'); }
+  if(P.real&&Math.abs(prof.st[1].p)<3000) msg.push('В горловине почти нулевое избыточное давление — на этом и работает водоструйный насос и пульверизатор.');
+  if(prof.st[1].p<0) msg.push('Давление в горловине ниже атмосферного: пьезометр показывает разрежение (розовый столб вниз).');
+  st.textContent=msg.join(' ');
+
+  var rows='<thead><tr><th>Сечение</th><th>D, мм</th><th>A, см²</th><th>v, м/с</th><th>p изб.</th><th>½ρv²</th><th>p/ρg</th><th>v²/2g</th><th>z</th><th>H</th><th>Re</th></tr></thead><tbody>';
+  s.forEach(function(o,i){
+    rows+='<tr><td>'+(i+1)+(i===1?' (горловина)':'')+'</td><td>'+nf(o.D*1000,0)+'</td><td>'+nf(o.A*1e4,2)+'</td><td>'+nf(o.v,3)+'</td>'+
+      '<td>'+press(o.p)+'</td><td>'+press(0.5*P.rho*o.v*o.v)+'</td>'+
+      '<td>'+head(o.p/(rhoRef()*G))+'</td><td>'+head((P.rho/rhoRef())*o.v*o.v/(2*G))+'</td>'+
+      '<td>'+head((P.rho/rhoRef())*o.z)+'</td><td>'+head(o.H*(P.rho/rhoRef()))+'</td><td>'+nf(o.Re,0)+'</td></tr>';
+  });
+  $('tbl').innerHTML=rows+'</tbody>';
+  $('tnote').textContent=isGas()
+    ? 'Для газа напоры выражены в миллиметрах водяного столба — так их и измеряют на практике. Геометрический напор газа ничтожен, поэтому перепад высот почти не влияет.'
+    : 'Напоры в метрах столба текущей жидкости. Проверьте: сумма трёх напоров в каждом сечении равна полному напору H — при выключенной «реальной жидкости» точно, при включённой убывает вниз по потоку.';
+  $('snote').textContent='Частицы движутся со местной скоростью v = Q/A: в горловине они заметно ускоряются, потому что площадь меньше, а расход тот же. Столбы давления падают именно там, где скорость растёт.';
+}
+function sync(){
+  $('p_fluid').value=P.fl;
+  $('p_rho').value=P.rho; $('o_rho').textContent=nf(P.rho,1)+' кг/м³';
+  $('p_mu').value=muToSlider(P.mu); $('o_mu').textContent=P.mu<0.01?P.mu.toExponential(2).replace('.',','):nf(P.mu,4);
+  $('p_v1').max=isGas()?150:12;
+  $('p_v1').value=P.v1; $('o_v1').textContent=nf(P.v1,2)+' м/с';
+  $('p_D1').value=P.D1*1000; $('o_D1').textContent=nf(P.D1*1000,0)+' мм';
+  $('p_D2').value=P.D2*1000; $('o_D2').textContent=nf(P.D2*1000,0)+' мм';
+  $('p_p1').value=P.p1/1000; $('o_p1').textContent=nf(P.p1/1000,0)+' кПа';
+  $('p_dz').value=P.dz; $('o_dz').textContent=nf(P.dz,2)+' м';
+  $('p_real').checked=P.real;
+  $('p_eps').value=P.eps*1000; $('o_eps').textContent=nf(P.eps*1000,4)+' мм';
+  $('p_K').value=P.K; $('o_K').textContent=nf(P.K,2);
+  $('p_diff').checked=P.diff;
+  $('p_H').value=P.H; $('o_H').textContent=nf(P.H,2)+' м';
+  $('p_hh').max=P.H-0.01; $('p_hh').value=Math.min(P.hh,P.H-0.01); $('o_hh').textContent=nf(P.hh,2)+' м';
+  $('p_d').value=P.d*1000; $('o_d').textContent=nf(P.d*1000,1)+' мм';
+  $('p_At').value=P.At; $('o_At').textContent=nf(P.At,2)+' м²';
+  $('p_Cd').value=P.Cd; $('o_Cd').textContent=nf(P.Cd,2);
+  $('p_drain').checked=P.drain;
+  $('p_sp').value=P.sp; $('o_sp').textContent=nf(P.sp,2)+'×';
+  $('boxVen').classList.toggle('hide',scene!=='ven');
+  $('boxReal').classList.toggle('hide',scene!=='ven');
+  $('boxTor').classList.toggle('hide',scene!=='tor');
+  $('rdv').classList.toggle('hide',scene!=='ven');
+  $('rdt').classList.toggle('hide',scene!=='tor');
+  $('cardTable').classList.toggle('hide',scene!=='ven');
+  $('m_pv').classList.toggle('hide',scene!=='ven');
+  $('m_head').classList.toggle('hide',scene!=='ven');
+  $('m_terms').classList.toggle('hide',scene!=='ven');
+  var f=FL[P.fl];
+  $('fnote').textContent='ρ = '+nf(P.rho,1)+' кг/м³, μ = '+P.mu.toExponential(2).replace('.',',')+' Па·с'+
+    (f.pv<1e8?', давление паров '+press(f.pv):'')+(f.a?', скорость звука '+f.a+' м/с':'');
+}
+function setRun(){ $('run').textContent=running?'❚❚ Пауза':'▶ Пуск'; $('run').classList.toggle('pri',!running); }
+function seed(){
+  parts=[]; for(var i=0;i<90;i++) parts.push({s:Math.random()*prof.gp.L,o:(Math.random()*2-1)});
+  drops=[]; for(var j=0;j<26;j++) drops.push(Math.random());
+}
+var QUICK=[
+ ['Классическое Вентури',function(){ P.fl=0;P.rho=998;P.mu=1.002e-3;P.v1=2;P.D1=0.1;P.D2=0.05;P.p1=30000;P.dz=0;P.real=false; setScene('ven'); }],
+ ['Горловина почти в ноль',function(){ P.fl=0;P.rho=998;P.mu=1.002e-3;P.v1=2;P.D1=0.1;P.D2=0.05;P.p1=30000;P.real=false; setScene('ven'); }],
+ ['Кавитация',function(){ P.fl=0;P.rho=998;P.mu=1.002e-3;P.v1=4.6;P.D1=0.1;P.D2=0.05;P.p1=30000;P.real=false; setScene('ven'); }],
+ ['Реальная жидкость',function(){ P.real=true;P.diff=true;P.v1=2;P.p1=30000; setScene('ven'); }],
+ ['Без диффузора',function(){ P.real=true;P.diff=false;P.v1=2;P.p1=30000; setScene('ven'); }],
+ ['Ламинарный глицерин',function(){ P.fl=4;P.rho=1261;P.mu=1.412;P.v1=0.5;P.real=true; setScene('ven'); }],
+ ['Подъём на 1,5 м',function(){ P.dz=1.5;P.real=false;P.v1=2; setScene('ven'); }],
+ ['Воздух, сжимаемость',function(){ P.fl=6;P.rho=1.204;P.mu=1.813e-5;P.v1=110;P.p1=5000;P.real=false; setScene('ven'); }],
+ ['Торричелли, середина',function(){ P.H=1;P.hh=0.5;P.drain=false; setScene('tor'); }],
+ ['Опорожнение бака',function(){ P.H=1;P.hh=0.9;P.drain=true; lvl=P.H; setScene('tor'); }]
+];
+function setScene(s){
+  scene=s; $('s_ven').setAttribute('aria-pressed',String(s==='ven'));
+  $('s_tor').setAttribute('aria-pressed',String(s==='tor'));
+  if(s==='tor') plotMode='pv';
+  compute(); seed(); sync();
+}
+QUICK.forEach(function(q){
+  var b=document.createElement('button'); b.textContent=q[0];
+  b.addEventListener('click',function(){ q[1](); running=!reduce; setRun(); });
+  $('quick').appendChild(b);
+});
+FL.forEach(function(f,i){ $('p_fluid').insertAdjacentHTML('beforeend','<option value="'+i+'">'+f.n+'</option>'); });
+$('p_fluid').addEventListener('change',function(e){
+  P.fl=+e.target.value; var f=FL[P.fl];
+  P.rho=f.rho; P.mu=f.mu; if(f.a&&P.v1>12) P.v1=110; if(!f.a&&P.v1>12) P.v1=2;
+  compute(); seed(); sync();
+});
+$('p_rho').addEventListener('input',function(e){ P.rho=+e.target.value; compute(); sync(); });
+$('p_mu').addEventListener('input',function(e){ P.mu=muFromSlider(+e.target.value); compute(); sync(); });
+$('p_v1').addEventListener('input',function(e){ P.v1=+e.target.value; compute(); sync(); });
+$('p_D1').addEventListener('input',function(e){ P.D1=+e.target.value/1000; if(P.D2>P.D1) P.D2=P.D1; compute(); sync(); });
+$('p_D2').addEventListener('input',function(e){ P.D2=Math.min(+e.target.value/1000,P.D1); compute(); sync(); });
+$('p_p1').addEventListener('input',function(e){ P.p1=+e.target.value*1000; compute(); sync(); });
+$('p_dz').addEventListener('input',function(e){ P.dz=+e.target.value; compute(); sync(); });
+$('p_real').addEventListener('change',function(e){ P.real=e.target.checked; compute(); sync(); });
+$('p_eps').addEventListener('input',function(e){ P.eps=+e.target.value/1000; compute(); sync(); });
+$('p_K').addEventListener('input',function(e){ P.K=+e.target.value; compute(); sync(); });
+$('p_diff').addEventListener('change',function(e){ P.diff=e.target.checked; compute(); sync(); });
+$('p_H').addEventListener('input',function(e){ P.H=+e.target.value; lvl=P.H; P.hh=Math.min(P.hh,P.H-0.01); sync(); });
+$('p_hh').addEventListener('input',function(e){ P.hh=+e.target.value; lvl=P.H; sync(); });
+$('p_d').addEventListener('input',function(e){ P.d=+e.target.value/1000; sync(); });
+$('p_At').addEventListener('input',function(e){ P.At=+e.target.value; sync(); });
+$('p_Cd').addEventListener('input',function(e){ P.Cd=+e.target.value; sync(); });
+$('p_drain').addEventListener('change',function(e){ P.drain=e.target.checked; lvl=P.H; sync(); });
+$('p_sp').addEventListener('input',function(e){ P.sp=+e.target.value; sync(); });
+$('s_ven').addEventListener('click',function(){ setScene('ven'); });
+$('s_tor').addEventListener('click',function(){ setScene('tor'); });
+$('run').addEventListener('click',function(){ running=!running; setRun(); });
+$('reset').addEventListener('click',function(){ lvl=P.H; tSim=0; compute(); seed(); });
+[['m_pv','pv'],['m_head','head'],['m_terms','terms']].forEach(function(p){
+  $(p[0]).addEventListener('click',function(){ plotMode=p[1];
+    [['m_pv','pv'],['m_head','head'],['m_terms','terms']].forEach(function(q){
+      $(q[0]).setAttribute('aria-pressed',String(plotMode===q[1])); }); });
+});
+['c_part','c_piez','c_pitot','c_lines','c_lab'].forEach(function(id){ $(id).addEventListener('change',function(){}); });
+window.addEventListener('keydown',function(ev){
+  var tg=ev.target.tagName; if(tg==='INPUT'||tg==='SELECT'||tg==='TEXTAREA') return;
+  if(ev.code==='Space'){ ev.preventDefault(); running=!running; setRun(); }
+  else if(ev.key==='r'||ev.key==='R'||ev.key==='к') $('reset').click();
+});
+var rt=null; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(function(){ readPal(); resize(); },150); });
+
+var lastT=0;
+function loop(ts){
+  requestAnimationFrame(loop);
+  var dt=Math.min(.05,(ts-lastT)/1000||0); lastT=ts;
+  if(running){
+    if(scene==='ven'){
+      parts.forEach(function(p){
+        var D=dat(prof.gp,p.s), v=prof.Q/area(D);
+        p.s+=v*dt*P.sp*0.35;
+        if(p.s>prof.gp.L){ p.s=0; p.o=Math.random()*2-1; }
+      });
+    } else {
+      for(var i=0;i<drops.length;i++) drops[i]=(drops[i]+dt*P.sp*0.5)%1;
+      if(P.drain){
+        var t=tor();
+        lvl=Math.max(0,lvl-t.Q/P.At*dt*P.sp*20);
+        if(lvl<=0.001){ lvl=0; running=false; setRun(); }
+      }
+    }
+    tSim+=dt*P.sp;
+  }
+  if(scene==='ven') drawVenturi(); else drawTor();
+  drawPlot(); readouts();
+}
+setScene('ven'); resize(); running=!reduce; setRun();
+lastT=performance.now(); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
