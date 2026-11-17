@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0E2226"/><stop offset=".55" stop-color="#0A171A"/><stop offset="1" stop-color="#050D0E"/>
+    </linearGradient>
+    <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
+      <path d="M46 0H0V46" fill="none" stroke="#7ED6C7" stroke-opacity=".06"/>
+    </pattern>
+    <radialGradient id="vig" cx=".5" cy=".45" r=".8">
+      <stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".58"/>
+    </radialGradient>
+    <radialGradient id="halo" cx=".5" cy=".5" r=".5">
+      <stop offset=".3" stop-color="#4FD8C4" stop-opacity=".22"/><stop offset="1" stop-color="#4FD8C4" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+      <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <rect width="1200" height="750" fill="url(#grid)"/>
+  <circle cx="600" cy="400" r="330" fill="url(#halo)"/>
+
+  <!-- полость: четыре точные параболы (квадратичные Безье) -->
+  <path d="M341.15 400 Q 309.42 690.58 600 658.85 Q 890.58 690.58 858.85 400 Q 890.58 109.42 600 141.15 Q 309.42 109.42 341.15 400 Z"
+        fill="#4FD8C4" fill-opacity=".05" stroke="#4FD8C4" stroke-width="3.4" filter="url(#glow)"/>
+
+  <!-- тёмные угловые зоны -->
+  <g fill="#D69FA9" fill-opacity=".16">
+    <path d="M600 141.15 Q 700 170 760 220 L 810 190 Q 700 150 600 141.15 Z"/>
+    <path d="M600 658.85 Q 500 630 440 580 L 390 610 Q 500 650 600 658.85 Z"/>
+  </g>
+
+  <!-- квадрат фокусов -->
+  <path d="M441.97 241.97 H 758.03 V 558.03 H 441.97 Z"
+        fill="none" stroke="#9FE8DC" stroke-width="1.9" stroke-dasharray="7 6"/>
+  <text x="600" y="228" fill="#9FE8DC" font-size="14" text-anchor="middle">квадрат фокусов · сторона 1,505025</text>
+
+  <!-- демонстрация: фокус -> параллельный пучок -> противоположный фокус -->
+  <g stroke="#9FE8DC" stroke-width="2" fill="none" opacity=".92" filter="url(#glow)">
+    <path d="M441.97 558.03 L 345.43 525.15"/><path d="M441.97 558.03 L 390 610"/><path d="M441.97 558.03 L 474.85 654.57"/>
+    <path d="M345.43 525.15 L 725.15 145.43"/><path d="M390 610 L 810 190"/><path d="M474.85 654.57 L 854.57 274.85"/>
+    <path d="M725.15 145.43 L 758.03 241.97"/><path d="M810 190 L 758.03 241.97"/><path d="M854.57 274.85 L 758.03 241.97"/>
+  </g>
+  <text x="565" y="404" fill="#9FE8DC" font-size="14" transform="rotate(-45 565 404)" text-anchor="middle">параллельный пучок вдоль диагонали</text>
+
+  <!-- хаотический след -->
+  <path d="M441.97 241.97 L 690 168 L 840 330 L 620 640 L 372 500 L 520 176 L 800 470 L 470 620 L 350 330 L 660 200"
+        fill="none" stroke="#D9B98C" stroke-width="1.5" stroke-opacity=".55"/>
+
+  <!-- фокусы -->
+  <g fill="#D9B98C" stroke="#071012" stroke-width="1.8" filter="url(#glow)">
+    <circle cx="441.97" cy="241.97" r="7"/><circle cx="758.03" cy="241.97" r="7"/>
+    <circle cx="758.03" cy="558.03" r="7"/><circle cx="441.97" cy="558.03" r="7"/>
+  </g>
+  <g fill="#D9B98C" font-size="15">
+    <text x="424" y="232" text-anchor="end">F₁</text><text x="776" y="232">F₂</text>
+    <text x="776" y="576">F₃</text><text x="424" y="576" text-anchor="end">F₄</text>
+  </g>
+  <!-- вершины и стыки -->
+  <g fill="#8FA8A6" font-size="13">
+    <text x="810" y="176" text-anchor="middle">вершина (R, R)</text>
+    <text x="600" y="682" text-anchor="middle">стык (0, −S), S = 1,232617</text>
+    <text x="322" y="400" text-anchor="end">стык (−S, 0)</text>
+  </g>
+  <g fill="#ABA6DC"><circle cx="600" cy="141.15" r="4"/><circle cx="600" cy="658.85" r="4"/>
+    <circle cx="341.15" cy="400" r="4"/><circle cx="858.85" cy="400" r="4"/></g>
+
+  <!-- сечение Пуанкаре -->
+  <g transform="translate(930,470)">
+    <rect x="0" y="0" width="230" height="180" rx="10" fill="#071012" stroke="#7ED6C7" stroke-opacity=".24"/>
+    <text x="12" y="22" fill="#8FA8A6" font-size="12">сечение Пуанкаре</text>
+    <path d="M12 96 H 218" stroke="#7ED6C7" stroke-opacity=".2"/>
+    <g fill="#4FD8C4" fill-opacity=".8">
+      <circle cx="30" cy="60" r="2"/><circle cx="52" cy="72" r="2"/><circle cx="74" cy="58" r="2"/>
+      <circle cx="96" cy="120" r="2"/><circle cx="118" cy="132" r="2"/><circle cx="140" cy="112" r="2"/>
+      <circle cx="162" cy="70" r="2"/><circle cx="184" cy="86" r="2"/><circle cx="206" cy="62" r="2"/>
+      <circle cx="44" cy="128" r="2"/><circle cx="88" cy="46" r="2"/><circle cx="132" cy="150" r="2"/>
+      <circle cx="176" cy="140" r="2"/><circle cx="66" cy="104" r="2"/><circle cx="150" cy="42" r="2"/>
+    </g>
+    <text x="12" y="170" fill="#8FA8A6" font-size="11">s / L →</text>
+  </g>
+
+  <!-- заголовки и формулы -->
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 14</text>
+  <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">ГЕОМЕТРИЧЕСКАЯ ОПТИКА · БИЛЬЯРДЫ · ХАОС</text>
+  <text x="48" y="132" fill="#4FD8C4" font-size="25" font-family="Unbounded, sans-serif" font-weight="700">четыре параболы → квадрат фокусов</text>
+  <text x="48" y="700" fill="#8FA8A6" font-size="15">v_max = −2p + 2√(p² + pR√2) · S = √2·v_max · сторона квадрата = 2(R − p/√2)</text>
+  <text x="1152" y="700" fill="#D9B98C" font-size="15" text-anchor="end">фокус → параллельный пучок → противоположный фокус</text>
+
+  <g stroke="#7ED6C7" stroke-opacity=".3" fill="none">
+    <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
+  </g>
+  <rect width="1200" height="750" fill="url(#vig)"/>
+</svg>
