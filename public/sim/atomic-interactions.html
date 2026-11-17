@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <style>
 :root{
-  --bg:#070c15; --grid:rgba(120,190,255,.05); --surface:#0d1626; --ink:#eaf3fa; --muted:#8ba3b8; --line:rgba(130,200,255,.16);
-  --cyan:#5fe0ff; --amber:#ffb454; --pink:#ff7ab6; --ok:#4cc58d; --warn:#ff7a6e; --on:#07121c;
+  --bg:#0A1417; --grid:rgba(126,214,199,.05); --surface:#102024; --ink:#E9F4F1; --muted:#8FA8A6; --line:rgba(126,214,199,.16);
+  --cyan:#4FD8C4; --amber:#D9B98C; --pink:#ABA6DC; --ok:#3FC9AE; --warn:#D69FA9; --on:#06110F;
   --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -23,7 +23,7 @@ h1{font:800 1.7rem/1.15 var(--disp);margin:0 0 8px;letter-spacing:-.01em}
 .lead{margin:0 0 16px;color:var(--muted);max-width:72ch}
 .lead b{color:var(--ink);font-family:var(--mono)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
-canvas{display:block;width:100%;border-radius:10px;background:#05080f;touch-action:none}
+canvas{display:block;width:100%;border-radius:10px;background:#071012;touch-action:none}
 #scene{cursor:grab}
 .note{margin:8px 2px 0;font-size:.85rem;color:var(--muted)}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
@@ -89,11 +89,11 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   <section class="card">
     <canvas id="plot" aria-label="График потенциальной энергии"></canvas>
     <div class="legend">
-      <span><i style="background:#5fe0ff"></i>полный потенциал V(r)</span>
-      <span><i style="background:#ff7ab6"></i>отталкивание</span>
-      <span><i style="background:#4cc58d"></i>притяжение</span>
-      <span><i style="background:#ffb454"></i>полная энергия E</span>
-      <span><i style="background:rgba(255,180,84,.35)"></i>зона кинетической энергии</span>
+      <span><i style="background:#4FD8C4"></i>полный потенциал V(r)</span>
+      <span><i style="background:#ABA6DC"></i>отталкивание</span>
+      <span><i style="background:#3FC9AE"></i>притяжение</span>
+      <span><i style="background:#D9B98C"></i>полная энергия E</span>
+      <span><i style="background:rgba(217,185,140,.35)"></i>зона кинетической энергии</span>
     </div>
     <div class="rd">
       <div><span>глубина ямы</span><b class="a" id="v_D">—</b></div>
@@ -347,8 +347,8 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
     if(!M) return;
     var g=geom();
     sx.clearRect(0,0,W,H1);
-    sx.fillStyle='#05080f'; sx.fillRect(0,0,W,H1);
-    sx.strokeStyle='rgba(120,190,255,.10)'; sx.lineWidth=1;
+    sx.fillStyle='#071012'; sx.fillRect(0,0,W,H1);
+    sx.strokeStyle='rgba(126,214,199,.10)'; sx.lineWidth=1;
     sx.beginPath(); sx.moveTo(0,g.cy+.5); sx.lineTo(W,g.cy+.5); sx.stroke();
 
     if($('cRuler').checked){
@@ -357,39 +357,39 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       for(var d=0;d<=Math.ceil(4*M.L);d+=step){
         [g.cx+d*g.k,g.cx-d*g.k].forEach(function(X){
           if(X<8||X>W-8) return;
-          sx.strokeStyle='rgba(130,200,255,.20)';
+          sx.strokeStyle='rgba(126,214,199,.20)';
           sx.beginPath(); sx.moveTo(X,H1-26); sx.lineTo(X,H1-20); sx.stroke();
-          sx.fillStyle='rgba(139,163,184,.85)'; sx.fillText(fmt(d,d%1?1:0),X,H1-8);
+          sx.fillStyle='rgba(143,168,166,.85)'; sx.fillText(fmt(d,d%1?1:0),X,H1-8);
         });
       }
-      sx.fillStyle='rgba(139,163,184,.7)'; sx.textAlign='left';
+      sx.fillStyle='rgba(143,168,166,.7)'; sx.textAlign='left';
       sx.fillText('Å от центра масс',8,H1-8);
     }
 
     var overlap=(g.r1+g.r2)-(g.x2-g.x1);
     if($('cCloud').checked){
-      [[g.x1,g.r1,'#5fe0ff'],[g.x2,g.r2,'#ffb454']].forEach(function(o){
+      [[g.x1,g.r1,'#4FD8C4'],[g.x2,g.r2,'#D9B98C']].forEach(function(o){
         var gr=sx.createRadialGradient(o[0],g.cy,o[1]*0.15,o[0],g.cy,o[1]*1.5);
         gr.addColorStop(0,o[2]+'55'); gr.addColorStop(.55,o[2]+'22'); gr.addColorStop(1,o[2]+'00');
         sx.fillStyle=gr; sx.beginPath(); sx.arc(o[0],g.cy,o[1]*1.5,0,6.2832); sx.fill();
       });
     }
     if(overlap>0){
-      sx.fillStyle='rgba(255,122,110,'+Math.min(.45,overlap/(g.r1+g.r2)*1.4).toFixed(3)+')';
+      sx.fillStyle='rgba(214,159,169,'+Math.min(.45,overlap/(g.r1+g.r2)*1.4).toFixed(3)+')';
       sx.beginPath(); sx.ellipse((g.x1+g.x2)/2,g.cy,overlap/2,Math.min(g.r1,g.r2)*0.8,0,0,6.2832); sx.fill();
     }
-    [[g.x1,g.r1,'#5fe0ff',M.n1],[g.x2,g.r2,'#ffb454',M.n2]].forEach(function(o){
+    [[g.x1,g.r1,'#4FD8C4',M.n1],[g.x2,g.r2,'#D9B98C',M.n2]].forEach(function(o){
       var gr=sx.createRadialGradient(o[0]-o[1]*.3,g.cy-o[1]*.3,o[1]*.1,o[0],g.cy,o[1]);
-      gr.addColorStop(0,'#ffffff'); gr.addColorStop(.35,o[2]); gr.addColorStop(1,'#0a1420');
+      gr.addColorStop(0,'#ffffff'); gr.addColorStop(.35,o[2]); gr.addColorStop(1,'#0B1A1C');
       sx.fillStyle=gr; sx.beginPath(); sx.arc(o[0],g.cy,o[1],0,6.2832); sx.fill();
       sx.strokeStyle=o[2]; sx.lineWidth=1.6; sx.stroke();
-      sx.fillStyle='#eaf3fa'; sx.font='600 12px JetBrains Mono, monospace'; sx.textAlign='center';
+      sx.fillStyle='#E9F4F1'; sx.font='600 12px JetBrains Mono, monospace'; sx.textAlign='center';
       sx.fillText(o[3],o[0],g.cy-o[1]-10);
     });
 
     if($('cForce').checked){
       var F=Fof(r), mag=Math.abs(F), s=Math.min(70,16*Math.log(1+mag/(0.02*M.D+1e-9)));
-      var col=F>0?'#ff7ab6':'#4cc58d', dir=F>0?-1:1;
+      var col=F>0?'#ABA6DC':'#3FC9AE', dir=F>0?-1:1;
       [[g.x1,dir],[g.x2,-dir]].forEach(function(o){
         var x0=o[0], sgn=o[1];
         var xa=x0+sgn*s, xe=xa+sgn*0;
@@ -402,7 +402,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       sx.fillStyle=col; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='center';
       sx.fillText(F>0?'отталкивание':'притяжение',W/2,20);
     }
-    sx.fillStyle='rgba(139,163,184,.9)'; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='right';
+    sx.fillStyle='rgba(143,168,166,.9)'; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='right';
     sx.fillText('r = '+fmt(r,3)+' Å',W-8,20);
     plot();
   }
@@ -410,15 +410,15 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   /* ---------- график ---------- */
   function plot(){
     var w=W,h=H2,L=44,Rr=12,Tp=14,B=30;
-    px.clearRect(0,0,w,h); px.fillStyle='#05080f'; px.fillRect(0,0,w,h);
+    px.clearRect(0,0,w,h); px.fillStyle='#071012'; px.fillRect(0,0,w,h);
     var xLo=M.rDrag*0.92, xHi=Math.max(3.0*M.L,r*1.1);
     var E=Etot(), D=M.D;
     var yLo=-1.30*D, yHi=Math.max(1.7*D,E*1.05+0.2*D);
     function X(x){ return L+(x-xLo)/(xHi-xLo)*(w-L-Rr); }
     function Y(y){ return Tp+(yHi-y)/(yHi-yLo)*(h-Tp-B); }
 
-    px.strokeStyle='rgba(130,200,255,.10)'; px.lineWidth=1;
-    px.font='10px JetBrains Mono, monospace'; px.fillStyle='rgba(139,163,184,.8)';
+    px.strokeStyle='rgba(126,214,199,.10)'; px.lineWidth=1;
+    px.font='10px JetBrains Mono, monospace'; px.fillStyle='rgba(143,168,166,.8)';
     var ys=[-D,-D/2,0,D,2*D];
     ys.forEach(function(val){
       if(val<yLo||val>yHi) return;
@@ -428,14 +428,14 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
     var st=M.L>2.6?1:0.5;
     px.textAlign='center';
     for(var xv=Math.ceil(xLo/st)*st; xv<=xHi; xv+=st){
-      px.strokeStyle='rgba(130,200,255,.07)';
+      px.strokeStyle='rgba(126,214,199,.07)';
       px.beginPath(); px.moveTo(X(xv),Tp); px.lineTo(X(xv),h-B); px.stroke();
-      px.fillStyle='rgba(139,163,184,.8)'; px.fillText(fmt(xv,xv%1?1:0),X(xv),h-B+14);
+      px.fillStyle='rgba(143,168,166,.8)'; px.fillText(fmt(xv,xv%1?1:0),X(xv),h-B+14);
     }
-    px.fillStyle='rgba(139,163,184,.9)'; px.textAlign='left';
+    px.fillStyle='rgba(143,168,166,.9)'; px.textAlign='left';
     px.fillText('V, мэВ',6,Tp+2); px.textAlign='right'; px.fillText('r, Å',w-Rr,h-6);
 
-    px.strokeStyle='rgba(234,243,250,.35)'; px.lineWidth=1.2;
+    px.strokeStyle='rgba(233,244,241,.35)'; px.lineWidth=1.2;
     px.beginPath(); px.moveTo(L,Y(0)); px.lineTo(w-Rr,Y(0)); px.stroke();
 
     var N=420, pts=[], rep=[], att=[];
@@ -452,7 +452,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       px.beginPath(); arr.forEach(function(p,j){ j?px.lineTo(p[0],p[1]):px.moveTo(p[0],p[1]); }); px.stroke();
       px.restore();
     }
-    if(rep.length){ line(rep,'rgba(255,122,182,.85)',[5,4],1.6); line(att,'rgba(76,197,141,.85)',[5,4],1.6); }
+    if(rep.length){ line(rep,'rgba(171,166,220,.85)',[5,4],1.6); line(att,'rgba(63,201,174,.85)',[5,4],1.6); }
 
     // зона кинетической энергии между V и E
     px.save(); px.beginPath(); px.rect(L,Tp,w-L-Rr,h-Tp-B); px.clip();
@@ -463,10 +463,10 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       else if(started){ px.lineTo(X(xx2),Y(E)); break; }
     }
     if(started){ px.lineTo(X(Math.min(xHi,r)),Y(E)); px.closePath();
-      px.fillStyle='rgba(255,180,84,.20)'; px.fill(); }
+      px.fillStyle='rgba(217,185,140,.20)'; px.fill(); }
     px.restore();
 
-    line(pts,'#5fe0ff',[],2.4);
+    line(pts,'#4FD8C4',[],2.4);
 
     if($('cQuant').checked){
       var shown=Math.min(8,M.nLev);
@@ -482,10 +482,10 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
           if(Vof(xa)<En&&Vof(xb)>=En) a2=xa;
         }
         if(a1===null||a2===null) continue;
-        px.strokeStyle=n===0?'rgba(255,122,182,.95)':'rgba(255,122,182,.45)';
+        px.strokeStyle=n===0?'rgba(171,166,220,.95)':'rgba(171,166,220,.45)';
         px.lineWidth=n===0?2:1.3;
         px.beginPath(); px.moveTo(X(a1),Y(En)); px.lineTo(X(a2),Y(En)); px.stroke();
-        px.fillStyle='rgba(255,122,182,.9)'; px.font='10px JetBrains Mono, monospace'; px.textAlign='left';
+        px.fillStyle='rgba(171,166,220,.9)'; px.font='10px JetBrains Mono, monospace'; px.textAlign='left';
         px.fillText('n='+n,X(a2)+4,Y(En)+3);
       }
       px.restore();
@@ -493,19 +493,19 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
 
     // полная энергия
     px.save(); px.beginPath(); px.rect(L,Tp,w-L-Rr,h-Tp-B); px.clip();
-    px.setLineDash([7,5]); px.strokeStyle='#ffb454'; px.lineWidth=1.8;
+    px.setLineDash([7,5]); px.strokeStyle='#D9B98C'; px.lineWidth=1.8;
     px.beginPath(); px.moveTo(L,Y(E)); px.lineTo(w-Rr,Y(E)); px.stroke(); px.setLineDash([]);
     // текущая точка
     var Vr=Vof(r);
-    px.strokeStyle='rgba(255,180,84,.6)'; px.lineWidth=1.2;
+    px.strokeStyle='rgba(217,185,140,.6)'; px.lineWidth=1.2;
     px.beginPath(); px.moveTo(X(r),Y(Vr)); px.lineTo(X(r),Y(E)); px.stroke();
     px.fillStyle='#fff'; px.beginPath(); px.arc(X(r),Y(clamp(Vr,yLo,yHi)),5,0,6.2832); px.fill();
-    px.strokeStyle='#5fe0ff'; px.lineWidth=2; px.stroke();
+    px.strokeStyle='#4FD8C4'; px.lineWidth=2; px.stroke();
     // равновесие
-    px.strokeStyle='rgba(95,224,255,.35)'; px.setLineDash([3,4]);
+    px.strokeStyle='rgba(79,216,196,.35)'; px.setLineDash([3,4]);
     px.beginPath(); px.moveTo(X(M.rm),Tp); px.lineTo(X(M.rm),h-B); px.stroke(); px.setLineDash([]);
     px.restore();
-    px.fillStyle='rgba(95,224,255,.85)'; px.font='10px JetBrains Mono, monospace'; px.textAlign='center';
+    px.fillStyle='rgba(79,216,196,.85)'; px.font='10px JetBrains Mono, monospace'; px.textAlign='center';
     px.fillText('r равн.',X(M.rm),h-B-4);
   }
 

@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <style>
 :root{
-  --bg:#070c15; --grid:rgba(120,190,255,.05); --surface:#0d1626; --ink:#eaf3fa; --muted:#8ba3b8; --line:rgba(130,200,255,.16);
-  --cyan:#5fe0ff; --amber:#ffb454; --pink:#ff7ab6; --ok:#4cc58d; --warn:#ff7a6e; --on:#07121c;
+  --bg:#0A1417; --grid:rgba(126,214,199,.05); --surface:#102024; --ink:#E9F4F1; --muted:#8FA8A6; --line:rgba(126,214,199,.16);
+  --cyan:#4FD8C4; --amber:#D9B98C; --pink:#ABA6DC; --ok:#3FC9AE; --warn:#D69FA9; --on:#06110F;
   --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -22,13 +22,13 @@ h1{font:800 1.65rem/1.15 var(--disp);margin:0 0 8px}
 .lead{margin:0 0 14px;color:var(--muted);max-width:76ch}
 .lead b{color:var(--ink);font-family:var(--mono)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
-canvas{display:block;width:100%;border-radius:10px;background:#05080f;touch-action:none}
+canvas{display:block;width:100%;border-radius:10px;background:#071012;touch-action:none}
 #sch{cursor:pointer}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
 button{font:inherit;font-family:var(--sans);min-height:42px;padding:8px 13px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 button.pri{background:var(--cyan);color:var(--on);border-color:var(--cyan);font-weight:600}
 button.sm{min-height:34px;padding:5px 10px;font-size:.84rem}
-button.dn{border-color:rgba(255,122,110,.45);color:#ffb3ab}
+button.dn{border-color:rgba(214,159,169,.45);color:#ffb3ab}
 button[aria-pressed="true"]{border-color:var(--cyan);color:var(--cyan)}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
 select,input[type=number]{font:inherit;font-family:var(--mono);font-size:.85rem;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
@@ -136,9 +136,9 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
     </div>
     <canvas id="plot" aria-label="Осциллограф и ВАХ"></canvas>
     <div class="legend">
-      <span><i style="background:#ffb454"></i>канал 1: U участка</span>
-      <span><i style="background:#5fe0ff"></i>канал 2: ток в цепи</span>
-      <span><i style="background:#ff7ab6"></i>ВАХ выбранного участка</span>
+      <span><i style="background:#D9B98C"></i>канал 1: U участка</span>
+      <span><i style="background:#4FD8C4"></i>канал 2: ток в цепи</span>
+      <span><i style="background:#ABA6DC"></i>ВАХ выбранного участка</span>
     </div>
     <p class="note" id="acNote"></p>
   </section>
@@ -475,29 +475,29 @@ function resize(){
 function geom(){ var K=blocks.length,x0=64,x1=W-24,top=HS*0.34,bot=HS*0.80,span=(x1-x0-70)/K;
   return {K:K,x0:x0,x1:x1,top:top,bot:bot,span:span,bx:function(i){return x0+70+span*(i+0.5);}}; }
 function sym(kind,x,y,s,br,o,key){
-  var col='#5fe0ff',heat=0;
+  var col='#4FD8C4',heat=0;
   if(o&&br&&br.k==='R'&&$('cHeat').checked) heat=Math.min(1,Math.abs(o.i*o.u)/2);
   sx.save(); sx.translate(x,y); sx.lineWidth=2.2; sx.strokeStyle=col;
   var w=Math.min(s*0.62,54),hh=13;
   if(kind==='R'){
-    if(heat>0.02){ sx.shadowColor='#ffb454'; sx.shadowBlur=18*heat; }
-    sx.strokeStyle=heat>0.02?'rgb(255,'+Math.round(180-90*heat)+','+Math.round(84-40*heat)+')':col;
-    sx.fillStyle='#0d1626'; sx.fillRect(-w/2,-hh/2,w,hh); sx.strokeRect(-w/2,-hh/2,w,hh); sx.shadowBlur=0;
+    if(heat>0.02){ sx.shadowColor='#D9B98C'; sx.shadowBlur=18*heat; }
+    sx.strokeStyle=heat>0.02?'rgb('+Math.round(217+8*heat)+','+Math.round(185-40*heat)+','+Math.round(140+20*heat)+')':col;
+    sx.fillStyle='#102024'; sx.fillRect(-w/2,-hh/2,w,hh); sx.strokeRect(-w/2,-hh/2,w,hh); sx.shadowBlur=0;
   } else if(kind==='C'){ sx.beginPath(); sx.moveTo(-4,-14); sx.lineTo(-4,14); sx.moveTo(4,-14); sx.lineTo(4,14); sx.stroke();
   } else if(kind==='L'){ sx.beginPath(); for(var i=0;i<4;i++) sx.arc(-18+i*12,0,6,Math.PI,0); sx.stroke();
   } else if(kind==='D'){
     var fwd=o&&o.i>1e-6, dir=(br&&br.rev)?-1:1;
     sx.scale(dir,1);
-    sx.strokeStyle=fwd?'#4cc58d':col; sx.fillStyle=fwd?'rgba(76,197,141,.35)':'#0d1626';
+    sx.strokeStyle=fwd?'#3FC9AE':col; sx.fillStyle=fwd?'rgba(63,201,174,.35)':'#102024';
     sx.beginPath(); sx.moveTo(-9,-11); sx.lineTo(-9,11); sx.lineTo(9,0); sx.closePath(); sx.fill(); sx.stroke();
     sx.beginPath(); sx.moveTo(9,-11); sx.lineTo(9,11); sx.stroke();
   } else if(kind==='Q'){
     var on=br.v>0,st=sat[key];
-    sx.strokeStyle=on?(st?'#ffb454':'#4cc58d'):col;
+    sx.strokeStyle=on?(st?'#D9B98C':'#3FC9AE'):col;
     sx.beginPath(); sx.arc(0,0,14,0,6.2832); sx.stroke();
     sx.beginPath(); sx.moveTo(-6,-8); sx.lineTo(-6,8); sx.moveTo(-6,-4); sx.lineTo(7,-10); sx.moveTo(-6,4); sx.lineTo(7,10); sx.stroke();
   } else if(kind==='A'||kind==='V'){
-    sx.beginPath(); sx.arc(0,0,13,0,6.2832); sx.fillStyle='#0d1626'; sx.fill(); sx.stroke();
+    sx.beginPath(); sx.arc(0,0,13,0,6.2832); sx.fillStyle='#102024'; sx.fill(); sx.stroke();
     sx.fillStyle=col; sx.font="700 13px 'Unbounded',sans-serif"; sx.textAlign='center'; sx.textBaseline='middle'; sx.fillText(kind,0,1);
   } else if(kind==='S'){
     sx.fillStyle=col; sx.beginPath(); sx.arc(-10,0,2.5,0,6.2832); sx.fill(); sx.beginPath(); sx.arc(10,0,2.5,0,6.2832); sx.fill();
@@ -507,30 +507,30 @@ function sym(kind,x,y,s,br,o,key){
 }
 function drawSch(){
   var g=geom(), sol=lastSol||opPoint();
-  sx.clearRect(0,0,W,HS); sx.fillStyle='#05080f'; sx.fillRect(0,0,W,HS);
+  sx.clearRect(0,0,W,HS); sx.fillStyle='#071012'; sx.fillRect(0,0,W,HS);
   var sgn=src.flip?-1:1, I=-sol.out['src'].i*sgn, U=sol.V[1]*sgn;
-  sx.strokeStyle='rgba(95,224,255,.55)'; sx.lineWidth=2.4;
+  sx.strokeStyle='rgba(79,216,196,.55)'; sx.lineWidth=2.4;
   sx.beginPath(); sx.moveTo(g.x0,g.top); sx.lineTo(g.x1,g.top);
   sx.moveTo(g.x1,g.top); sx.lineTo(g.x1,g.bot); sx.moveTo(g.x1,g.bot); sx.lineTo(g.x0,g.bot);
   sx.moveTo(g.x0,g.bot); sx.lineTo(g.x0,g.top); sx.stroke();
   var my=(g.top+g.bot)/2;
-  sx.fillStyle='#05080f'; sx.fillRect(g.x0-16,my-24,32,48);
+  sx.fillStyle='#071012'; sx.fillRect(g.x0-16,my-24,32,48);
   var plusTop=!src.flip;
-  sx.strokeStyle='#5fe0ff';
+  sx.strokeStyle='#4FD8C4';
   sx.lineWidth=3; sx.beginPath(); sx.moveTo(g.x0-13,my-8); sx.lineTo(g.x0+13,my-8); sx.stroke();
   sx.lineWidth=7; sx.beginPath(); sx.moveTo(g.x0-7,my+8); sx.lineTo(g.x0+7,my+8); sx.stroke();
-  sx.fillStyle='#eaf3fa'; sx.font='14px JetBrains Mono, monospace'; sx.textAlign='center'; sx.textBaseline='alphabetic';
+  sx.fillStyle='#E9F4F1'; sx.font='14px JetBrains Mono, monospace'; sx.textAlign='center'; sx.textBaseline='alphabetic';
   sx.fillText(plusTop?'+':'−',g.x0-26,my-3);
   sx.fillText(plusTop?'−':'+',g.x0-26,my+15);
   if($('cLab').checked){
-    sx.fillStyle='#ffb454'; sx.textAlign='left';
+    sx.fillStyle='#D9B98C'; sx.textAlign='left';
     sx.fillText(src.type==='dc'?('ℰ = '+nf(src.emf,1)+' В'):('ℰₘ = '+nf(src.amp,1)+' В, '+src.f+' Гц'),g.x0+22,my+2);
     sx.fillText('r = '+nf(src.r,1)+' Ом',g.x0+22,my+18);
   }
   blocks.forEach(function(bl,bi){
     var cx=g.bx(bi),n=bl.br.length,dy=Math.min(30,(g.bot-g.top-24)/Math.max(n,1)),y0=g.top-(n-1)*dy/2;
-    if(bi===selB){ sx.fillStyle='rgba(255,180,84,.08)'; sx.fillRect(cx-g.span/2+3,g.top-52,g.span-6,g.bot-g.top+64); }
-    sx.strokeStyle='rgba(95,224,255,.55)'; sx.lineWidth=2.4;
+    if(bi===selB){ sx.fillStyle='rgba(217,185,140,.08)'; sx.fillRect(cx-g.span/2+3,g.top-52,g.span-6,g.bot-g.top+64); }
+    sx.strokeStyle='rgba(79,216,196,.55)'; sx.lineWidth=2.4;
     if(n>1){ sx.beginPath();
       sx.moveTo(cx-g.span*0.34,y0); sx.lineTo(cx-g.span*0.34,y0+(n-1)*dy);
       sx.moveTo(cx+g.span*0.34,y0); sx.lineTo(cx+g.span*0.34,y0+(n-1)*dy);
@@ -538,35 +538,35 @@ function drawSch(){
       sx.moveTo(cx+g.span*0.34,g.top); sx.lineTo(cx+g.span/2,g.top); sx.stroke(); }
     bl.br.forEach(function(br,ri){
       var yy=y0+ri*dy,key=bi+'_'+ri,o=sol.out[key];
-      sx.strokeStyle='rgba(95,224,255,.55)'; sx.lineWidth=2.4;
+      sx.strokeStyle='rgba(79,216,196,.55)'; sx.lineWidth=2.4;
       sx.beginPath(); sx.moveTo(cx-g.span*0.34,yy); sx.lineTo(cx+g.span*0.34,yy); sx.stroke();
-      sx.fillStyle='#05080f'; sx.fillRect(cx-30,yy-16,60,32);
+      sx.fillStyle='#071012'; sx.fillRect(cx-30,yy-16,60,32);
       sym(br.k,cx,yy,g.span,br,o,key);
       if($('cLab').checked){
-        sx.fillStyle=bi===selB?'#ffb454':'#8ba3b8'; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='center';
+        sx.fillStyle=bi===selB?'#D9B98C':'#8FA8A6'; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='center';
         sx.fillText(valText(br),cx,yy-20);
-        if(o&&br.k==='A'){ sx.fillStyle='#5fe0ff'; sx.fillText(amp(o.i),cx,yy+26); }
+        if(o&&br.k==='A'){ sx.fillStyle='#4FD8C4'; sx.fillText(amp(o.i),cx,yy+26); }
       }
       if($('cFlow').checked&&o&&Math.abs(o.i)>1e-9){
         var sp=Math.min(2.2,Math.log(1+Math.abs(o.i)*200)*0.5);
         for(var d=0;d<3;d++){
           var t=((flow*sp*Math.sign(o.i)+d/3)%1+1)%1;
-          sx.fillStyle='rgba(234,252,255,.7)';
+          sx.fillStyle='rgba(234,250,246,.7)';
           sx.beginPath(); sx.arc(cx-g.span*0.34+t*g.span*0.68,yy,2.2,0,6.2832); sx.fill();
         }
       }
     });
     if(bl.volt){
       var vy=g.bot-26;
-      sx.strokeStyle='rgba(255,180,84,.6)'; sx.lineWidth=1.6; sx.setLineDash([4,4]);
+      sx.strokeStyle='rgba(217,185,140,.6)'; sx.lineWidth=1.6; sx.setLineDash([4,4]);
       sx.beginPath(); sx.moveTo(cx-g.span*0.34,g.top); sx.lineTo(cx-g.span*0.34,vy);
       sx.moveTo(cx+g.span*0.34,g.top); sx.lineTo(cx+g.span*0.34,vy); sx.stroke(); sx.setLineDash([]);
       sym('V',cx,vy,40,null,null,null);
       var a=1+bi,b=(bi<blocks.length-1)?(2+bi):-1;
-      sx.fillStyle='#ffb454'; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='center';
+      sx.fillStyle='#D9B98C'; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='center';
       sx.fillText(volt((sol.V[a]||0)-(b>=0?(sol.V[b]||0):0)),cx,vy+26);
     }
-    sx.fillStyle=bi===probe?'#ff7ab6':'#8ba3b8'; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='center';
+    sx.fillStyle=bi===probe?'#ABA6DC':'#8FA8A6'; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='center';
     sx.fillText('У'+(bi+1)+(bi===probe?' · проба':''),cx,g.top-46);
   });
   if($('cFlow').checked&&Math.abs(I)>1e-9){
@@ -576,10 +576,10 @@ function drawSch(){
       if(dd<wT){X=g.x0+dd;Y=g.top;} else if(dd<wT+hS){X=g.x1;Y=g.top+(dd-wT);}
       else if(dd<2*wT+hS){X=g.x1-(dd-wT-hS);Y=g.bot;} else {X=g.x0;Y=g.bot-(dd-2*wT-hS);}
       if(Math.abs(X-g.x0)<18&&Math.abs(Y-my)<28) continue;
-      sx.fillStyle='rgba(234,252,255,.45)'; sx.beginPath(); sx.arc(X,Y,2,0,6.2832); sx.fill();
+      sx.fillStyle='rgba(234,250,246,.45)'; sx.beginPath(); sx.arc(X,Y,2,0,6.2832); sx.fill();
     }
   }
-  sx.fillStyle='#8ba3b8'; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='left';
+  sx.fillStyle='#8FA8A6'; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='left';
   sx.fillText('I = '+amp(I)+'   U клемм = '+volt(U),8,16);
   sx.textAlign='right'; sx.fillText(src.type==='ac'?('AC '+src.f+' Гц'):'DC',W-8,16);
   return sol;
@@ -601,14 +601,14 @@ function blockI(bi,u){
   return {i:tot,short:short};
 }
 function drawPlot(){
-  px.clearRect(0,0,W,HP); px.fillStyle='#05080f'; px.fillRect(0,0,W,HP);
+  px.clearRect(0,0,W,HP); px.fillStyle='#071012'; px.fillRect(0,0,W,HP);
   var L=52,R=12,T=14,B=26;
-  px.strokeStyle='rgba(130,200,255,.14)'; px.lineWidth=1;
+  px.strokeStyle='rgba(126,214,199,.14)'; px.lineWidth=1;
   for(var i=0;i<=8;i++){ var X=L+(W-L-R)*i/8; px.beginPath(); px.moveTo(X,T); px.lineTo(X,HP-B); px.stroke(); }
   for(var j=0;j<=6;j++){ var Y=T+(HP-T-B)*j/6; px.beginPath(); px.moveTo(L,Y); px.lineTo(W-R,Y); px.stroke(); }
   px.font='10px JetBrains Mono, monospace';
   if(plotMode==='scope'){
-    if(scope.length<3){ px.fillStyle='#8ba3b8'; px.fillText('Нажмите «Пуск» — осциллограф начнёт запись',L+8,HP/2); return; }
+    if(scope.length<3){ px.fillStyle='#8FA8A6'; px.fillText('Нажмите «Пуск» — осциллограф начнёт запись',L+8,HP/2); return; }
     var win=Math.pow(10,+$('win').value), t1=scope[scope.length-1].t;
     if($('cTrig').checked&&src.type==='ac'){
       var per=1/src.f, k=Math.floor((t1-win)/per);
@@ -620,14 +620,14 @@ function drawPlot(){
     function Xs(t){ return L+(t-t0)/win*(W-L-R); }
     function Yu(u){ return T+(HP-T-B)*(0.5-0.44*u/mu); }
     function Yi(v){ return T+(HP-T-B)*(0.5-0.44*v/mi); }
-    px.strokeStyle='rgba(234,243,250,.3)'; px.beginPath(); px.moveTo(L,Yu(0)); px.lineTo(W-R,Yu(0)); px.stroke();
-    [[Yu,'u','#ffb454'],[Yi,'i','#5fe0ff']].forEach(function(c){
+    px.strokeStyle='rgba(233,244,241,.3)'; px.beginPath(); px.moveTo(L,Yu(0)); px.lineTo(W-R,Yu(0)); px.stroke();
+    [[Yu,'u','#D9B98C'],[Yi,'i','#4FD8C4']].forEach(function(c){
       px.strokeStyle=c[2]; px.lineWidth=2; px.beginPath();
       pts.forEach(function(s,k){ var xx=Xs(s.t),yy=c[0](s[c[1]]); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
     });
-    px.fillStyle='#ffb454'; px.textAlign='left'; px.fillText('U: ±'+volt(mu),L+4,T+12);
-    px.fillStyle='#5fe0ff'; px.fillText('I: ±'+amp(mi),L+4,T+24);
-    px.fillStyle='#8ba3b8'; px.textAlign='right'; px.fillText('окно '+tsec(win),W-R,HP-8);
+    px.fillStyle='#D9B98C'; px.textAlign='left'; px.fillText('U: ±'+volt(mu),L+4,T+12);
+    px.fillStyle='#4FD8C4'; px.fillText('I: ±'+amp(mi),L+4,T+24);
+    px.fillStyle='#8FA8A6'; px.textAlign='right'; px.fillText('окно '+tsec(win),W-R,HP-8);
     px.textAlign='left'; px.fillText('t = '+tsec(scope[scope.length-1].t),L,HP-8);
   } else {
     var bi=Math.min(selB,blocks.length-1), Um=Math.max(1,src.type==='dc'?src.emf:src.amp)*1.2;
@@ -637,21 +637,21 @@ function drawPlot(){
       cur.push([u,r.i]); mx=Math.max(mx,Math.abs(r.i)); }
     function Xi(u){ return L+(u+Um)/(2*Um)*(W-L-R); }
     function Yy(v){ return T+(HP-T-B)*(0.5-0.46*v/mx); }
-    px.strokeStyle='rgba(234,243,250,.3)';
+    px.strokeStyle='rgba(233,244,241,.3)';
     px.beginPath(); px.moveTo(L,Yy(0)); px.lineTo(W-R,Yy(0)); px.stroke();
     px.beginPath(); px.moveTo(Xi(0),T); px.lineTo(Xi(0),HP-B); px.stroke();
     if(anyShort){
-      px.strokeStyle='#4cc58d'; px.lineWidth=3; px.beginPath(); px.moveTo(Xi(0),T); px.lineTo(Xi(0),HP-B); px.stroke();
-      px.fillStyle='#4cc58d'; px.textAlign='left';
+      px.strokeStyle='#3FC9AE'; px.lineWidth=3; px.beginPath(); px.moveTo(Xi(0),T); px.lineTo(Xi(0),HP-B); px.stroke();
+      px.fillStyle='#3FC9AE'; px.textAlign='left';
       px.fillText('В участке есть провод / катушка / замкнутый ключ:',L+6,T+14);
       px.fillText('на постоянном токе это короткое — ВАХ вертикальна.',L+6,T+28);
     }
     if(cur.length>1){
-      px.strokeStyle='#ff7ab6'; px.lineWidth=2.4; px.beginPath();
+      px.strokeStyle='#ABA6DC'; px.lineWidth=2.4; px.beginPath();
       cur.forEach(function(p,k){ var xx=Xi(p[0]),yy=Yy(p[1]); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
     }
-    px.fillStyle='#ff7ab6'; px.textAlign='left'; px.fillText('I: ±'+amp(mx),L+4,HP-B-6);
-    px.fillStyle='#8ba3b8'; px.textAlign='right'; px.fillText('U: ±'+volt(Um),W-R,HP-8);
+    px.fillStyle='#ABA6DC'; px.textAlign='left'; px.fillText('I: ±'+amp(mx),L+4,HP-B-6);
+    px.fillStyle='#8FA8A6'; px.textAlign='right'; px.fillText('U: ±'+volt(Um),W-R,HP-8);
     px.textAlign='left'; px.fillText('ВАХ участка '+(bi+1),L,HP-8);
   }
 }

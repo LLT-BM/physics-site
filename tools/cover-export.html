@@ -1,9 +1,9 @@
 <!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><title>Экспорт SVG → PNG</title>
-<style>body{background:#0d1626;color:#eaf3fa;font:15px system-ui;padding:20px;max-width:1000px;margin:0 auto}
-textarea{width:100%;height:190px;background:#05080f;color:#eaf3fa;border:1px solid #2a3a52;border-radius:8px;padding:10px;font:12px monospace}
-canvas{max-width:100%;background:#05080f;border:1px solid #2a3a52;border-radius:8px;margin-top:12px}
-button,select,input{font:inherit;padding:8px 12px;border-radius:8px;border:1px solid #2a3a52;background:#132033;color:#eaf3fa;margin:6px 6px 0 0}
-button{background:#5fe0ff;color:#07121c;font-weight:600;cursor:pointer}
+<style>body{background:#102024;color:#E9F4F1;font:15px system-ui;padding:20px;max-width:1000px;margin:0 auto}
+textarea{width:100%;height:190px;background:#071012;color:#E9F4F1;border:1px solid #2C4044;border-radius:8px;padding:10px;font:12px monospace}
+canvas{max-width:100%;background:#071012;border:1px solid #2C4044;border-radius:8px;margin-top:12px}
+button,select,input{font:inherit;padding:8px 12px;border-radius:8px;border:1px solid #2C4044;background:#14262A;color:#E9F4F1;margin:6px 6px 0 0}
+button{background:#4FD8C4;color:#06110F;font-weight:600;cursor:pointer}
 input[type=number]{width:100px}</style></head><body>
 <h2>Экспорт SVG → PNG точного размера</h2>
 <p>Обложка соцсетей: <b>1200×630</b>. Иконка Apple: <b>180×180</b>. Иконка PNG: <b>32×32</b>.</p>
@@ -12,7 +12,7 @@ input[type=number]{width:100px}</style></head><body>
 <input type="number" id="w" value="1200" min="16" max="4096">
 <input type="number" id="h" value="630" min="16" max="4096">
 <select id="mode"><option value="fit">вписать с полями</option><option value="cover">заполнить с обрезкой</option></select>
-Фон <input type="color" id="bg" value="#070f1d">
+Фон <input type="color" id="bg" value="#0A171A">
 Имя <input type="text" id="name" value="cover" style="width:130px">
 <button id="go">Скачать PNG</button></div>
 <canvas id="cv" width="1200" height="630"></canvas>

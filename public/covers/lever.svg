@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0c1930"/><stop offset=".55" stop-color="#070f1d"/><stop offset="1" stop-color="#04070d"/>
+      <stop offset="0" stop-color="#0E2226"/><stop offset=".55" stop-color="#0A171A"/><stop offset="1" stop-color="#050D0E"/>
     </linearGradient>
     <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
-      <path d="M46 0H0V46" fill="none" stroke="#78beff" stroke-opacity=".06"/>
+      <path d="M46 0H0V46" fill="none" stroke="#7ED6C7" stroke-opacity=".06"/>
     </pattern>
     <radialGradient id="vig" cx=".5" cy=".45" r=".8">
       <stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/>
@@ -13,67 +13,67 @@
       <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8b9aa8"/><stop offset=".5" stop-color="#6c7b89"/><stop offset="1" stop-color="#4a5763"/>
+      <stop offset="0" stop-color="#8C9A97"/><stop offset=".5" stop-color="#6E7C7A"/><stop offset="1" stop-color="#4C5754"/>
     </linearGradient>
     <radialGradient id="brass" cx=".35" cy=".35" r=".95">
-      <stop offset="0" stop-color="#f4e3a8"/><stop offset=".5" stop-color="#d1a93f"/><stop offset="1" stop-color="#7d6420"/>
+      <stop offset="0" stop-color="#F0E2C4"/><stop offset=".5" stop-color="#C9A96E"/><stop offset="1" stop-color="#7A6440"/>
     </radialGradient>
   </defs>
   <rect width="1200" height="750" fill="url(#bg)"/>
   <rect width="1200" height="750" fill="url(#grid)"/>
 
   <!-- стойка -->
-  <polygon points="600,360 540,640 660,640" fill="#3a4654"/>
-  <rect x="500" y="640" width="200" height="22" rx="5" fill="#3a4654"/>
+  <polygon points="600,360 540,640 660,640" fill="#3C4A4A"/>
+  <rect x="500" y="640" width="200" height="22" rx="5" fill="#3C4A4A"/>
 
   <!-- луч рычага (слегка наклонён) -->
   <g transform="rotate(-4 600 350)">
-    <rect x="180" y="338" width="840" height="24" rx="8" fill="url(#steel)" stroke="#9aa8b5" stroke-width="1.5"/>
+    <rect x="180" y="338" width="840" height="24" rx="8" fill="url(#steel)" stroke="#9CA8A5" stroke-width="1.5"/>
     <!-- деления -->
-    <g stroke="#cdd8e2" stroke-opacity=".5">
+    <g stroke="#CFDCD8" stroke-opacity=".5">
       <path d="M280 338v-12"/><path d="M380 338v-12"/><path d="M480 338v-12"/><path d="M720 338v-12"/><path d="M820 338v-12"/><path d="M920 338v-12"/>
     </g>
     <!-- плечи -->
-    <rect x="320" y="362" width="280" height="6" fill="#5fe0ff" opacity=".85"/>
-    <rect x="600" y="362" width="220" height="6" fill="#ffb454" opacity=".85"/>
-    <rect x="600" y="372" width="120" height="5" fill="#ff7ab6" opacity=".85"/>
+    <rect x="320" y="362" width="280" height="6" fill="#4FD8C4" opacity=".85"/>
+    <rect x="600" y="362" width="220" height="6" fill="#D9B98C" opacity=".85"/>
+    <rect x="600" y="372" width="120" height="5" fill="#ABA6DC" opacity=".85"/>
 
     <!-- левый груз (cyan) -->
     <g filter="url(#glow)">
-      <line x1="320" y1="362" x2="320" y2="410" stroke="#eaf3fa" stroke-width="2.5"/>
-      <rect x="288" y="410" width="64" height="54" rx="8" fill="#5fe0ff"/>
-      <text x="320" y="440" fill="#07121c" font-size="22" font-weight="700" text-anchor="middle" font-family="Unbounded, sans-serif">m₁</text>
+      <line x1="320" y1="362" x2="320" y2="410" stroke="#E9F4F1" stroke-width="2.5"/>
+      <rect x="288" y="410" width="64" height="54" rx="8" fill="#4FD8C4"/>
+      <text x="320" y="440" fill="#06110F" font-size="22" font-weight="700" text-anchor="middle" font-family="Unbounded, sans-serif">m₁</text>
     </g>
     <!-- правый груз (amber) -->
     <g filter="url(#glow)">
-      <line x1="820" y1="362" x2="820" y2="410" stroke="#eaf3fa" stroke-width="2.5"/>
-      <rect x="782" y="410" width="76" height="64" rx="8" fill="#ffb454"/>
-      <text x="820" y="445" fill="#07121c" font-size="24" font-weight="700" text-anchor="middle" font-family="Unbounded, sans-serif">m₂</text>
+      <line x1="820" y1="362" x2="820" y2="410" stroke="#E9F4F1" stroke-width="2.5"/>
+      <rect x="782" y="410" width="76" height="64" rx="8" fill="#D9B98C"/>
+      <text x="820" y="445" fill="#06110F" font-size="24" font-weight="700" text-anchor="middle" font-family="Unbounded, sans-serif">m₂</text>
     </g>
     <!-- третий груз (малиновый, удлинённый подвес) -->
     <g filter="url(#glow)">
-      <line x1="720" y1="362" x2="720" y2="450" stroke="#eaf3fa" stroke-width="2.5"/>
-      <rect x="694" y="450" width="52" height="44" rx="7" fill="#ff7ab6"/>
-      <text x="720" y="476" fill="#07121c" font-size="19" font-weight="700" text-anchor="middle" font-family="Unbounded, sans-serif">m₃</text>
+      <line x1="720" y1="362" x2="720" y2="450" stroke="#E9F4F1" stroke-width="2.5"/>
+      <rect x="694" y="450" width="52" height="44" rx="7" fill="#ABA6DC"/>
+      <text x="720" y="476" fill="#06110F" font-size="19" font-weight="700" text-anchor="middle" font-family="Unbounded, sans-serif">m₃</text>
     </g>
   </g>
 
   <!-- ось (латунь) -->
-  <circle cx="600" cy="350" r="20" fill="url(#brass)" stroke="#3a4654" stroke-width="3" filter="url(#glow)"/>
+  <circle cx="600" cy="350" r="20" fill="url(#brass)" stroke="#3C4A4A" stroke-width="3" filter="url(#glow)"/>
 
   <!-- подписи плеч -->
-  <g fill="#8ba3b8" font-size="20">
+  <g fill="#8FA8A6" font-size="20">
     <text x="430" y="318" text-anchor="middle">l₁</text>
     <text x="740" y="318" text-anchor="middle">l₂</text>
   </g>
 
   <!-- формула -->
-  <text x="48" y="64" fill="#ffb454" font-size="20" letter-spacing="6">LIBLABTAB · 05</text>
-  <text x="48" y="94" fill="#8ba3b8" font-size="16" letter-spacing="3">МЕХАНИКА · СТАТИКА · ΣMслева = ΣMсправа</text>
-  <text x="600" y="700" fill="#5fe0ff" font-size="26" text-anchor="middle" font-family="Unbounded, sans-serif" font-weight="600">F₁·l₁ + F₃·l₃ = F₂·l₂</text>
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 05</text>
+  <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">МЕХАНИКА · СТАТИКА · ΣMслева = ΣMсправа</text>
+  <text x="600" y="700" fill="#4FD8C4" font-size="26" text-anchor="middle" font-family="Unbounded, sans-serif" font-weight="600">F₁·l₁ + F₃·l₃ = F₂·l₂</text>
 
   <!-- угловые скобки -->
-  <g stroke="#78beff" stroke-opacity=".3" fill="none">
+  <g stroke="#7ED6C7" stroke-opacity=".3" fill="none">
     <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
   </g>
   <rect width="1200" height="750" fill="url(#vig)"/>

@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0c1930"/><stop offset=".55" stop-color="#070f1d"/><stop offset="1" stop-color="#04070d"/>
+      <stop offset="0" stop-color="#0E2226"/><stop offset=".55" stop-color="#0A171A"/><stop offset="1" stop-color="#050D0E"/>
     </linearGradient>
     <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
-      <path d="M46 0H0V46" fill="none" stroke="#78beff" stroke-opacity=".06"/>
+      <path d="M46 0H0V46" fill="none" stroke="#7ED6C7" stroke-opacity=".06"/>
     </pattern>
     <radialGradient id="vig" cx=".5" cy=".45" r=".8">
       <stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>
@@ -17,80 +17,80 @@
   <rect width="1200" height="750" fill="url(#grid)"/>
 
   <!-- контур -->
-  <g fill="none" stroke="#5fe0ff" stroke-width="3.5" stroke-opacity=".8">
+  <g fill="none" stroke="#4FD8C4" stroke-width="3.5" stroke-opacity=".8">
     <path d="M180 250 H 1020"/><path d="M1020 250 V 520"/><path d="M1020 520 H 180"/>
     <path d="M180 520 V 420"/><path d="M180 340 V 250"/>
   </g>
   <!-- источник -->
-  <g stroke="#5fe0ff" filter="url(#glow)">
+  <g stroke="#4FD8C4" filter="url(#glow)">
     <path d="M152 340 H 208" stroke-width="4"/>
     <path d="M164 360 H 196" stroke-width="8"/>
     <path d="M152 380 H 208" stroke-width="4"/>
     <path d="M164 400 H 196" stroke-width="8"/>
     <path d="M180 400 V 420" stroke-width="3.5"/>
   </g>
-  <text x="128" y="348" fill="#8ba3b8" font-size="22" text-anchor="end">+</text>
-  <text x="128" y="408" fill="#8ba3b8" font-size="22" text-anchor="end">−</text>
-  <text x="222" y="368" fill="#ffb454" font-size="20">ℰ, r</text>
+  <text x="128" y="348" fill="#8FA8A6" font-size="22" text-anchor="end">+</text>
+  <text x="128" y="408" fill="#8FA8A6" font-size="22" text-anchor="end">−</text>
+  <text x="222" y="368" fill="#D9B98C" font-size="20">ℰ, r</text>
 
   <!-- резистор с нагревом -->
   <g filter="url(#glow)">
-    <rect x="380" y="232" width="120" height="36" rx="5" fill="#0d1626" stroke="#ffb454" stroke-width="3.5"/>
-    <path d="M392 250 l14 -12 l16 24 l16 -24 l16 24 l14 -12" fill="none" stroke="#ffb454" stroke-width="3"/>
+    <rect x="380" y="232" width="120" height="36" rx="5" fill="#102024" stroke="#D9B98C" stroke-width="3.5"/>
+    <path d="M392 250 l14 -12 l16 24 l16 -24 l16 24 l14 -12" fill="none" stroke="#D9B98C" stroke-width="3"/>
   </g>
-  <text x="440" y="212" fill="#ffb454" font-size="19" text-anchor="middle">R₁</text>
+  <text x="440" y="212" fill="#D9B98C" font-size="19" text-anchor="middle">R₁</text>
 
   <!-- параллельные резисторы -->
-  <g fill="none" stroke="#5fe0ff" stroke-width="3.5" stroke-opacity=".8">
+  <g fill="none" stroke="#4FD8C4" stroke-width="3.5" stroke-opacity=".8">
     <path d="M660 250 V 200"/><path d="M660 200 H 700"/><path d="M660 250 V 300"/><path d="M660 300 H 700"/>
     <path d="M820 200 H 860"/><path d="M820 300 H 860"/><path d="M860 200 V 300"/><path d="M860 250 H 900"/>
   </g>
-  <rect x="700" y="184" width="120" height="32" rx="5" fill="#0d1626" stroke="#5fe0ff" stroke-width="3"/>
-  <rect x="700" y="284" width="120" height="32" rx="5" fill="#0d1626" stroke="#5fe0ff" stroke-width="3"/>
-  <text x="760" y="168" fill="#5fe0ff" font-size="17" text-anchor="middle">R₂</text>
-  <text x="760" y="342" fill="#5fe0ff" font-size="17" text-anchor="middle">R₃</text>
+  <rect x="700" y="184" width="120" height="32" rx="5" fill="#102024" stroke="#4FD8C4" stroke-width="3"/>
+  <rect x="700" y="284" width="120" height="32" rx="5" fill="#102024" stroke="#4FD8C4" stroke-width="3"/>
+  <text x="760" y="168" fill="#4FD8C4" font-size="17" text-anchor="middle">R₂</text>
+  <text x="760" y="342" fill="#4FD8C4" font-size="17" text-anchor="middle">R₃</text>
 
   <!-- амперметр в разрыве нижней ветви -->
-  <circle cx="440" cy="520" r="34" fill="#0d1626" stroke="#5fe0ff" stroke-width="3.5" filter="url(#glow)"/>
-  <text x="440" y="530" fill="#5fe0ff" font-size="26" text-anchor="middle" font-family="Unbounded, sans-serif" font-weight="800">A</text>
-  <text x="440" y="592" fill="#5fe0ff" font-size="17" text-anchor="middle">0,545 А</text>
+  <circle cx="440" cy="520" r="34" fill="#102024" stroke="#4FD8C4" stroke-width="3.5" filter="url(#glow)"/>
+  <text x="440" y="530" fill="#4FD8C4" font-size="26" text-anchor="middle" font-family="Unbounded, sans-serif" font-weight="800">A</text>
+  <text x="440" y="592" fill="#4FD8C4" font-size="17" text-anchor="middle">0,545 А</text>
 
   <!-- вольтметр параллельно -->
-  <g stroke="#ffb454" stroke-width="2" stroke-dasharray="6 5" fill="none">
+  <g stroke="#D9B98C" stroke-width="2" stroke-dasharray="6 5" fill="none">
     <path d="M360 250 V 400"/><path d="M520 250 V 400"/><path d="M360 400 H 400"/><path d="M480 400 H 520"/>
   </g>
-  <circle cx="440" cy="400" r="34" fill="#0d1626" stroke="#ffb454" stroke-width="3.5" filter="url(#glow)"/>
-  <text x="440" y="410" fill="#ffb454" font-size="26" text-anchor="middle" font-family="Unbounded, sans-serif" font-weight="800">V</text>
-  <text x="440" y="462" fill="#ffb454" font-size="17" text-anchor="middle">5,455 В</text>
+  <circle cx="440" cy="400" r="34" fill="#102024" stroke="#D9B98C" stroke-width="3.5" filter="url(#glow)"/>
+  <text x="440" y="410" fill="#D9B98C" font-size="26" text-anchor="middle" font-family="Unbounded, sans-serif" font-weight="800">V</text>
+  <text x="440" y="462" fill="#D9B98C" font-size="17" text-anchor="middle">5,455 В</text>
 
   <!-- конденсатор и катушка на правой ветви -->
-  <g stroke="#ff7ab6" stroke-width="4" filter="url(#glow)">
+  <g stroke="#ABA6DC" stroke-width="4" filter="url(#glow)">
     <path d="M1006 330 H 1034"/><path d="M1006 350 H 1034"/>
   </g>
-  <text x="1064" y="346" fill="#ff7ab6" font-size="17">C</text>
-  <g fill="none" stroke="#4cc58d" stroke-width="3.5">
+  <text x="1064" y="346" fill="#ABA6DC" font-size="17">C</text>
+  <g fill="none" stroke="#3FC9AE" stroke-width="3.5">
     <path d="M1020 430 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0" transform="translate(-20,0)"/>
   </g>
-  <text x="1064" y="436" fill="#4cc58d" font-size="17">L</text>
+  <text x="1064" y="436" fill="#3FC9AE" font-size="17">L</text>
 
   <!-- заряды -->
-  <g fill="#eafcff" filter="url(#glow)">
+  <g fill="#EAFAF6" filter="url(#glow)">
     <circle cx="280" cy="250" r="5"/><circle cx="330" cy="250" r="5"/><circle cx="580" cy="250" r="5"/>
     <circle cx="950" cy="250" r="5"/><circle cx="1020" cy="290" r="5"/><circle cx="900" cy="520" r="5"/>
     <circle cx="700" cy="520" r="5"/><circle cx="280" cy="520" r="5"/><circle cx="180" cy="470" r="5"/>
   </g>
-  <g stroke="#4cc58d" stroke-width="3" fill="#4cc58d">
+  <g stroke="#3FC9AE" stroke-width="3" fill="#3FC9AE">
     <path d="M250 275 H 300"/><path d="M300 275 l-12 -6 l0 12 z"/>
   </g>
-  <text x="275" y="300" fill="#4cc58d" font-size="14" text-anchor="middle">направление тока</text>
+  <text x="275" y="300" fill="#3FC9AE" font-size="14" text-anchor="middle">направление тока</text>
 
   <!-- формулы -->
-  <text x="48" y="64" fill="#ffb454" font-size="20" letter-spacing="6">LIBLABTAB · 10</text>
-  <text x="48" y="94" fill="#8ba3b8" font-size="16" letter-spacing="3">ЭЛЕКТРОДИНАМИКА · КОНСТРУКТОР ЦЕПИ</text>
-  <text x="48" y="700" fill="#5fe0ff" font-size="26" font-family="Unbounded, sans-serif" font-weight="600">I = U/R</text>
-  <text x="1152" y="700" fill="#ffb454" font-size="26" text-anchor="end" font-family="Unbounded, sans-serif" font-weight="600">I = ℰ/(R + r)</text>
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 10</text>
+  <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">ЭЛЕКТРОДИНАМИКА · КОНСТРУКТОР ЦЕПИ</text>
+  <text x="48" y="700" fill="#4FD8C4" font-size="26" font-family="Unbounded, sans-serif" font-weight="600">I = U/R</text>
+  <text x="1152" y="700" fill="#D9B98C" font-size="26" text-anchor="end" font-family="Unbounded, sans-serif" font-weight="600">I = ℰ/(R + r)</text>
 
-  <g stroke="#78beff" stroke-opacity=".3" fill="none">
+  <g stroke="#7ED6C7" stroke-opacity=".3" fill="none">
     <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
   </g>
   <rect width="1200" height="750" fill="url(#vig)"/>

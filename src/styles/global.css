@@ -1,11 +1,11 @@
-:root{--bg:#070c15;--panel:#0d1626;--line:rgba(130,200,255,.16);--ink:#eaf3fa;
-  --mut:#8ba3b8;--amber:#ffb454;--cyan:#5fe0ff;
+:root{--bg:#0A1417;--panel:#102024;--line:rgba(126,214,199,.16);--ink:#E9F4F1;
+  --mut:#8FA8A6;--amber:#D9B98C;--cyan:#4FD8C4;
   --mono:'JetBrains Mono',monospace;--disp:'Unbounded',sans-serif}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);line-height:1.65;
   font-family:'IBM Plex Sans',system-ui,sans-serif;
-  background-image:linear-gradient(rgba(120,190,255,.04) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(120,190,255,.04) 1px,transparent 1px);
+  background-image:linear-gradient(rgba(126,214,199,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(126,214,199,.04) 1px,transparent 1px);
   background-size:46px 46px}
 a{color:var(--cyan)}
 .site-head{display:flex;justify-content:space-between;align-items:center;
@@ -25,14 +25,14 @@ h1{font:800 clamp(24px,4vw,40px)/1.15 var(--disp);margin:18px 0 10px}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;margin-top:22px}
 .card{display:flex;flex-direction:column;gap:9px;padding:18px;text-decoration:none;color:inherit;
   background:var(--panel);border:1px solid var(--line);transition:.2s}
-.card:hover{transform:translateY(-4px);border-color:rgba(95,224,255,.5);
+.card:hover{transform:translateY(-4px);border-color:rgba(79,216,196,.5);
   box-shadow:0 12px 32px rgba(0,0,0,.45)}
 .card h2{font:600 17px var(--disp);margin:0}
 .card p{margin:0;color:var(--mut);font-size:14px}
 .open{font:600 11px var(--mono);color:var(--amber);letter-spacing:.1em;margin-top:auto}
 .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;
   font:400 11px var(--mono);color:var(--mut)}
-.frame{width:100%;height:min(74vh,780px);border:1px solid var(--line);background:#05080f;display:block}
+.frame{width:100%;height:min(74vh,780px);border:1px solid var(--line);background:#071012;display:block}
 .hint{font:400 12px var(--mono);color:var(--mut)}
 .content{max-width:760px;margin-top:34px}
 .content h2{font:600 20px var(--disp);margin:28px 0 10px}
@@ -42,10 +42,10 @@ h1{font:800 clamp(24px,4vw,40px)/1.15 var(--disp);margin:18px 0 10px}
 .card{padding:0;overflow:hidden}
 .card-body{display:flex;flex-direction:column;gap:9px;padding:14px 16px 16px;flex:1}
 .cover{width:100%;aspect-ratio:16/10;object-fit:cover;object-position:center;
-  border-bottom:1px solid var(--line);background:#05080f;display:block}
+  border-bottom:1px solid var(--line);background:#071012;display:block}
 .nocover{aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;
   border-bottom:1px solid var(--line);
-  background:linear-gradient(135deg,#0d1626,#13243c);
-  font:800 42px var(--disp);color:rgba(95,224,255,.35)}
-  .cover{aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--line);background:#05080f}
+  background:linear-gradient(135deg,#102024,#13243c);
+  font:800 42px var(--disp);color:rgba(79,216,196,.35)}
+  .cover{aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--line);background:#071012}
 .cover svg{width:100%;height:100%;display:block}

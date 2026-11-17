@@ -1,25 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0c1930"/><stop offset=".55" stop-color="#070f1d"/><stop offset="1" stop-color="#04070d"/>
+      <stop offset="0" stop-color="#0E2226"/><stop offset=".55" stop-color="#0A171A"/><stop offset="1" stop-color="#050D0E"/>
     </linearGradient>
     <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
-      <path d="M46 0H0V46" fill="none" stroke="#78beff" stroke-opacity=".06"/>
+      <path d="M46 0H0V46" fill="none" stroke="#7ED6C7" stroke-opacity=".06"/>
     </pattern>
     <radialGradient id="vig" cx=".5" cy=".45" r=".8">
       <stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>
     </radialGradient>
     <radialGradient id="cA" cx=".35" cy=".32" r=".85">
-      <stop offset="0" stop-color="#ffffff"/><stop offset=".38" stop-color="#5fe0ff"/><stop offset="1" stop-color="#0a2436"/>
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".38" stop-color="#4FD8C4"/><stop offset="1" stop-color="#0B2A28"/>
     </radialGradient>
     <radialGradient id="cB" cx=".35" cy=".32" r=".85">
-      <stop offset="0" stop-color="#fff3e0"/><stop offset=".38" stop-color="#ffb454"/><stop offset="1" stop-color="#3a2408"/>
+      <stop offset="0" stop-color="#F7F0E2"/><stop offset=".38" stop-color="#D9B98C"/><stop offset="1" stop-color="#3A2E1C"/>
     </radialGradient>
     <radialGradient id="halo" cx=".5" cy=".5" r=".5">
-      <stop offset=".45" stop-color="#5fe0ff" stop-opacity=".22"/><stop offset="1" stop-color="#5fe0ff" stop-opacity="0"/>
+      <stop offset=".45" stop-color="#4FD8C4" stop-opacity=".22"/><stop offset="1" stop-color="#4FD8C4" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="haloB" cx=".5" cy=".5" r=".5">
-      <stop offset=".45" stop-color="#ffb454" stop-opacity=".22"/><stop offset="1" stop-color="#ffb454" stop-opacity="0"/>
+      <stop offset=".45" stop-color="#D9B98C" stop-opacity=".22"/><stop offset="1" stop-color="#D9B98C" stop-opacity="0"/>
     </radialGradient>
     <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
       <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -33,62 +33,62 @@
   <circle cx="175" cy="185" r="62" fill="url(#cA)" filter="url(#glow)"/>
   <circle cx="395" cy="185" r="130" fill="url(#haloB)"/>
   <circle cx="395" cy="185" r="72" fill="url(#cB)" filter="url(#glow)"/>
-  <text x="175" y="90" fill="#5fe0ff" font-size="19" text-anchor="middle">Ar</text>
-  <text x="395" y="80" fill="#ffb454" font-size="19" text-anchor="middle">Ar</text>
+  <text x="175" y="90" fill="#4FD8C4" font-size="19" text-anchor="middle">Ar</text>
+  <text x="395" y="80" fill="#D9B98C" font-size="19" text-anchor="middle">Ar</text>
   <!-- силы притяжения -->
-  <g stroke="#4cc58d" stroke-width="4" fill="#4cc58d">
+  <g stroke="#3FC9AE" stroke-width="4" fill="#3FC9AE">
     <path d="M240 185 H 292"/><path d="M292 185 l-12 -6 l0 12 z"/>
     <path d="M320 185 H 268"/><path d="M268 185 l12 -6 l0 12 z"/>
   </g>
-  <text x="285" y="160" fill="#4cc58d" font-size="15" text-anchor="middle">притяжение</text>
-  <g stroke="#8ba3b8" stroke-width="1.5" stroke-dasharray="5 5">
+  <text x="285" y="160" fill="#3FC9AE" font-size="15" text-anchor="middle">притяжение</text>
+  <g stroke="#8FA8A6" stroke-width="1.5" stroke-dasharray="5 5">
     <path d="M175 275 V 300"/><path d="M395 275 V 300"/><path d="M175 292 H 395"/>
   </g>
-  <text x="285" y="322" fill="#eaf3fa" font-size="18" text-anchor="middle">r = 3,82 Å</text>
+  <text x="285" y="322" fill="#E9F4F1" font-size="18" text-anchor="middle">r = 3,82 Å</text>
 
   <!-- оси графика -->
-  <g stroke="rgba(130,200,255,.35)" stroke-width="1.5">
+  <g stroke="rgba(126,214,199,.35)" stroke-width="1.5">
     <path d="M380 250 V 660"/><path d="M380 430 H 1120"/>
   </g>
-  <text x="366" y="258" fill="#8ba3b8" font-size="15" text-anchor="end">V</text>
-  <text x="1124" y="452" fill="#8ba3b8" font-size="15">r</text>
-  <text x="366" y="435" fill="#8ba3b8" font-size="14" text-anchor="end">0</text>
-  <text x="366" y="610" fill="#ffb454" font-size="14" text-anchor="end">−ε</text>
+  <text x="366" y="258" fill="#8FA8A6" font-size="15" text-anchor="end">V</text>
+  <text x="1124" y="452" fill="#8FA8A6" font-size="15">r</text>
+  <text x="366" y="435" fill="#8FA8A6" font-size="14" text-anchor="end">0</text>
+  <text x="366" y="610" fill="#D9B98C" font-size="14" text-anchor="end">−ε</text>
 
   <!-- зона кинетической энергии -->
   <path d="M436 500 L 452 593 L 465 605 L 478 599 L 491 586 L 504 570 L 517 553 L 530 537 L 543 523 L 556 511 L 569 500 Z"
-        fill="#ffb454" fill-opacity=".22"/>
-  <path d="M400 500 H 640" stroke="#ffb454" stroke-width="2" stroke-dasharray="8 5"/>
-  <text x="648" y="496" fill="#ffb454" font-size="15">полная энергия E</text>
+        fill="#D9B98C" fill-opacity=".22"/>
+  <path d="M400 500 H 640" stroke="#D9B98C" stroke-width="2" stroke-dasharray="8 5"/>
+  <text x="648" y="496" fill="#D9B98C" font-size="15">полная энергия E</text>
 
   <!-- кривая Леннард-Джонса (точные значения) -->
-  <polyline fill="none" stroke="#5fe0ff" stroke-width="3.5" filter="url(#glow)"
+  <polyline fill="none" stroke="#4FD8C4" stroke-width="3.5" filter="url(#glow)"
     points="419.3,328.2 425.8,430 432.3,499.6 438.9,546 445.4,575.6 452,593.1 458.5,602.1 465,605 471.6,603.6 478.1,599.4 484.7,593.2 491.2,585.9 497.8,577.9 504.3,569.6 510.8,561.2 517.4,553 523.9,545 530.5,537.3 537,530 543.6,523.1 550.1,516.7 556.6,510.6 563.2,505 569.7,499.7 576.3,494.8 582.8,490.3 589.3,486.1 595.9,482.2 602.4,478.5 615.5,472.1 628.6,466.6 641.7,461.9 654.8,457.8 667.9,454.3 680.9,451.3 694,448.7 707.1,446.5 720.2,444.6 733.3,442.9 746.4,441.4 759.4,440.2 772.5,439 785.6,438.1 798.7,437.2 811.8,436.5 837.9,435.2 864.1,434.2 890.3,433.5 916.4,432.9 942.6,432.4 968.8,432 995,431.7 1021.1,431.4 1047.3,431.2 1080,431"/>
 
   <!-- составляющие -->
-  <path d="M419 330 C 432 470, 445 560, 462 600" fill="none" stroke="#ff7ab6" stroke-width="2" stroke-dasharray="6 5" opacity=".8"/>
-  <text x="470" y="352" fill="#ff7ab6" font-size="15">отталкивание ~ r⁻¹²</text>
-  <path d="M470 690 C 560 640, 700 470, 1080 434" fill="none" stroke="#4cc58d" stroke-width="2" stroke-dasharray="6 5" opacity=".7"/>
-  <text x="700" y="672" fill="#4cc58d" font-size="15">притяжение ~ −r⁻⁶ (Лондон)</text>
+  <path d="M419 330 C 432 470, 445 560, 462 600" fill="none" stroke="#ABA6DC" stroke-width="2" stroke-dasharray="6 5" opacity=".8"/>
+  <text x="470" y="352" fill="#ABA6DC" font-size="15">отталкивание ~ r⁻¹²</text>
+  <path d="M470 690 C 560 640, 700 470, 1080 434" fill="none" stroke="#3FC9AE" stroke-width="2" stroke-dasharray="6 5" opacity=".7"/>
+  <text x="700" y="672" fill="#3FC9AE" font-size="15">притяжение ~ −r⁻⁶ (Лондон)</text>
 
   <!-- квантовые уровни -->
-  <g stroke="#ff7ab6">
+  <g stroke="#ABA6DC">
     <path d="M448 578 H 486" stroke-width="2.5"/><path d="M441 545 H 500" stroke-width="1.6" opacity=".55"/><path d="M436 512 H 512" stroke-width="1.6" opacity=".45"/>
   </g>
-  <text x="520" y="582" fill="#ff7ab6" font-size="14">n=0 · нулевая энергия</text>
+  <text x="520" y="582" fill="#ABA6DC" font-size="14">n=0 · нулевая энергия</text>
 
   <!-- маркер текущего состояния -->
-  <path d="M497 578 V 500" stroke="#ffb454" stroke-width="1.5" stroke-dasharray="4 4"/>
-  <circle cx="497" cy="578" r="8" fill="#fff" stroke="#5fe0ff" stroke-width="3" filter="url(#glow)"/>
-  <path d="M465 605 V 660" stroke="#5fe0ff" stroke-width="1.2" stroke-dasharray="3 4" opacity=".6"/>
-  <text x="465" y="682" fill="#5fe0ff" font-size="14" text-anchor="middle">r равн. = 2^⅙σ</text>
+  <path d="M497 578 V 500" stroke="#D9B98C" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <circle cx="497" cy="578" r="8" fill="#fff" stroke="#4FD8C4" stroke-width="3" filter="url(#glow)"/>
+  <path d="M465 605 V 660" stroke="#4FD8C4" stroke-width="1.2" stroke-dasharray="3 4" opacity=".6"/>
+  <text x="465" y="682" fill="#4FD8C4" font-size="14" text-anchor="middle">r равн. = 2^⅙σ</text>
 
   <!-- заголовки -->
-  <text x="48" y="64" fill="#ffb454" font-size="20" letter-spacing="6">LIBLABTAB · 08</text>
-  <text x="48" y="94" fill="#8ba3b8" font-size="16" letter-spacing="3">МОЛЕКУЛЯРНАЯ ФИЗИКА · ВАН-ДЕР-ВААЛЬС</text>
-  <text x="1152" y="716" fill="#5fe0ff" font-size="24" text-anchor="end" font-family="Unbounded, sans-serif" font-weight="600">V = 4ε[(σ/r)¹² − (σ/r)⁶]</text>
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 08</text>
+  <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">МОЛЕКУЛЯРНАЯ ФИЗИКА · ВАН-ДЕР-ВААЛЬС</text>
+  <text x="1152" y="716" fill="#4FD8C4" font-size="24" text-anchor="end" font-family="Unbounded, sans-serif" font-weight="600">V = 4ε[(σ/r)¹² − (σ/r)⁶]</text>
 
-  <g stroke="#78beff" stroke-opacity=".3" fill="none">
+  <g stroke="#7ED6C7" stroke-opacity=".3" fill="none">
     <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
   </g>
   <rect width="1200" height="750" fill="url(#vig)"/>

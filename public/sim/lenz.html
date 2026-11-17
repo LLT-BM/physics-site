@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <style>
   :root{
-    --ink:#eaf3fa; --mut:#8ba3b8; --line:rgba(130,200,255,.16);
-    --cyan:#54e8ff; --warm:#ffb454; --npole:#ff6a55; --spole:#5c8dff;
+    --ink:#E9F4F1; --mut:#8FA8A6; --line:rgba(126,214,199,.16);
+    --cyan:#54e8ff; --warm:#D9B98C; --npole:#D9B98C; --spole:#ABA6DC;
     --mono:'JetBrains Mono',monospace; --disp:'Unbounded',sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box}
@@ -20,10 +20,10 @@
     background:
       radial-gradient(1100px 700px at 78% 8%, rgba(255,170,80,.05), transparent 60%),
       radial-gradient(1200px 900px at 12% 92%, rgba(60,200,240,.08), transparent 60%),
-      radial-gradient(1600px 1200px at 50% 40%, #0b1626 0%, #070f1c 55%, #04070d 100%);}
+      radial-gradient(1600px 1200px at 50% 40%, #0b1626 0%, #070f1c 55%, #050D0E 100%);}
   .bg::after{content:'';position:absolute;inset:0;
-    background-image:linear-gradient(rgba(120,190,255,.05) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(120,190,255,.05) 1px,transparent 1px);
+    background-image:linear-gradient(rgba(126,214,199,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(126,214,199,.05) 1px,transparent 1px);
     background-size:48px 48px;
     -webkit-mask-image:radial-gradient(80% 75% at 50% 45%,#000 30%,transparent 100%);
             mask-image:radial-gradient(80% 75% at 50% 45%,#000 30%,transparent 100%);}
@@ -39,7 +39,7 @@
   header{position:fixed;top:22px;left:26px;z-index:5;pointer-events:none}
   .eyebrow{font:600 10px var(--mono);color:var(--warm);letter-spacing:.32em;text-transform:uppercase}
   h1{font:800 clamp(22px,3vw,34px)/1.05 var(--disp);letter-spacing:.02em;margin:8px 0 8px;
-    text-shadow:0 0 28px rgba(255,180,84,.22)}
+    text-shadow:0 0 28px rgba(217,185,140,.22)}
   .sub{display:flex;align-items:center;gap:8px;font:400 11px var(--mono);color:var(--mut)}
   .live{width:7px;height:7px;background:var(--warm);border-radius:50%;
     box-shadow:0 0 10px var(--warm);animation:pulse 1.7s ease-in-out infinite}
@@ -51,7 +51,7 @@
     clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)}
   .formula{font:600 21px var(--disp);letter-spacing:.02em;text-align:center;padding:6px 0 2px}
   .formula b{display:inline-block;color:#0a1220;background:var(--warm);border-radius:4px;
-    padding:0 7px;margin:0 3px;box-shadow:0 0 16px rgba(255,180,84,.45)}
+    padding:0 7px;margin:0 3px;box-shadow:0 0 16px rgba(217,185,140,.45)}
   .formula sub{font-size:11px;color:var(--mut)}
   .fnote{font:400 9.5px var(--mono);color:var(--mut);text-align:center;letter-spacing:.08em;margin-bottom:12px}
   .steps{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:13px}
@@ -64,7 +64,7 @@
   li[data-st=down] b{color:var(--cyan)}
   li[data-st=zero] b{color:var(--mut)}
   li[data-st=up],li[data-st=down]{border-color:rgba(255,200,130,.3)}
-  .meters{border-top:1px dashed rgba(130,200,255,.22);padding-top:11px}
+  .meters{border-top:1px dashed rgba(126,214,199,.22);padding-top:11px}
   .mrow{display:flex;align-items:center;gap:9px;margin-bottom:9px}
   .mlab{font:600 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);width:58px}
   .bar{flex:1;height:8px;background:rgba(8,16,28,.9);border:1px solid var(--line);overflow:hidden}
@@ -90,12 +90,12 @@
   .tgl:hover{color:var(--ink);border-color:rgba(150,220,255,.4);transform:translateY(-1px)}
   .tgl.on{color:var(--cyan);border-color:rgba(84,232,255,.5);
     box-shadow:inset 0 0 12px rgba(84,232,255,.08),0 0 10px rgba(84,232,255,.12)}
-  .tgl.main.on{color:var(--warm);border-color:rgba(255,180,84,.55);
-    box-shadow:inset 0 0 12px rgba(255,180,84,.1),0 0 10px rgba(255,180,84,.15)}
-  #btnFlip{color:var(--warm);border-color:rgba(255,180,84,.35)}
-  #btnFlip:hover{box-shadow:0 0 14px rgba(255,180,84,.25)}
+  .tgl.main.on{color:var(--warm);border-color:rgba(217,185,140,.55);
+    box-shadow:inset 0 0 12px rgba(217,185,140,.1),0 0 10px rgba(217,185,140,.15)}
+  #btnFlip{color:var(--warm);border-color:rgba(217,185,140,.35)}
+  #btnFlip:hover{box-shadow:0 0 14px rgba(217,185,140,.25)}
   .flash{animation:flash .4s}
-  @keyframes flash{0%{box-shadow:0 0 0 rgba(255,180,84,0)}40%{box-shadow:0 0 22px rgba(255,180,84,.7)}100%{box-shadow:0 0 0 rgba(255,180,84,0)}}
+  @keyframes flash{0%{box-shadow:0 0 0 rgba(217,185,140,0)}40%{box-shadow:0 0 22px rgba(217,185,140,.7)}100%{box-shadow:0 0 0 rgba(217,185,140,0)}}
   .spd{display:flex;align-items:center;gap:8px}
   .spd .lbl{font:600 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
   .spd b{font:600 10.5px var(--mono);color:var(--cyan);min-width:48px}
@@ -268,7 +268,7 @@ function drawCoil(g,In,dirB){
     ctx.strokeStyle='rgba(150,96,48,.5)';
     ctx.beginPath();ctx.ellipse(x,g.axisY,g.rx,g.ry,0,Math.PI/2,Math.PI*1.5);ctx.stroke();
     const grd=ctx.createLinearGradient(0,g.axisY-g.ry,0,g.axisY+g.ry);
-    grd.addColorStop(0,'#f0b070');grd.addColorStop(.5,'#c97f3e');grd.addColorStop(1,'#8a5326');
+    grd.addColorStop(0,'#D8B98C');grd.addColorStop(.5,'#B08A5C');grd.addColorStop(1,'#6E5636');
     ctx.strokeStyle=grd;
     ctx.beginPath();ctx.ellipse(x,g.axisY,g.rx,g.ry,0,Math.PI*1.5,Math.PI*2.5);ctx.stroke();
   }
@@ -321,7 +321,7 @@ function drawMagnet(g,now){
   ctx.save();
   ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=18;ctx.shadowOffsetY=10;
   rr(x0,y0,g.LW,g.LH,9);ctx.clip();
-  const blue=['#8ab6ff','#2f5cc4'], red=['#ff8a6e','#c23726'];
+  const blue=['#8ab6ff','#2f5cc4'], red=['#ff8a6e','#D9B98C'];
   const lc=nRight?blue:red, rc=nRight?red:blue;
   let grd=ctx.createLinearGradient(0,y0,0,y0+g.LH);
   grd.addColorStop(0,lc[0]);grd.addColorStop(1,lc[1]);
@@ -359,7 +359,7 @@ function drawWires(g,In,dt){
   const leadL=[[g.coilLeft,g.axisY+g.ry],[g.coilLeft,ty],[tL.x,ty],[tL.x,tL.y]];
   const leadR=[[g.coilRight,g.axisY+g.ry],[g.coilRight,ty-10],[tR.x,ty-10],[tR.x,tR.y]];
   for(const p of[leadL,leadR]){
-    ctx.strokeStyle='#28405c';ctx.lineWidth=3;ctx.lineJoin='round';
+    ctx.strokeStyle='#2A3A38';ctx.lineWidth=3;ctx.lineJoin='round';
     ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();
   }
   if(S.show.current&&Math.abs(In)>0.05){
@@ -380,31 +380,31 @@ function drawMeter(g){
   rr(mCx-mw/2,mCy-mh/2,mw,mh,10);ctx.fillStyle='#0f1b2b';ctx.fill();
   ctx.restore();
   rr(mCx-mw/2,mCy-mh/2,mw,mh,10);
-  ctx.strokeStyle='rgba(130,200,255,.25)';ctx.lineWidth=1;ctx.stroke();
+  ctx.strokeStyle='rgba(126,214,199,.25)';ctx.lineWidth=1;ctx.stroke();
   const dw=mw*0.84,dh=mh*0.62,dx=mCx-dw/2,dy=mCy-mh/2+mh*0.12;
-  rr(dx,dy,dw,dh,7);ctx.fillStyle='#f2e8d5';ctx.fill();
+  rr(dx,dy,dw,dh,7);ctx.fillStyle='#EFE6D6';ctx.fill();
   const pivX=mCx,pivY=dy+dh*0.95,R=dh*0.82;
   for(let a=-60;a<=60;a+=10){
     const rad=(a-90)*Math.PI/180, major=a%30===0;
     const r1=R*(major?0.80:0.87),r2=R*0.95;
-    ctx.strokeStyle=a===0?'#22323f':'#7a8994';ctx.lineWidth=major?2:1;
+    ctx.strokeStyle=a===0?'#232E2C':'#7a8994';ctx.lineWidth=major?2:1;
     ctx.beginPath();
     ctx.moveTo(pivX+r1*Math.cos(rad),pivY+r1*Math.sin(rad));
     ctx.lineTo(pivX+r2*Math.cos(rad),pivY+r2*Math.sin(rad));ctx.stroke();
   }
-  ctx.fillStyle='#43525d';ctx.font='700 '+Math.round(mw*0.085)+'px "JetBrains Mono",monospace';
+  ctx.fillStyle='#46524F';ctx.font='700 '+Math.round(mw*0.085)+'px "JetBrains Mono",monospace';
   ctx.textAlign='center';
   ctx.fillText('−',pivX-R*0.6,pivY-R*0.28);
   ctx.fillText('+',pivX+R*0.6,pivY-R*0.28);
   ctx.font='600 '+Math.round(mw*0.062)+'px "JetBrains Mono",monospace';
   ctx.fillText('мкА',pivX,pivY-R*0.42);
   const ang=(clamp(S.needle,-1.15,1.15)*55-90)*Math.PI/180;
-  ctx.strokeStyle='#c93a2e';ctx.lineWidth=2.5;
+  ctx.strokeStyle='#B08A5C';ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(pivX-10*Math.cos(ang),pivY-10*Math.sin(ang));
   ctx.lineTo(pivX+R*0.92*Math.cos(ang),pivY+R*0.92*Math.sin(ang));ctx.stroke();
-  ctx.beginPath();ctx.arc(pivX,pivY,4.5,0,TAU);ctx.fillStyle='#22323f';ctx.fill();
+  ctx.beginPath();ctx.arc(pivX,pivY,4.5,0,TAU);ctx.fillStyle='#232E2C';ctx.fill();
   ctx.font='600 '+Math.round(mw*0.058)+'px "JetBrains Mono",monospace';
-  ctx.fillStyle='rgba(139,163,184,.85)';
+  ctx.fillStyle='rgba(143,168,166,.85)';
   ctx.fillText('ГАЛЬВАНОМЕТР',mCx,mCy+mh*0.38);
   ctx.textAlign='left';
   for(const tx of[mCx-mw*0.22,mCx+mw*0.22]){
@@ -555,8 +555,8 @@ function frame(now){
   if(S.show.force&&Math.abs(In)>0.06&&Math.abs(S.vS)>14){
     const len=clamp(30+70*Math.abs(In),30,100)*-Math.sign(S.vS);
     const y=geo.axisY-geo.LH/2-18;
-    arrow(S.mx-geo.LW/2,y,S.mx-geo.LW/2+len,y,'#ffb454',2.5,10);
-    ctx.font='600 11px "JetBrains Mono",monospace';ctx.fillStyle='#ffb454';
+    arrow(S.mx-geo.LW/2,y,S.mx-geo.LW/2+len,y,'#D9B98C',2.5,10);
+    ctx.font='600 11px "JetBrains Mono",monospace';ctx.fillStyle='#D9B98C';
     ctx.fillText('F',S.mx-geo.LW/2+len/2-4,y-9);
   }
   drawMeter(geo);

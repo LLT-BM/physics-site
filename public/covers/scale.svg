@@ -1,22 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0c1930"/><stop offset=".55" stop-color="#070f1d"/><stop offset="1" stop-color="#04070d"/>
+      <stop offset="0" stop-color="#0E2226"/><stop offset=".55" stop-color="#0A171A"/><stop offset="1" stop-color="#050D0E"/>
     </linearGradient>
     <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
-      <path d="M46 0H0V46" fill="none" stroke="#78beff" stroke-opacity=".06"/>
+      <path d="M46 0H0V46" fill="none" stroke="#7ED6C7" stroke-opacity=".06"/>
     </pattern>
     <radialGradient id="vig" cx=".5" cy=".5" r=".8">
       <stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>
     </radialGradient>
     <radialGradient id="sunG" cx=".35" cy=".32" r=".85">
-      <stop offset="0" stop-color="#fff8e6"/><stop offset=".4" stop-color="#ffb454"/><stop offset="1" stop-color="#4a2c06"/>
+      <stop offset="0" stop-color="#F7F2E6"/><stop offset=".4" stop-color="#D9B98C"/><stop offset="1" stop-color="#4a2c06"/>
     </radialGradient>
     <radialGradient id="earthG" cx=".35" cy=".32" r=".85">
-      <stop offset="0" stop-color="#dff6ff"/><stop offset=".4" stop-color="#5fe0ff"/><stop offset="1" stop-color="#08283a"/>
+      <stop offset="0" stop-color="#DFF6F0"/><stop offset=".4" stop-color="#4FD8C4"/><stop offset="1" stop-color="#0A2E2C"/>
     </radialGradient>
     <radialGradient id="halo" cx=".5" cy=".5" r=".5">
-      <stop offset=".35" stop-color="#ffb454" stop-opacity=".3"/><stop offset="1" stop-color="#ffb454" stop-opacity="0"/>
+      <stop offset=".35" stop-color="#D9B98C" stop-opacity=".3"/><stop offset="1" stop-color="#D9B98C" stop-opacity="0"/>
     </radialGradient>
     <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
       <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -26,8 +26,8 @@
   <rect width="1200" height="750" fill="url(#grid)"/>
 
   <!-- логарифмическая ось -->
-  <line x1="70" y1="520" x2="1130" y2="520" stroke="#78beff" stroke-opacity=".45" stroke-width="2"/>
-  <g stroke="#78beff" stroke-opacity=".45" fill="#8ba3b8" font-size="14" text-anchor="middle">
+  <line x1="70" y1="520" x2="1130" y2="520" stroke="#7ED6C7" stroke-opacity=".45" stroke-width="2"/>
+  <g stroke="#7ED6C7" stroke-opacity=".45" fill="#8FA8A6" font-size="14" text-anchor="middle">
     <path d="M110 512v16"/><text x="110" y="552">10⁻³⁵</text>
     <path d="M250 512v16"/><text x="250" y="552">10⁻¹⁵</text>
     <path d="M390 512v16"/><text x="390" y="552">10⁻¹⁰</text>
@@ -37,87 +37,87 @@
     <path d="M950 512v16"/><text x="950" y="552">10⁹</text>
     <path d="M1090 512v16"/><text x="1090" y="552">10²⁷</text>
   </g>
-  <text x="1130" y="580" fill="#8ba3b8" font-size="14" text-anchor="end">метры</text>
+  <text x="1130" y="580" fill="#8FA8A6" font-size="14" text-anchor="end">метры</text>
 
   <!-- планковская пена -->
-  <g stroke="#ff7ab6" fill="none" filter="url(#glow)">
+  <g stroke="#ABA6DC" fill="none" filter="url(#glow)">
     <circle cx="96" cy="470" r="5"/><circle cx="110" cy="462" r="5"/><circle cx="124" cy="472" r="5"/>
     <circle cx="103" cy="482" r="5"/><circle cx="118" cy="484" r="5"/>
   </g>
-  <text x="110" y="430" fill="#ff7ab6" font-size="13" text-anchor="middle">Планк</text>
+  <text x="110" y="430" fill="#ABA6DC" font-size="13" text-anchor="middle">Планк</text>
 
   <!-- протон -->
   <g filter="url(#glow)">
-    <circle cx="238" cy="466" r="10" fill="#ff9ad0"/><circle cx="256" cy="462" r="10" fill="#eaf3fa"/><circle cx="248" cy="480" r="10" fill="#ff9ad0"/>
+    <circle cx="238" cy="466" r="10" fill="#C3BEE8"/><circle cx="256" cy="462" r="10" fill="#E9F4F1"/><circle cx="248" cy="480" r="10" fill="#C3BEE8"/>
   </g>
-  <text x="248" y="424" fill="#ff9ad0" font-size="13" text-anchor="middle">протон</text>
+  <text x="248" y="424" fill="#C3BEE8" font-size="13" text-anchor="middle">протон</text>
 
   <!-- атом -->
   <g transform="translate(390,455)">
-    <g stroke="#c9a0ff" fill="none" stroke-width="1.8" opacity=".9">
+    <g stroke="#B7A9E0" fill="none" stroke-width="1.8" opacity=".9">
       <ellipse rx="34" ry="13"/><ellipse rx="34" ry="13" transform="rotate(60)"/><ellipse rx="34" ry="13" transform="rotate(120)"/>
     </g>
-    <circle r="7" fill="#ffb454" filter="url(#glow)"/>
-    <circle cx="33" cy="4" r="4" fill="#c9a0ff"/><circle cx="-17" cy="-28" r="4" fill="#c9a0ff"/>
+    <circle r="7" fill="#D9B98C" filter="url(#glow)"/>
+    <circle cx="33" cy="4" r="4" fill="#B7A9E0"/><circle cx="-17" cy="-28" r="4" fill="#B7A9E0"/>
   </g>
-  <text x="390" y="404" fill="#c9a0ff" font-size="13" text-anchor="middle">атом</text>
+  <text x="390" y="404" fill="#B7A9E0" font-size="13" text-anchor="middle">атом</text>
 
   <!-- клетка -->
   <g transform="translate(530,452)">
-    <circle r="28" fill="#5fe0ff" opacity=".22"/><circle r="28" fill="none" stroke="#5fe0ff" stroke-width="2"/>
-    <circle cx="5" cy="-4" r="10" fill="#ff7ab6" filter="url(#glow)"/>
-    <ellipse cx="-14" cy="10" rx="7" ry="4" fill="#5fe0ff"/><ellipse cx="14" cy="12" rx="7" ry="4" fill="#5fe0ff"/>
+    <circle r="28" fill="#4FD8C4" opacity=".22"/><circle r="28" fill="none" stroke="#4FD8C4" stroke-width="2"/>
+    <circle cx="5" cy="-4" r="10" fill="#ABA6DC" filter="url(#glow)"/>
+    <ellipse cx="-14" cy="10" rx="7" ry="4" fill="#4FD8C4"/><ellipse cx="14" cy="12" rx="7" ry="4" fill="#4FD8C4"/>
   </g>
-  <text x="530" y="404" fill="#5fe0ff" font-size="13" text-anchor="middle">клетка</text>
+  <text x="530" y="404" fill="#4FD8C4" font-size="13" text-anchor="middle">клетка</text>
 
   <!-- человек -->
-  <g transform="translate(670,452)" fill="#4cc58d" stroke="#4cc58d" filter="url(#glow)">
+  <g transform="translate(670,452)" fill="#3FC9AE" stroke="#3FC9AE" filter="url(#glow)">
     <circle cx="0" cy="-34" r="8" stroke="none"/>
     <path d="M-9 -24 L9 -24 L7 4 L-7 4 Z" stroke="none"/>
     <g stroke-width="5" fill="none"><path d="M-4 4 L-8 32"/><path d="M4 4 L8 32"/><path d="M-8 -20 L-20 2"/><path d="M8 -20 L20 2"/></g>
   </g>
-  <text x="670" y="392" fill="#4cc58d" font-size="13" text-anchor="middle">человек · 1,7 м</text>
+  <text x="670" y="392" fill="#3FC9AE" font-size="13" text-anchor="middle">человек · 1,7 м</text>
 
   <!-- Земля -->
   <circle cx="810" cy="452" r="40" fill="url(#earthG)" filter="url(#glow)"/>
-  <text x="810" y="392" fill="#5fe0ff" font-size="13" text-anchor="middle">Земля</text>
+  <text x="810" y="392" fill="#4FD8C4" font-size="13" text-anchor="middle">Земля</text>
 
   <!-- Солнце -->
   <circle cx="950" cy="446" r="86" fill="url(#halo)"/>
   <circle cx="950" cy="446" r="54" fill="url(#sunG)" filter="url(#glow)"/>
-  <text x="950" y="368" fill="#ffb454" font-size="13" text-anchor="middle">Солнце</text>
+  <text x="950" y="368" fill="#D9B98C" font-size="13" text-anchor="middle">Солнце</text>
 
   <!-- Вселенная: космическая паутина -->
   <g transform="translate(1090,430)">
-    <g stroke="#e0e6ff" stroke-opacity=".5" stroke-width="1">
+    <g stroke="#DCEFEA" stroke-opacity=".5" stroke-width="1">
       <path d="M-46 -30 L-10 -6 L28 -34 L46 4 L10 26 L-24 34 L-46 -30"/>
       <path d="M-10 -6 L10 26"/><path d="M-10 -6 L46 4"/><path d="M28 -34 L-24 34"/>
     </g>
-    <g fill="#e0e6ff" filter="url(#glow)">
+    <g fill="#DCEFEA" filter="url(#glow)">
       <circle cx="-46" cy="-30" r="4"/><circle cx="-10" cy="-6" r="6"/><circle cx="28" cy="-34" r="4"/>
       <circle cx="46" cy="4" r="5"/><circle cx="10" cy="26" r="4"/><circle cx="-24" cy="34" r="4"/>
     </g>
   </g>
-  <text x="1090" y="352" fill="#e0e6ff" font-size="13" text-anchor="middle">Вселенная</text>
+  <text x="1090" y="352" fill="#DCEFEA" font-size="13" text-anchor="middle">Вселенная</text>
 
   <!-- окно просмотра -->
-  <rect x="612" y="330" width="118" height="180" fill="#ffb454" fill-opacity=".1" stroke="#ffb454" stroke-width="1.5" stroke-dasharray="6 5"/>
-  <text x="671" y="322" fill="#ffb454" font-size="12" text-anchor="middle">окно просмотра</text>
+  <rect x="612" y="330" width="118" height="180" fill="#D9B98C" fill-opacity=".1" stroke="#D9B98C" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="671" y="322" fill="#D9B98C" font-size="12" text-anchor="middle">окно просмотра</text>
 
   <!-- полоса-лестница -->
-  <rect x="70" y="620" width="1060" height="30" rx="8" fill="#05080f" stroke="#78beff" stroke-opacity=".25"/>
-  <g fill="#78beff" fill-opacity=".5">
+  <rect x="70" y="620" width="1060" height="30" rx="8" fill="#071012" stroke="#7ED6C7" stroke-opacity=".25"/>
+  <g fill="#7ED6C7" fill-opacity=".5">
     <rect x="110" y="628" width="2" height="14"/><rect x="250" y="628" width="2" height="14"/><rect x="390" y="628" width="2" height="14"/>
     <rect x="530" y="628" width="2" height="14"/><rect x="810" y="628" width="2" height="14"/><rect x="950" y="628" width="2" height="14"/><rect x="1090" y="628" width="2" height="14"/>
   </g>
-  <rect x="664" y="622" width="14" height="26" fill="#ffb454" fill-opacity=".25" stroke="#ffb454"/>
-  <text x="600" y="682" fill="#8ba3b8" font-size="14" text-anchor="middle">62 порядка масштаба на одной ленте</text>
+  <rect x="664" y="622" width="14" height="26" fill="#D9B98C" fill-opacity=".25" stroke="#D9B98C"/>
+  <text x="600" y="682" fill="#8FA8A6" font-size="14" text-anchor="middle">62 порядка масштаба на одной ленте</text>
 
-  <text x="48" y="64" fill="#ffb454" font-size="20" letter-spacing="6">LIBLABTAB · 09</text>
-  <text x="48" y="94" fill="#8ba3b8" font-size="16" letter-spacing="3">МАСШТАБЫ ВСЕЛЕННОЙ · ЛОГАРИФМИЧЕСКАЯ ШКАЛА</text>
-  <text x="48" y="150" fill="#5fe0ff" font-size="26" font-family="Unbounded, sans-serif" font-weight="800">от 10⁻³⁵ до 10²⁷ м</text>
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 09</text>
+  <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">МАСШТАБЫ ВСЕЛЕННОЙ · ЛОГАРИФМИЧЕСКАЯ ШКАЛА</text>
+  <text x="48" y="150" fill="#4FD8C4" font-size="26" font-family="Unbounded, sans-serif" font-weight="800">от 10⁻³⁵ до 10²⁷ м</text>
 
-  <g stroke="#78beff" stroke-opacity=".3" fill="none">
+  <g stroke="#7ED6C7" stroke-opacity=".3" fill="none">
     <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
   </g>
   <rect width="1200" height="750" fill="url(#vig)"/>

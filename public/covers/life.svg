@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="JetBrains Mono, Consolas, monospace">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0c1930"/><stop offset=".55" stop-color="#070f1d"/><stop offset="1" stop-color="#04070d"/>
+      <stop offset="0" stop-color="#0E2226"/><stop offset=".55" stop-color="#0A171A"/><stop offset="1" stop-color="#050D0E"/>
     </linearGradient>
     <pattern id="cells" width="50" height="50" patternUnits="userSpaceOnUse">
-      <rect x="1" y="1" width="48" height="48" fill="none" stroke="#78beff" stroke-opacity=".08"/>
+      <rect x="1" y="1" width="48" height="48" fill="none" stroke="#7ED6C7" stroke-opacity=".08"/>
     </pattern>
     <radialGradient id="vig" cx=".5" cy=".45" r=".8">
       <stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/>
@@ -18,57 +18,57 @@
 
   <!-- окрестность Мура 3x3: три живых соседа -> рождение в центре -->
   <g transform="translate(120,250)">
-    <rect x="-14" y="-14" width="178" height="178" rx="10" fill="none" stroke="#ffb454" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 6"/>
+    <rect x="-14" y="-14" width="178" height="178" rx="10" fill="none" stroke="#D9B98C" stroke-opacity=".55" stroke-width="2" stroke-dasharray="6 6"/>
     <g filter="url(#glow)">
-      <rect x="0"   y="0"  width="46" height="46" rx="5" fill="#5fe0ff"/>
-      <rect x="100" y="0"  width="46" height="46" rx="5" fill="#5fe0ff"/>
-      <rect x="50"  y="100" width="46" height="46" rx="5" fill="#5fe0ff"/>
+      <rect x="0"   y="0"  width="46" height="46" rx="5" fill="#4FD8C4"/>
+      <rect x="100" y="0"  width="46" height="46" rx="5" fill="#4FD8C4"/>
+      <rect x="50"  y="100" width="46" height="46" rx="5" fill="#4FD8C4"/>
     </g>
-    <rect x="50" y="50" width="46" height="46" rx="5" fill="none" stroke="#ffb454" stroke-width="2.5"/>
-    <circle cx="73" cy="73" r="9" fill="#ffb454" filter="url(#glow)"/>
-    <text x="73" y="200" fill="#ffb454" font-size="17" text-anchor="middle">3 соседа → рождение</text>
-    <text x="73" y="-28" fill="#8ba3b8" font-size="15" text-anchor="middle">окрестность Мура</text>
+    <rect x="50" y="50" width="46" height="46" rx="5" fill="none" stroke="#D9B98C" stroke-width="2.5"/>
+    <circle cx="73" cy="73" r="9" fill="#D9B98C" filter="url(#glow)"/>
+    <text x="73" y="200" fill="#D9B98C" font-size="17" text-anchor="middle">3 соседа → рождение</text>
+    <text x="73" y="-28" fill="#8FA8A6" font-size="15" text-anchor="middle">окрестность Мура</text>
   </g>
 
   <!-- планер со следом (движение по диагонали) -->
   <g transform="translate(640,230)">
-    <g fill="#5fe0ff" opacity=".14">
+    <g fill="#4FD8C4" opacity=".14">
       <rect x="-100" y="-100" width="42" height="42" rx="5"/><rect x="-50" y="-50" width="42" height="42" rx="5"/><rect x="-150" y="-50" width="42" height="42" rx="5"/><rect x="-100" y="0" width="42" height="42" rx="5"/><rect x="-50" y="0" width="42" height="42" rx="5"/>
     </g>
-    <g fill="#5fe0ff" opacity=".3">
+    <g fill="#4FD8C4" opacity=".3">
       <rect x="-50" y="-50" width="42" height="42" rx="5"/><rect x="0" y="0" width="42" height="42" rx="5"/><rect x="-100" y="0" width="42" height="42" rx="5"/><rect x="-50" y="50" width="42" height="42" rx="5"/><rect x="0" y="50" width="42" height="42" rx="5"/>
     </g>
-    <g filter="url(#glow)" fill="#5fe0ff">
+    <g filter="url(#glow)" fill="#4FD8C4">
       <rect x="50" y="0" width="42" height="42" rx="5"/>
       <rect x="100" y="50" width="42" height="42" rx="5"/>
       <rect x="0" y="100" width="42" height="42" rx="5"/>
       <rect x="50" y="100" width="42" height="42" rx="5"/>
       <rect x="100" y="100" width="42" height="42" rx="5"/>
     </g>
-    <path d="M-40 -40 L 60 60" stroke="#ffb454" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>
-    <path d="M60 60 l-16 -4 l4 16 z" fill="#ffb454"/>
-    <text x="70" y="190" fill="#8ba3b8" font-size="16" text-anchor="middle">планер · c/4 по диагонали</text>
+    <path d="M-40 -40 L 60 60" stroke="#D9B98C" stroke-width="2.5" stroke-dasharray="7 6" fill="none"/>
+    <path d="M60 60 l-16 -4 l4 16 z" fill="#D9B98C"/>
+    <text x="70" y="190" fill="#8FA8A6" font-size="16" text-anchor="middle">планер · c/4 по диагонали</text>
   </g>
 
   <!-- маяк: устойчивый блок + мигалка -->
   <g transform="translate(960,470)" filter="url(#glow)">
-    <rect x="0" y="0" width="34" height="34" rx="4" fill="#ff7ab6"/><rect x="40" y="0" width="34" height="34" rx="4" fill="#ff7ab6"/>
-    <rect x="0" y="40" width="34" height="34" rx="4" fill="#ff7ab6"/><rect x="40" y="40" width="34" height="34" rx="4" fill="#ff7ab6"/>
+    <rect x="0" y="0" width="34" height="34" rx="4" fill="#ABA6DC"/><rect x="40" y="0" width="34" height="34" rx="4" fill="#ABA6DC"/>
+    <rect x="0" y="40" width="34" height="34" rx="4" fill="#ABA6DC"/><rect x="40" y="40" width="34" height="34" rx="4" fill="#ABA6DC"/>
   </g>
-  <text x="997" y="580" fill="#8ba3b8" font-size="15" text-anchor="middle">блок · устойчив</text>
+  <text x="997" y="580" fill="#8FA8A6" font-size="15" text-anchor="middle">блок · устойчив</text>
   <g transform="translate(400,540)" filter="url(#glow)">
-    <rect x="0" y="0" width="34" height="34" rx="4" fill="#ffb454"/>
-    <rect x="40" y="0" width="34" height="34" rx="4" fill="#ffb454"/>
-    <rect x="80" y="0" width="34" height="34" rx="4" fill="#ffb454"/>
+    <rect x="0" y="0" width="34" height="34" rx="4" fill="#D9B98C"/>
+    <rect x="40" y="0" width="34" height="34" rx="4" fill="#D9B98C"/>
+    <rect x="80" y="0" width="34" height="34" rx="4" fill="#D9B98C"/>
   </g>
-  <text x="457" y="610" fill="#8ba3b8" font-size="15" text-anchor="middle">мигалка · период 2</text>
+  <text x="457" y="610" fill="#8FA8A6" font-size="15" text-anchor="middle">мигалка · период 2</text>
 
   <!-- заголовки -->
-  <text x="48" y="64" fill="#ffb454" font-size="20" letter-spacing="6">LIBLABTAB · 07</text>
-  <text x="48" y="94" fill="#8ba3b8" font-size="16" letter-spacing="3">КЛЕТОЧНЫЕ АВТОМАТЫ · САМООРГАНИЗАЦИЯ</text>
-  <text x="1152" y="700" fill="#5fe0ff" font-size="30" text-anchor="end" font-family="Unbounded, sans-serif" font-weight="800">B3/S23</text>
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 07</text>
+  <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">КЛЕТОЧНЫЕ АВТОМАТЫ · САМООРГАНИЗАЦИЯ</text>
+  <text x="1152" y="700" fill="#4FD8C4" font-size="30" text-anchor="end" font-family="Unbounded, sans-serif" font-weight="800">B3/S23</text>
 
-  <g stroke="#78beff" stroke-opacity=".3" fill="none">
+  <g stroke="#7ED6C7" stroke-opacity=".3" fill="none">
     <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>
   </g>
   <rect width="1200" height="750" fill="url(#vig)"/>

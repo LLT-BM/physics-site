@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <style>
 :root{
-  --bg:#070c15; --grid:rgba(120,190,255,.05); --surface:#0d1626; --ink:#eaf3fa; --muted:#8ba3b8; --line:rgba(130,200,255,.16);
-  --cyan:#5fe0ff; --amber:#ffb454; --pink:#ff7ab6; --ok:#4cc58d; --warn:#ff7a6e; --on:#07121c;
+  --bg:#0A1417; --grid:rgba(126,214,199,.05); --surface:#102024; --ink:#E9F4F1; --muted:#8FA8A6; --line:rgba(126,214,199,.16);
+  --cyan:#4FD8C4; --amber:#D9B98C; --pink:#ABA6DC; --ok:#3FC9AE; --warn:#D69FA9; --on:#06110F;
   --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -24,7 +24,7 @@ h1{font:800 1.7rem/1.15 var(--disp);margin:0 0 8px;letter-spacing:-.01em}
 .lead b{color:var(--ink);font-family:var(--mono);white-space:nowrap}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
 .holder{position:relative}
-canvas#field{display:block;width:100%;border-radius:10px;background:#05080f;touch-action:none;cursor:crosshair}
+canvas#field{display:block;width:100%;border-radius:10px;background:#071012;touch-action:none;cursor:crosshair}
 canvas#graph{display:block;width:100%;height:56px;margin-top:10px;border-radius:8px;background:rgba(0,0,0,.28)}
 .note{margin:8px 2px 0;font-size:.85rem;color:var(--muted)}
 .status{margin-top:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-family:var(--mono);font-size:.9rem;font-weight:600}
@@ -87,10 +87,10 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
     <div id="status" class="status" aria-live="polite"></div>
     <canvas id="graph" aria-label="График численности по поколениям"></canvas>
     <div class="legend">
-      <span><i style="background:#5fe0ff"></i>новорождённая</span>
-      <span><i style="background:#ffb454"></i>живёт давно</span>
-      <span><i style="background:#ff7ab6"></i>долгожитель</span>
-      <span><i style="background:rgba(95,224,255,.28)"></i>след погибшей</span>
+      <span><i style="background:#4FD8C4"></i>новорождённая</span>
+      <span><i style="background:#D9B98C"></i>живёт давно</span>
+      <span><i style="background:#ABA6DC"></i>долгожитель</span>
+      <span><i style="background:rgba(79,216,196,.28)"></i>след погибшей</span>
     </div>
     <p class="note">Рисуйте левой кнопкой (или пальцем), стирайте правой кнопкой или в режиме «Стереть». Горячие клавиши: <kbd>Пробел</kbd> пуск/пауза, <kbd>S</kbd> шаг, <kbd>C</kbd> очистить, <kbd>R</kbd> случайное поле.</p>
   </section>
@@ -244,14 +244,14 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
     gridCv.width=Math.max(1,W*dpr); gridCv.height=Math.max(1,H*dpr);
     gxx.setTransform(dpr,0,0,dpr,0,0);
     gxx.clearRect(0,0,W,H);
-    gxx.fillStyle='#05080f'; gxx.fillRect(0,0,W,H);
+    gxx.fillStyle='#071012'; gxx.fillRect(0,0,W,H);
     if(gridOn&&cs>=6){
-      gxx.strokeStyle='rgba(120,190,255,.07)'; gxx.lineWidth=1; gxx.beginPath();
+      gxx.strokeStyle='rgba(126,214,199,.07)'; gxx.lineWidth=1; gxx.beginPath();
       for(var x=0;x<=cols;x++){ var px=ox+x*cs+.5; gxx.moveTo(px,oy); gxx.lineTo(px,oy+rows*cs); }
       for(var y=0;y<=rows;y++){ var py=oy+y*cs+.5; gxx.moveTo(ox,py); gxx.lineTo(ox+cols*cs,py); }
       gxx.stroke();
     }
-    gxx.strokeStyle='rgba(130,200,255,.22)'; gxx.lineWidth=1;
+    gxx.strokeStyle='rgba(126,214,199,.22)'; gxx.lineWidth=1;
     gxx.strokeRect(ox+.5,oy+.5,cols*cs-1,rows*cs-1);
   }
   function resize(){
@@ -323,7 +323,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   var palette=[];
   (function(){
     function mix(a,b,t){ return [Math.round(a[0]+(b[0]-a[0])*t),Math.round(a[1]+(b[1]-a[1])*t),Math.round(a[2]+(b[2]-a[2])*t)]; }
-    var C=[95,224,255],A=[255,180,84],P=[255,122,182];
+    var C=[79,216,196],A=[217,185,140],P=[171,166,220];
     for(var i=0;i<64;i++){
       var c = i<8 ? mix(C,A,i/8) : (i<32 ? A : mix(A,P,Math.min(1,(i-32)/24)));
       palette.push('rgb('+c[0]+','+c[1]+','+c[2]+')');
@@ -336,7 +336,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
     if(trails){
       for(var i=0;i<fade.length;i++){
         if(fade[i]>0.03&&!cur[i]){
-          ctx.fillStyle='rgba(95,224,255,'+(fade[i]*0.3).toFixed(3)+')';
+          ctx.fillStyle='rgba(79,216,196,'+(fade[i]*0.3).toFixed(3)+')';
           ctx.fillRect(ox+(i%cols)*cs,oy+Math.floor(i/cols)*cs,s,s);
         }
       }
@@ -344,20 +344,20 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
     for(var y=0;y<rows;y++) for(var x=0;x<cols;x++){
       var i=y*cols+x;
       if(cur[i]){
-        ctx.fillStyle = ageCol ? palette[Math.min(63,age[i])] : '#5fe0ff';
+        ctx.fillStyle = ageCol ? palette[Math.min(63,age[i])] : '#4FD8C4';
         ctx.fillRect(ox+x*cs,oy+y*cs,s,s);
       }
     }
     if(stamp&&hover&&hover.inside){
       var x0=hover.x-Math.floor(stamp.w/2), y0=hover.y-Math.floor(stamp.h/2);
-      ctx.fillStyle='rgba(255,180,84,.42)';
+      ctx.fillStyle='rgba(217,185,140,.42)';
       stamp.pts.forEach(function(q){
         var x=x0+q[0],y=y0+q[1];
         if(wrap){x=(x+cols)%cols;y=(y+rows)%rows;}
         if(x>=0&&y>=0&&x<cols&&y<rows) ctx.fillRect(ox+x*cs,oy+y*cs,s,s);
       });
     } else if(hover&&hover.inside&&mode!=='stamp'){
-      ctx.strokeStyle=mode==='erase'?'rgba(255,122,110,.9)':'rgba(95,224,255,.9)';
+      ctx.strokeStyle=mode==='erase'?'rgba(214,159,169,.9)':'rgba(79,216,196,.9)';
       ctx.lineWidth=1.5; ctx.strokeRect(ox+hover.x*cs+.5,oy+hover.y*cs+.5,cs-1,cs-1);
     }
     drawGraph();
@@ -366,20 +366,20 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   function drawGraph(){
     var w=W,h=56;
     gctx.clearRect(0,0,w,h);
-    if(pops.length<2){ gctx.fillStyle='rgba(139,163,184,.7)'; gctx.font='11px JetBrains Mono, monospace';
+    if(pops.length<2){ gctx.fillStyle='rgba(143,168,166,.7)'; gctx.font='11px JetBrains Mono, monospace';
       gctx.fillText('график численности появится после первых поколений',10,32); return; }
     var mx=Math.max.apply(null,pops)||1;
-    gctx.strokeStyle='rgba(130,200,255,.16)'; gctx.lineWidth=1;
+    gctx.strokeStyle='rgba(126,214,199,.16)'; gctx.lineWidth=1;
     gctx.beginPath(); gctx.moveTo(0,h-1.5); gctx.lineTo(w,h-1.5); gctx.stroke();
     gctx.beginPath();
     for(var i=0;i<pops.length;i++){
       var x=i/(pops.length-1)*(w-2)+1, y=h-3-(pops[i]/mx)*(h-10);
       i?gctx.lineTo(x,y):gctx.moveTo(x,y);
     }
-    gctx.strokeStyle='#5fe0ff'; gctx.lineWidth=1.8; gctx.stroke();
+    gctx.strokeStyle='#4FD8C4'; gctx.lineWidth=1.8; gctx.stroke();
     gctx.lineTo(w-1,h-2); gctx.lineTo(1,h-2); gctx.closePath();
-    gctx.fillStyle='rgba(95,224,255,.14)'; gctx.fill();
-    gctx.fillStyle='rgba(139,163,184,.9)'; gctx.font='11px JetBrains Mono, monospace';
+    gctx.fillStyle='rgba(79,216,196,.14)'; gctx.fill();
+    gctx.fillStyle='rgba(143,168,166,.9)'; gctx.font='11px JetBrains Mono, monospace';
     gctx.fillText('макс '+mx,8,14);
   }
   function updateStatus(){
