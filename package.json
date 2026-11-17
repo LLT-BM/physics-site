@@ -1,6 +1,10 @@
 {
   "name": "physics-site",
   "type": "module",
+  "license": "MIT",
+  "description": "LibLabTab — каталог интерактивных физических моделей на Astro",
+  "homepage": "https://liblabtab.ru",
+  "repository": { "type": "git", "url": "https://github.com/LLT-BM/physics-site.git" },
   "version": "0.0.1",
   "engines": {
     "node": ">=22.23.4"

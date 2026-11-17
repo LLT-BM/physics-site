@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Конструктор цепи — законы Ома</title>
+<link rel="canonical" href="https://liblabtab.ru/models/circuit-lab/">
 <link rel="stylesheet" href="/fonts/fonts.css">
 <style>
 :root{
@@ -28,8 +29,9 @@ button{font:inherit;font-family:var(--sans);min-height:42px;padding:8px 13px;bor
 button.pri{background:var(--cyan);color:var(--on);border-color:var(--cyan);font-weight:600}
 button.sm{min-height:34px;padding:5px 10px;font-size:.84rem}
 button.dn{border-color:rgba(255,122,110,.45);color:#ffb3ab}
+button[aria-pressed="true"]{border-color:var(--cyan);color:var(--cyan)}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
-select,input[type=number],input[type=text]{font:inherit;font-family:var(--mono);font-size:.85rem;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+select,input[type=number]{font:inherit;font-family:var(--mono);font-size:.85rem;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
 input[type=range]{width:100%;height:28px;margin:2px 0 0;-webkit-appearance:none;appearance:none;background:transparent;accent-color:var(--cyan)}
 label{display:flex;justify-content:space-between;align-items:baseline;font-size:.86rem;color:var(--muted);margin-top:9px;gap:8px}
 output{font-family:var(--mono);font-weight:600;color:var(--amber)}
@@ -51,8 +53,8 @@ output{font-family:var(--mono);font-weight:600;color:var(--amber)}
 .blkhead{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between}
 .blkhead b{font-family:var(--mono);font-size:.86rem;color:var(--amber)}
 .br{display:grid;grid-template-columns:1.15fr 1fr auto;gap:6px;align-items:center;margin-top:8px}
-.br .u{font-family:var(--mono);font-size:.76rem;color:var(--muted)}
 .brw{display:grid;grid-template-columns:1.15fr 1fr auto;gap:6px;align-items:center;margin-top:6px}
+.u{font-family:var(--mono);font-size:.76rem;color:var(--muted)}
 .tag{font-family:var(--mono);font-size:.72rem;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
 .hide{display:none}
 kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
@@ -63,40 +65,37 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
 <body>
 <main class="wrap">
   <h1>Конструктор цепи</h1>
-  <p class="lead">Собирайте цепь из участков: в каждом до четырёх параллельных ветвей. Решатель считает её по-настоящему — методом узловых потенциалов, с диодами и переходными процессами. Для участка работает <b>I = U/R</b>, для всей цепи <b>I = ℰ/(R+r)</b>. Приборы неидеальны: амперметр 0,01 Ом, вольтметр 10 МОм — и это видно в числах.</p>
+  <p class="lead">Участки соединены последовательно, ветви внутри участка — параллельно. Решатель считает цепь методом узловых потенциалов, диоды — методом Ньютона, переходные процессы — неявным Эйлером. Для участка <b>I = U/R</b>, для всей цепи <b>I = ℰ/(R+r)</b>. Приборы неидеальны: амперметр 0,01 Ом, вольтметр 10 МОм.</p>
 
   <section class="card">
     <canvas id="sch" aria-label="Схема цепи"></canvas>
     <div class="bar">
       <button class="pri" id="run">▶ Пуск</button>
       <button id="step">Шаг</button>
-      <button id="reset">Сброс</button>
+      <button id="reset">Сброс времени</button>
+      <button id="disch">Разрядить C</button>
       <button id="addBlk">+ Участок</button>
       <span style="flex:1"></span>
-      <label style="margin:0;min-width:170px">Пример
-        <select id="preset"></select>
-      </label>
+      <label style="margin:0;min-width:180px">Пример<select id="preset"></select></label>
     </div>
     <div class="rd">
       <div><span>ток в цепи I</span><b class="c" id="r_I">—</b></div>
       <div><span>напряжение на клеммах U</span><b class="a" id="r_U">—</b></div>
       <div><span>падение внутри источника</span><b id="r_Ur">—</b></div>
-      <div><span>внешнее R (по постоянному току)</span><b id="r_R">—</b></div>
-      <div><span>мощность во внешней цепи</span><b class="a" id="r_P">—</b></div>
+      <div><span>R внешней цепи (резистивное)</span><b id="r_R">—</b></div>
+      <div><span>активная мощность снаружи</span><b class="a" id="r_P">—</b></div>
       <div><span>потери внутри источника</span><b class="p" id="r_Pr">—</b></div>
       <div><span>КПД η</span><b class="g" id="r_eff">—</b></div>
       <div><span>время модели</span><b id="r_t">—</b></div>
     </div>
     <div class="status" id="stat" aria-live="polite"></div>
-    <p class="note">Точки на проводах — условное направление тока (от «+» к «−» во внешней цепи). В металле электроны дрейфуют <b>против</b> этого направления. Кликните по участку на схеме, чтобы выделить его. Клавиши: <kbd>Пробел</kbd> пуск/пауза, <kbd>S</kbd> шаг, <kbd>R</kbd> сброс.</p>
+    <p class="note">Точки на проводах — условное направление тока: во внешней цепи от «+» к «−». В металле электроны дрейфуют <b>против</b> него. Длинная линия батарейки — плюс, короткая толстая — минус. Клик по участку выделяет его. Клавиши: <kbd>Пробел</kbd> пуск, <kbd>S</kbd> шаг, <kbd>R</kbd> сброс.</p>
   </section>
 
   <div class="ctl">
     <section class="card grp">
       <h2>Источник</h2>
-      <label>Тип
-        <select id="sType"><option value="dc">постоянный (DC)</option><option value="ac">переменный (AC)</option></select>
-      </label>
+      <label>Тип<select id="sType"><option value="dc">постоянный (DC)</option><option value="ac">переменный (AC)</option></select></label>
       <label id="lEmf">ЭДС ℰ <output id="oEmf"></output></label>
       <input type="range" id="sEmf" min="0" max="24" step="0.1" value="6">
       <label id="lAmp" class="hide">Амплитуда ℰₘ <output id="oAmp"></output></label>
@@ -105,6 +104,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <input type="range" id="sF" min="1" max="2000" step="1" value="50" class="hide">
       <label>Внутреннее сопротивление r <output id="oR"></output></label>
       <input type="range" id="sR" min="0" max="20" step="0.1" value="1">
+      <label class="chk"><input type="checkbox" id="sFlip"> Перевернуть полярность источника</label>
       <p class="note" id="srcNote"></p>
     </section>
 
@@ -114,27 +114,27 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <input type="range" id="spd" min="-3" max="3" step="0.05" value="0">
       <label>Окно осциллографа <output id="oWin"></output></label>
       <input type="range" id="win" min="-4" max="0.7" step="0.05" value="-2">
-      <label class="chk"><input type="checkbox" id="cFlow" checked> Показывать движение заряда</label>
+      <label class="chk"><input type="checkbox" id="cFlow" checked> Движение заряда</label>
       <label class="chk"><input type="checkbox" id="cHeat" checked> Нагрев резисторов</label>
       <label class="chk"><input type="checkbox" id="cLab" checked> Подписи значений</label>
-      <p class="note">Скорость — сколько модельного времени проходит за реальную секунду. Для RC-цепи с τ = 1 мс поставьте около 1 мс/с, чтобы увидеть заряд плавно.</p>
+      <label class="chk"><input type="checkbox" id="cTrig" checked> Синхронизация осциллографа</label>
+      <p class="note">Ползунки параметров больше не сбрасывают время: можно крутить R и смотреть, как меняется переходный процесс. Полный сброс — кнопка «Сброс времени».</p>
     </section>
   </div>
 
   <section class="card grp c">
     <h2>Участки цепи</h2>
     <div id="editor"></div>
-    <p class="note">Ветви внутри одного участка соединены <b>параллельно</b>, участки между собой — <b>последовательно</b>. Вольтметр подключается параллельно участку (как в реальной схеме), амперметр ставится в разрыв ветви. Проба осциллографа показывает напряжение этого участка.</p>
+    <p class="note">Вольтметр подключается <b>параллельно</b> участку, амперметр ставится <b>в разрыв</b> ветви. Кнопка «проба» выбирает участок для осциллографа. Диод можно перевернуть — тогда он пропускает ток в обратную сторону.</p>
   </section>
 
   <section class="card">
     <div class="bar" style="margin:0 0 10px">
       <button class="sm" id="mScope" aria-pressed="true">Осциллограф</button>
       <button class="sm" id="mIV" aria-pressed="false">ВАХ участка</button>
-      <span style="flex:1"></span>
-      <span class="tag" id="probeTag">—</span>
+      <span style="flex:1"></span><span class="tag" id="probeTag">—</span>
     </div>
-    <canvas id="plot" aria-label="Осциллограф и вольт-амперная характеристика"></canvas>
+    <canvas id="plot" aria-label="Осциллограф и ВАХ"></canvas>
     <div class="legend">
       <span><i style="background:#ffb454"></i>канал 1: U участка</span>
       <span><i style="background:#5fe0ff"></i>канал 2: ток в цепи</span>
@@ -148,439 +148,411 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
 (function(){
 'use strict';
 var $=function(id){return document.getElementById(id)};
-var VT=0.02585, GMIN=1e-9, RA=0.01, RV=1e7, RW=1e-4, VSAT=0.2, RSAT=0.05;
+var VT=0.02585, GMIN=1e-12, RA=0.01, RV=1e7, RW=1e-3, VSAT=0.2, RSAT=0.05, LDC=1e-6;
 
-/* ================= модель цепи ================= */
 var KIND={
-  R:{n:'Резистор',u:'Ом',def:10,min:0.1,max:1e6,log:true},
-  C:{n:'Конденсатор',u:'мкФ',def:100,min:0.01,max:1e5,log:true},
-  L:{n:'Катушка',u:'мГн',def:100,min:0.01,max:1e5,log:true},
-  D:{n:'Диод',u:'В при 0,1 А',def:0.7,min:0.15,max:3.2,log:false},
-  Q:{n:'Транзисторный ключ',u:'мА базы',def:0,min:0,max:5,log:false},
-  A:{n:'Амперметр',u:'Ом',def:RA,min:RA,max:RA,log:false},
-  S:{n:'Ключ',u:'',def:1,min:0,max:1,log:false},
-  W:{n:'Провод',u:'',def:0,min:0,max:0,log:false}
+  R:{n:'Резистор',def:10,min:0.1,max:1e6,log:true},
+  C:{n:'Конденсатор',def:100,min:0.01,max:1e5,log:true},
+  L:{n:'Катушка',def:100,min:0.01,max:1e5,log:true},
+  D:{n:'Диод',def:0.7,min:0.15,max:3.2,log:false},
+  Q:{n:'Транзисторный ключ',def:0,min:0,max:5,log:false},
+  A:{n:'Амперметр',def:RA,min:RA,max:RA,log:false},
+  S:{n:'Ключ',def:1,min:0,max:1,log:false},
+  W:{n:'Провод',def:0,min:0,max:0,log:false}
 };
-function mk(kind){
-  var k=KIND[kind];
-  var o={k:kind,v:k.def};
-  if(kind==='D') o.v=0.7;
-  if(kind==='Q'){ o.v=0; o.beta=100; }
-  if(kind==='S') o.v=1;
-  return o;
-}
-var src={type:'dc',emf:6,amp:10,f:50,r:1};
-var blocks=[];
-var selB=0, selR=0, probe=0, running=false, plotMode='scope';
-var simT=0, hist={}, sat={}, flow=0;
-var scope=[], SCOPE_MAX=2600;
-var lastSol=null, rms={u:0,i:0,n:0,su:0,si:0};
+function mk(k){ var o={k:k,v:KIND[k].def}; if(k==='Q') o.beta=100; if(k==='D') o.rev=false; return o; }
+
+var src={type:'dc',emf:6,amp:10,f:50,r:1,flip:false};
+var blocks=[], selB=0, probe=0, running=false, plotMode='scope';
+var simT=0, hist={}, sat={}, flow=0, elsCache=null, lastSol=null;
+var scope=[], SCOPE_MAX=3000;
+var acc={n:0,pe:0,pi:0,su:0,si:0,u:0,i:0,peAvg:0,piAvg:0};
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function newBlock(br){ return {br:br||[mk('R')],volt:false}; }
-function clampBlocks(){ if(!blocks.length) blocks=[newBlock()]; selB=Math.min(selB,blocks.length-1); selR=Math.min(selR,blocks[selB].br.length-1); probe=Math.min(probe,blocks.length-1); }
+function clampAll(){ if(!blocks.length) blocks=[newBlock()];
+  selB=Math.min(selB,blocks.length-1); probe=Math.min(probe,blocks.length-1); }
 
-/* ================= численный решатель ================= */
+/* ---------- формат ---------- */
+function nf(x,n){ if(!isFinite(x)) return '∞'; return x.toFixed(n).replace('.',','); }
+function amp(x){ var a=Math.abs(x);
+  if(a<1e-9) return '0 А'; if(a<1e-6) return nf(x*1e9,1)+' нА';
+  if(a<1e-3) return nf(x*1e6,2)+' мкА'; if(a<1) return nf(x*1e3,2)+' мА'; return nf(x,3)+' А'; }
+function volt(x){ var a=Math.abs(x);
+  if(a<1e-3) return nf(x*1e3,2)+' мВ'; if(a<1e3) return nf(x,3)+' В'; return nf(x/1e3,2)+' кВ'; }
+function watt(x){ var a=Math.abs(x);
+  if(a<1e-6) return nf(x*1e9,1)+' нВт'; if(a<1e-3) return nf(x*1e6,2)+' мкВт';
+  if(a<1) return nf(x*1e3,2)+' мВт'; if(a<1e3) return nf(x,3)+' Вт'; return nf(x/1e3,2)+' кВт'; }
+function ohm(x){ if(!isFinite(x)) return '∞';
+  if(x<1) return nf(x,3)+' Ом'; if(x<1e3) return nf(x,2)+' Ом';
+  if(x<1e6) return nf(x/1e3,2)+' кОм'; return nf(x/1e6,2)+' МОм'; }
+function tsec(t){ var a=Math.abs(t);
+  if(a<1e-6) return nf(t*1e9,1)+' нс'; if(a<1e-3) return nf(t*1e6,2)+' мкс';
+  if(a<1) return nf(t*1e3,3)+' мс'; return nf(t,3)+' с'; }
+function valText(br){
+  if(br.k==='R') return ohm(br.v);
+  if(br.k==='C') return br.v<1000?nf(br.v,br.v<10?2:0)+' мкФ':nf(br.v/1000,2)+' мФ';
+  if(br.k==='L') return br.v<1000?nf(br.v,br.v<10?2:0)+' мГн':nf(br.v/1000,2)+' Гн';
+  if(br.k==='D') return (br.rev?'← развёрнут, ':'')+nf(br.v,2)+' В при 0,1 А';
+  if(br.k==='Q') return 'I_b='+nf(br.v,2)+' мА, β='+br.beta;
+  if(br.k==='A') return 'амперметр 0,01 Ом';
+  if(br.k==='S') return br.v?'замкнут':'разомкнут';
+  return 'провод';
+}
+
+/* ---------- решатель ---------- */
 function diodeLin(Vd,Vf){
   var Is=0.1*Math.exp(-Vf/VT), vc=Vf+0.2, v=Math.min(Vd,vc);
   var e=Math.exp(v/VT), Id=Is*(e-1), G=Math.min(Is/VT*e,1e4);
-  return [G, Id-G*v];
+  return [Math.max(G,GMIN), Id-G*v];
 }
 function gauss(A,b){
   var n=b.length,M=[],i,j;
   for(i=0;i<n;i++){ M.push(A[i].slice()); M[i].push(b[i]); }
   for(i=0;i<n;i++){
     var p=i; for(j=i+1;j<n;j++) if(Math.abs(M[j][i])>Math.abs(M[p][i])) p=j;
-    if(Math.abs(M[p][i])<1e-18) M[p][i]=1e-18;
-    var tmp=M[i]; M[i]=M[p]; M[p]=tmp;
-    for(j=i+1;j<n;j++){
-      var f=M[j][i]/M[i][i]; if(!f) continue;
-      for(var c=i;c<=n;c++) M[j][c]-=f*M[i][c];
-    }
+    if(Math.abs(M[p][i])<1e-14) M[p][i]=1e-14;
+    var t=M[i]; M[i]=M[p]; M[p]=t;
+    for(j=i+1;j<n;j++){ var f=M[j][i]/M[i][i]; if(!f) continue;
+      for(var c=i;c<=n;c++) M[j][c]-=f*M[i][c]; }
   }
   var x=new Array(n);
-  for(i=n-1;i>=0;i--){
-    var s=M[i][n];
-    for(j=i+1;j<n;j++) s-=M[i][j]*x[j];
-    x[i]=s/M[i][i];
-  }
+  for(i=n-1;i>=0;i--){ var s=M[i][n]; for(j=i+1;j<n;j++) s-=M[i][j]*x[j]; x[i]=s/M[i][i]; }
   return x;
 }
-function emfAt(t){ return src.type==='dc'?src.emf:src.amp*Math.sin(2*Math.PI*src.f*t); }
+function emfAt(t){ var v=src.type==='dc'?src.emf:src.amp*Math.sin(2*Math.PI*src.f*t); return src.flip?-v:v; }
 
-function elements(t){
-  var K=blocks.length, els=[], bi, ri;
-  els.push({k:'V',a:0,b:-1,val:emfAt(t),key:'src'});
-  els.push({k:'R',a:0,b:1,val:Math.max(src.r,1e-6),key:'rint'});
+function buildEls(){
+  var K=blocks.length, els=[],bi,ri;
+  els.push({k:'V',a:0,b:-1,val:0,key:'src'});
+  els.push({k:'R',a:0,b:1,val:Math.max(src.r,1e-4),key:'rint'});
   for(bi=0;bi<K;bi++){
     var a=1+bi, b=(bi<K-1)?(2+bi):-1;
     for(ri=0;ri<blocks[bi].br.length;ri++){
-      var br=blocks[bi].br[ri], e={k:br.k,a:a,b:b,key:bi+'_'+ri,ref:br};
-      if(br.k==='R') e.val=br.v;
-      else if(br.k==='C') e.val=br.v*1e-6;
-      else if(br.k==='L') e.val=br.v*1e-3;
-      else if(br.k==='A') e.val=RA;
-      else if(br.k==='W') e.val=RW;
-      else if(br.k==='S') e.val=br.v?RW:1e9;
-      else if(br.k==='D') e.Vf=br.v;
-      else if(br.k==='Q'){ e.beta=br.beta; e.ib=br.v*1e-3; }
+      var br=blocks[bi].br[ri];
+      var e={k:br.k,a:a,b:b,key:bi+'_'+ri,ref:br};
+      if(br.k==='D'&&br.rev){ e.a=b; e.b=a; }
       els.push(e);
     }
     if(blocks[bi].volt) els.push({k:'R',a:a,b:b,val:RV,key:'vm'+bi});
   }
   return els;
 }
-function solveAt(els,h,useHist){
-  var nn=blocks.length+1, nI=0, i, e;
-  for(i=0;i<els.length;i++){
-    e=els[i]; e.ix=-1;
-    if(e.k==='V'||e.k==='L'){ e.ix=nn+nI; nI++; }
-    else if(e.k==='Q'){ e.sat=!!sat[e.key]; if(e.sat){ e.ix=nn+nI; nI++; } }
-  }
-  var n=nn+nI, V=new Array(nn).fill(0), x=null;
+function syncEls(){
+  if(!elsCache) elsCache=buildEls();
+  elsCache.forEach(function(e){
+    var br=e.ref;
+    if(e.k==='R'&&!br) { if(e.key==='rint') e.val=Math.max(src.r,1e-4); return; }
+    if(!br) return;
+    if(br.k==='R') e.val=Math.max(br.v,1e-9);
+    else if(br.k==='C') e.val=br.v*1e-6;
+    else if(br.k==='L') e.val=br.v*1e-3;
+    else if(br.k==='A') e.val=RA;
+    else if(br.k==='W') e.val=RW;
+    else if(br.k==='S') e.val=br.v?RW:1e9;
+    else if(br.k==='D') e.Vf=br.v;
+    else if(br.k==='Q'){ e.beta=br.beta; e.ib=br.v*1e-3; }
+  });
+  return elsCache;
+}
+function structural(){
+  elsCache=null; syncEls();
+  var live={}; elsCache.forEach(function(e){ live[e.key]=1; });
+  Object.keys(hist).forEach(function(k){ if(!live[k]) delete hist[k]; });
+  Object.keys(sat).forEach(function(k){ if(!live[k]) delete sat[k]; });
+}
+function solve(els,h,dc){
+  var nn=blocks.length+1,nI=0,i,e;
+  for(i=0;i<els.length;i++){ e=els[i]; e.ix=-1;
+    if(e.k==='V'||(e.k==='L'&&!dc)){ e.ix=nn+nI; nI++; }
+    else if(e.k==='Q'){ e.satFlag=!!sat[e.key]; if(e.satFlag){ e.ix=nn+nI; nI++; } } }
+  var n=nn+nI,V=new Array(nn).fill(0),x=null;
   for(var it=0;it<60;it++){
     var A=[],RHS=new Array(n).fill(0);
     for(i=0;i<n;i++) A.push(new Array(n).fill(0));
     function G(a,b,g){ if(a>=0)A[a][a]+=g; if(b>=0)A[b][b]+=g; if(a>=0&&b>=0){A[a][b]-=g;A[b][a]-=g;} }
     function IS(a,b,v){ if(a>=0)RHS[a]-=v; if(b>=0)RHS[b]+=v; }
     function VS(a,b,v,ix,z){ if(a>=0){A[a][ix]+=1;A[ix][a]+=1;} if(b>=0){A[b][ix]-=1;A[ix][b]-=1;} if(z)A[ix][ix]-=z; RHS[ix]=v; }
+    for(i=0;i<nn;i++) G(i,-1,GMIN);
     for(i=0;i<els.length;i++){
-      e=els[i]; var a=e.a,b=e.b;
-      var va=a>=0?V[a]:0, vb=b>=0?V[b]:0;
-      if(e.k==='R') G(a,b,1/Math.max(e.val,1e-9));
+      e=els[i]; var a=e.a,b=e.b, va=a>=0?V[a]:0, vb=b>=0?V[b]:0;
+      if(e.k==='R') G(a,b,1/e.val);
       else if(e.k==='V') VS(a,b,e.val,e.ix,0);
-      else if(e.k==='C'){ var g=e.val/h, vp=useHist?(hist[e.key]||0):0; G(a,b,g); IS(a,b,-g*vp); }
-      else if(e.k==='L'){ var z=e.val/h, ip=useHist?(hist[e.key]||0):0; VS(a,b,-z*ip,e.ix,z); }
-      else if(e.k==='D'){ var dl=diodeLin(va-vb,e.Vf); G(a,b,dl[0]); IS(a,b,dl[1]); }
-      else if(e.k==='Q'){
-        var Ic=e.beta*e.ib;
-        if(Ic<=0) G(a,b,GMIN);
-        else if(e.sat) VS(a,b,VSAT,e.ix,RSAT);
-        else IS(a,b,Ic);
-      }
+      else if(e.k==='C'){ if(dc) G(a,b,GMIN); else { var g=e.val/h; G(a,b,g); IS(a,b,-g*(hist[e.key]||0)); } }
+      else if(e.k==='L'){ if(dc) G(a,b,1/LDC); else { var z=e.val/h; VS(a,b,-z*(hist[e.key]||0),e.ix,z); } }
+      else if(e.k==='D'){ var d=diodeLin(va-vb,e.Vf); G(a,b,d[0]); IS(a,b,d[1]); }
+      else if(e.k==='Q'){ var Ic=e.beta*e.ib;
+        if(Ic<=0) G(a,b,GMIN); else if(e.satFlag) VS(a,b,VSAT,e.ix,RSAT); else IS(a,b,Ic); }
     }
     x=gauss(A,RHS);
-    var d=0; for(i=0;i<nn;i++) d=Math.max(d,Math.abs(x[i]-V[i]));
+    var dd=0; for(i=0;i<nn;i++) dd=Math.max(dd,Math.abs(x[i]-V[i]));
     for(i=0;i<nn;i++) V[i]=x[i];
-    if(d<1e-10) break;
+    if(dd<1e-10) break;
   }
   var out={};
   for(i=0;i<els.length;i++){
-    e=els[i]; var a2=e.a,b2=e.b;
-    var va2=a2>=0?V[a2]:0, vb2=b2>=0?V[b2]:0, cur;
-    if(e.k==='R') cur=(va2-vb2)/Math.max(e.val,1e-9);
-    else if(e.k==='V'||e.k==='L') cur=x[e.ix];
-    else if(e.k==='C') cur=e.val/h*((va2-vb2)-(useHist?(hist[e.key]||0):0));
+    e=els[i]; var a2=e.a,b2=e.b, va2=a2>=0?V[a2]:0, vb2=b2>=0?V[b2]:0, cur;
+    if(e.k==='R') cur=(va2-vb2)/e.val;
+    else if(e.k==='V') cur=x[e.ix];
+    else if(e.k==='C') cur=dc?0:(e.val/h)*((va2-vb2)-(hist[e.key]||0));
+    else if(e.k==='L') cur=dc?(va2-vb2)/LDC:x[e.ix];
     else if(e.k==='D'){ var d2=diodeLin(va2-vb2,e.Vf); cur=d2[0]*(va2-vb2)+d2[1]; }
-    else if(e.k==='Q'){
-      var Ic2=e.beta*e.ib;
-      if(Ic2<=0) cur=(va2-vb2)*GMIN;
-      else if(e.sat) cur=x[e.ix];
-      else cur=Ic2;
-    }
-    out[e.key]={i:cur,u:va2-vb2,e:e};
+    else if(e.k==='Q'){ var I2=e.beta*e.ib;
+      if(I2<=0) cur=(va2-vb2)*GMIN; else if(e.satFlag) cur=x[e.ix]; else cur=I2; }
+    var sgn=(e.ref&&e.ref.k==='D'&&e.ref.rev)?-1:1;
+    out[e.key]={i:cur*sgn,u:(va2-vb2)*sgn,e:e};
   }
-  return {V:V,x:x,out:out,els:els};
+  return {V:V,out:out,els:els};
 }
 function decideSat(sol){
-  var changed=false;
+  var ch=false;
   sol.els.forEach(function(e){
     if(e.k!=='Q') return;
-    var o=sol.out[e.key], Ic=e.beta*e.ib, want;
+    var o=sol.out[e.key],Ic=e.beta*e.ib,want;
     if(Ic<=0) want=false;
     else if(sat[e.key]) want=o.i<Ic-1e-9;
     else want=o.u<VSAT-1e-9;
-    if(want!==!!sat[e.key]){ sat[e.key]=want; changed=true; }
+    if(want!==!!sat[e.key]){ sat[e.key]=want; ch=true; }
   });
-  return changed;
+  return ch;
+}
+function probeU(sol){
+  var bi=Math.min(probe,blocks.length-1), a=1+bi, b=(bi<blocks.length-1)?(2+bi):-1;
+  return (sol.V[a]||0)-(b>=0?(sol.V[b]||0):0);
 }
 function stepSim(h){
   simT+=h;
-  var els=elements(simT), sol;
-  for(var k=0;k<4;k++){ sol=solveAt(els,h,true); if(!decideSat(sol)) break; }
+  var els=syncEls(); els[0].val=emfAt(simT);
+  var sol;
+  for(var k=0;k<4;k++){ sol=solve(els,h,false); if(!decideSat(sol)) break; }
   sol.els.forEach(function(e){
-    if(e.k==='C') hist[e.key]=sol.out[e.key].u;
+    if(e.k==='C') hist[e.key]=sol.out[e.key].u*(e.ref&&e.ref.rev?-1:1);
     else if(e.k==='L') hist[e.key]=sol.out[e.key].i;
   });
   lastSol=sol;
-  var I=-sol.out['src'].i, U=sol.V[1];
+  var I=-sol.out['src'].i*(src.flip?-1:1), U=sol.V[1];
+  var pe=0;
+  blocks.forEach(function(b,bi){ b.br.forEach(function(br,ri){
+    if(br.k==='A'||br.k==='W') return;
+    var o=sol.out[bi+'_'+ri]; if(o) pe+=o.u*o.i;
+  }); });
+  var pi=Math.abs(sol.out['rint'].u*sol.out['rint'].i);
+  acc.pe+=pe; acc.pi+=pi; acc.su+=probeU(sol)*probeU(sol); acc.si+=I*I; acc.n++;
+  if(acc.n>=500){ acc.peAvg=acc.pe/acc.n; acc.piAvg=acc.pi/acc.n;
+    acc.u=Math.sqrt(acc.su/acc.n); acc.i=Math.sqrt(acc.si/acc.n);
+    acc.pe=0;acc.pi=0;acc.su=0;acc.si=0;acc.n=0; }
   scope.push({t:simT,u:probeU(sol),i:I});
   if(scope.length>SCOPE_MAX) scope.shift();
-  rms.su+=probeU(sol)*probeU(sol); rms.si+=I*I; rms.n++;
-  if(rms.n>=400){ rms.u=Math.sqrt(rms.su/rms.n); rms.i=Math.sqrt(rms.si/rms.n); rms.su=0;rms.si=0;rms.n=0; }
   return sol;
 }
-function probeU(sol){
-  var bi=Math.min(probe,blocks.length-1);
-  var a=1+bi, b=(bi<blocks.length-1)?(2+bi):-1;
-  return (sol.V[a]||0)-(b>=0?(sol.V[b]||0):0);
+function opPoint(){
+  var sh=hist,ss=sat; hist={}; sat={};
+  var els=syncEls(); els[0].val=emfAt(simT);
+  var sol;
+  for(var k=0;k<6;k++){ sol=solve(els,1,true); if(!decideSat(sol)) break; }
+  sol=solve(els,1,true);
+  hist=sh; sat=ss; return sol;
 }
-function operatingPoint(){
-  var savedHist=hist, savedSat=sat; hist={}; sat={};
-  var els=elements(0), sol;
-  for(var k=0;k<6;k++){ sol=solveAt(els,1e6,false); if(!decideSat(sol)) break; }
-  sol=solveAt(els,1e6,false);
-  hist=savedHist; sat=savedSat;
-  return sol;
+function isLinearDC(){
+  if(src.type!=='dc') return false;
+  var ok=true;
+  blocks.forEach(function(b){ b.br.forEach(function(br){ if('CDQ'.indexOf(br.k)>=0) ok=false; }); });
+  return ok;
 }
-function blockDCEquiv(bi){
-  var g=0, hasPath=false;
+function blockRDC(bi){
+  var g=0,path=false;
   blocks[bi].br.forEach(function(br){
-    if(br.k==='R'){ g+=1/Math.max(br.v,1e-9); hasPath=true; }
-    else if(br.k==='A'){ g+=1/RA; hasPath=true; }
-    else if(br.k==='W'){ g+=1/RW; hasPath=true; }
-    else if(br.k==='S'&&br.v){ g+=1/RW; hasPath=true; }
-    else if(br.k==='L'){ g+=1/1e-6; hasPath=true; }
+    if(br.k==='R'){ g+=1/Math.max(br.v,1e-9); path=true; }
+    else if(br.k==='A'){ g+=1/RA; path=true; }
+    else if(br.k==='W'){ g+=1/RW; path=true; }
+    else if(br.k==='S'&&br.v){ g+=1/RW; path=true; }
+    else if(br.k==='L'){ g+=1/LDC; path=true; }
   });
-  if(blocks[bi].volt) g+=1/RV;
-  return hasPath?(1/g):Infinity;
+  if(blocks[bi].volt){ g+=1/RV; path=true; }
+  return path?1/g:Infinity;
 }
+function extR(){ var s=0; for(var i=0;i<blocks.length;i++){ var r=blockRDC(i); if(!isFinite(r)) return Infinity; s+=r; } return s; }
 
-/* ================= формат ================= */
-function nf(x,n){ if(!isFinite(x)) return '∞'; return x.toFixed(n).replace('.',','); }
-function amp(x){
-  var a=Math.abs(x);
-  if(a<1e-9) return '0 А';
-  if(a<1e-6) return nf(x*1e9,1)+' нА';
-  if(a<1e-3) return nf(x*1e6,2)+' мкА';
-  if(a<1) return nf(x*1e3,2)+' мА';
-  return nf(x,3)+' А';
-}
-function volt(x){
-  var a=Math.abs(x);
-  if(a<1e-3) return nf(x*1e3,2)+' мВ';
-  if(a<1e3) return nf(x,3)+' В';
-  return nf(x/1e3,2)+' кВ';
-}
-function watt(x){
-  var a=Math.abs(x);
-  if(a<1e-6) return nf(x*1e9,1)+' нВт';
-  if(a<1e-3) return nf(x*1e6,2)+' мкВт';
-  if(a<1) return nf(x*1e3,2)+' мВт';
-  if(a<1e3) return nf(x,3)+' Вт';
-  return nf(x/1e3,2)+' кВт';
-}
-function ohm(x){
-  if(!isFinite(x)) return '∞';
-  if(x<1) return nf(x,3)+' Ом';
-  if(x<1e3) return nf(x,2)+' Ом';
-  if(x<1e6) return nf(x/1e3,2)+' кОм';
-  return nf(x/1e6,2)+' МОм';
-}
-function tsec(t){
-  var a=Math.abs(t);
-  if(a<1e-6) return nf(t*1e9,1)+' нс';
-  if(a<1e-3) return nf(t*1e6,2)+' мкс';
-  if(a<1) return nf(t*1e3,3)+' мс';
-  return nf(t,3)+' с';
-}
-function valText(br){
-  if(br.k==='R') return ohm(br.v);
-  if(br.k==='C') return br.v<1000?nf(br.v,br.v<10?2:0)+' мкФ':nf(br.v/1000,2)+' мФ';
-  if(br.k==='L') return br.v<1000?nf(br.v,br.v<10?2:0)+' мГн':nf(br.v/1000,2)+' Гн';
-  if(br.k==='D') return 'U_d≈'+nf(br.v,2)+' В';
-  if(br.k==='Q') return 'I_b='+nf(br.v,2)+' мА, β='+br.beta;
-  if(br.k==='A') return 'амперметр';
-  if(br.k==='S') return br.v?'замкнут':'разомкнут';
-  return 'провод';
-}
-
-/* ================= редактор (DOM) ================= */
-function logSlider(v,min,max){ return Math.log(v/min)/Math.log(max/min); }
-function fromLog(t,min,max){ return min*Math.pow(max/min,t); }
-function editor(){
-  var html='';
+/* ---------- редактор без перерисовки при драге ---------- */
+function logT(v,kd){ return Math.log(Math.max(kd.min,Math.min(kd.max,v))/kd.min)/Math.log(kd.max/kd.min); }
+function logV(t,kd){ return kd.min*Math.pow(kd.max/kd.min,t); }
+function buildEditor(){
+  var h='';
   blocks.forEach(function(bl,bi){
-    var req=blockDCEquiv(bi);
-    html+='<div class="blk'+(bi===selB?' sel':'')+'" data-b="'+bi+'">'+
-      '<div class="blkhead"><b>Участок '+(bi+1)+' · Rэкв ≈ '+ohm(req)+'</b><span>'+
-      '<button class="sm" data-act="addbr" data-b="'+bi+'">+ ветвь</button> '+
-      '<button class="sm" data-act="probe" data-b="'+bi+'">'+(probe===bi?'✓ проба':'проба')+'</button> '+
-      '<button class="sm" data-act="delblk" data-b="'+bi+'">удалить</button></span></div>';
+    h+='<div class="blk" id="blk'+bi+'"><div class="blkhead"><b id="bh'+bi+'"></b><span>'+
+      '<button class="sm" data-a="addbr" data-b="'+bi+'">+ ветвь</button> '+
+      '<button class="sm" data-a="probe" data-b="'+bi+'" id="pb'+bi+'">проба</button> '+
+      '<button class="sm dn" data-a="delblk" data-b="'+bi+'">удалить</button></span></div>';
     bl.br.forEach(function(br,ri){
-      var kd=KIND[br.k];
-      html+='<div class="br"><select data-act="kind" data-b="'+bi+'" data-r="'+ri+'">';
-      Object.keys(KIND).forEach(function(k){ html+='<option value="'+k+'"'+(k===br.k?' selected':'')+'>'+KIND[k].n+'</option>'; });
-      html+='</select>';
-      if(br.k==='S'){
-        html+='<button class="sm" data-act="toggle" data-b="'+bi+'" data-r="'+ri+'">'+(br.v?'разомкнуть':'замкнуть')+'</button>';
-      } else if(br.k==='W'||br.k==='A'){
-        html+='<span class="u">'+(br.k==='A'?'0,01 Ом':'≈0 Ом')+'</span>';
-      } else {
-        var t=kd.log?logSlider(Math.max(kd.min,Math.min(kd.max,br.v)),kd.min,kd.max):(br.v-kd.min)/(kd.max-kd.min);
-        html+='<input type="range" data-act="val" data-b="'+bi+'" data-r="'+ri+'" min="0" max="1" step="0.001" value="'+t+'">';
-      }
-      html+='<button class="sm dn" data-act="delbr" data-b="'+bi+'" data-r="'+ri+'">×</button></div>';
-      html+='<div class="brw"><span class="u">'+valText(br)+'</span><span class="u" id="m_'+bi+'_'+ri+'">—</span><span></span></div>';
-      if(br.k==='Q'){
-        html+='<div class="brw"><span class="u">коэффициент β</span><input type="range" data-act="beta" data-b="'+bi+'" data-r="'+ri+'" min="20" max="400" step="5" value="'+br.beta+'"><span class="u">'+br.beta+'</span></div>';
-      }
-      if(br.k==='D'){
-        html+='<div class="brw"><span class="u">тип</span><select data-act="dtype" data-b="'+bi+'" data-r="'+ri+'">'+
-          '<option value="0.7"'+(Math.abs(br.v-0.7)<0.01?' selected':'')+'>кремний 0,7 В</option>'+
-          '<option value="0.3"'+(Math.abs(br.v-0.3)<0.01?' selected':'')+'>германий / Шоттки 0,3 В</option>'+
-          '<option value="1.8"'+(Math.abs(br.v-1.8)<0.01?' selected':'')+'>светодиод 1,8 В</option>'+
-          '<option value="3.2"'+(Math.abs(br.v-3.2)<0.01?' selected':'')+'>синий LED 3,2 В</option>'+
-          '</select><span></span></div>';
-      }
+      h+='<div class="br"><select data-a="kind" data-b="'+bi+'" data-r="'+ri+'">';
+      Object.keys(KIND).forEach(function(k){ h+='<option value="'+k+'"'+(k===br.k?' selected':'')+'>'+KIND[k].n+'</option>'; });
+      h+='</select>';
+      if(br.k==='S') h+='<button class="sm" data-a="toggle" data-b="'+bi+'" data-r="'+ri+'" id="tg'+bi+'_'+ri+'"></button>';
+      else if(br.k==='W'||br.k==='A') h+='<span class="u">'+(br.k==='A'?'0,01 Ом':'0,001 Ом')+'</span>';
+      else h+='<input type="range" data-a="val" data-b="'+bi+'" data-r="'+ri+'" min="0" max="1" step="0.002" value="'+(KIND[br.k].log?logT(br.v,KIND[br.k]):(br.v-KIND[br.k].min)/(KIND[br.k].max-KIND[br.k].min))+'">';
+      h+='<button class="sm dn" data-a="delbr" data-b="'+bi+'" data-r="'+ri+'">×</button></div>';
+      h+='<div class="brw"><span class="u" id="vt'+bi+'_'+ri+'"></span><span class="u" id="m'+bi+'_'+ri+'">—</span><span></span></div>';
+      if(br.k==='Q') h+='<div class="brw"><span class="u">β</span><input type="range" data-a="beta" data-b="'+bi+'" data-r="'+ri+'" min="20" max="400" step="5" value="'+br.beta+'"><span class="u" id="bt'+bi+'_'+ri+'"></span></div>';
+      if(br.k==='D') h+='<div class="brw"><select data-a="dtype" data-b="'+bi+'" data-r="'+ri+'">'+
+        [['0.7','кремний 0,7 В'],['0.3','германий / Шоттки 0,3 В'],['1.8','светодиод 1,8 В'],['3.2','синий LED 3,2 В']]
+        .map(function(o){ return '<option value="'+o[0]+'"'+(Math.abs(br.v-parseFloat(o[0]))<0.01?' selected':'')+'>'+o[1]+'</option>'; }).join('')+
+        '</select><button class="sm" data-a="rev" data-b="'+bi+'" data-r="'+ri+'" id="rv'+bi+'_'+ri+'"></button><span></span></div>';
     });
-    html+='<label class="chk"><input type="checkbox" data-act="volt" data-b="'+bi+'"'+(bl.volt?' checked':'')+'> Вольтметр параллельно участку (10 МОм)</label>';
-    html+='</div>';
+    h+='<label class="chk"><input type="checkbox" data-a="volt" data-b="'+bi+'"'+(bl.volt?' checked':'')+'> Вольтметр параллельно (10 МОм)</label></div>';
   });
-  $('editor').innerHTML=html;
-  Array.prototype.forEach.call($('editor').querySelectorAll('[data-act]'),function(el){
-    var act=el.dataset.act, bi=+el.dataset.b, ri=el.dataset.r!==undefined?+el.dataset.r:0;
-    var ev=(el.tagName==='SELECT'||el.type==='checkbox')?'change':'input';
-    if(el.tagName==='BUTTON') ev='click';
+  $('editor').innerHTML=h;
+  Array.prototype.forEach.call($('editor').querySelectorAll('[data-a]'),function(el){
+    var a=el.dataset.a,bi=+el.dataset.b,ri=el.dataset.r!==undefined?+el.dataset.r:0;
+    var ev=el.tagName==='BUTTON'?'click':(el.tagName==='SELECT'||el.type==='checkbox'?'change':'input');
     el.addEventListener(ev,function(){
-      selB=bi; selR=ri;
-      if(act==='kind'){ blocks[bi].br[ri]=mk(el.value); }
-      else if(act==='val'){ var kd=KIND[blocks[bi].br[ri].k];
-        blocks[bi].br[ri].v=kd.log?fromLog(+el.value,kd.min,kd.max):kd.min+(kd.max-kd.min)*(+el.value); }
-      else if(act==='beta'){ blocks[bi].br[ri].beta=+el.value; }
-      else if(act==='dtype'){ blocks[bi].br[ri].v=+el.value; }
-      else if(act==='toggle'){ blocks[bi].br[ri].v=blocks[bi].br[ri].v?0:1; }
-      else if(act==='volt'){ blocks[bi].volt=el.checked; }
-      else if(act==='addbr'){ if(blocks[bi].br.length<4) blocks[bi].br.push(mk('R')); }
-      else if(act==='delbr'){ if(blocks[bi].br.length>1) blocks[bi].br.splice(ri,1); }
-      else if(act==='delblk'){ if(blocks.length>1) blocks.splice(bi,1); }
-      else if(act==='probe'){ probe=bi; }
-      clampBlocks(); invalidate(); editor();
+      selB=bi;
+      var br=blocks[bi]&&blocks[bi].br[ri];
+      if(a==='val'){ var kd=KIND[br.k]; br.v=kd.log?logV(+el.value,kd):kd.min+(kd.max-kd.min)*(+el.value); labels(); return; }
+      if(a==='beta'){ br.beta=+el.value; labels(); return; }
+      if(a==='volt'){ blocks[bi].volt=el.checked; structural(); labels(); return; }
+      if(a==='probe'){ probe=bi; labels(); return; }
+      if(a==='toggle'){ br.v=br.v?0:1; labels(); return; }
+      if(a==='rev'){ br.rev=!br.rev; structural(); labels(); return; }
+      if(a==='dtype'){ br.v=+el.value; labels(); return; }
+      if(a==='kind'){ blocks[bi].br[ri]=mk(el.value); structural(); buildEditor(); return; }
+      if(a==='addbr'){ if(blocks[bi].br.length<4) blocks[bi].br.push(mk('R')); structural(); buildEditor(); return; }
+      if(a==='delbr'){ if(blocks[bi].br.length>1) blocks[bi].br.splice(ri,1); structural(); buildEditor(); return; }
+      if(a==='delblk'){ if(blocks.length>1) blocks.splice(bi,1); clampAll(); structural(); buildEditor(); return; }
+    });
+  });
+  labels();
+}
+function labels(){
+  blocks.forEach(function(bl,bi){
+    var e=$('bh'+bi); if(e) e.textContent='Участок '+(bi+1)+' · Rэкв ≈ '+ohm(blockRDC(bi));
+    var b=$('blk'+bi); if(b) b.classList.toggle('sel',bi===selB);
+    var p=$('pb'+bi); if(p) p.textContent=probe===bi?'✓ проба':'проба';
+    bl.br.forEach(function(br,ri){
+      var v=$('vt'+bi+'_'+ri); if(v) v.textContent=valText(br);
+      var t=$('tg'+bi+'_'+ri); if(t) t.textContent=br.v?'разомкнуть':'замкнуть';
+      var r=$('rv'+bi+'_'+ri); if(r) r.textContent=br.rev?'← развернуть':'развернуть →';
+      var bt=$('bt'+bi+'_'+ri); if(bt) bt.textContent=br.beta;
     });
   });
 }
-function invalidate(){ hist={}; sat={}; scope=[]; simT=0; rms={u:0,i:0,n:0,su:0,si:0}; lastSol=null; }
 
-/* ================= примеры ================= */
+/* ---------- примеры ---------- */
 var PRESETS=[
-  {n:'Участок цепи (I = U/R)',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0}; blocks=[newBlock([mk('R')])]; blocks[0].br[0].v=10; blocks[0].volt=true; probe=0; }},
-  {n:'Полная цепь (I = ℰ/(R+r))',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:1}; blocks=[newBlock([mk('R')])]; blocks[0].br[0].v=10; blocks[0].volt=true; probe=0; }},
-  {n:'Короткое замыкание',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:1}; blocks=[newBlock([mk('W')])]; probe=0; }},
-  {n:'Последовательные R',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:1}; blocks=[newBlock([mk('R')]),newBlock([mk('R')])]; blocks[0].br[0].v=10; blocks[1].br[0].v=20; blocks[1].volt=true; probe=1; }},
-  {n:'Параллельные R',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:1}; blocks=[newBlock([mk('R'),mk('R')])]; blocks[0].br[0].v=10; blocks[0].br[1].v=20; blocks[0].volt=true; probe=0; }},
-  {n:'Делитель напряжения',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0}; blocks=[newBlock([mk('R')]),newBlock([mk('R')])]; blocks[0].br[0].v=10; blocks[1].br[0].v=20; blocks[1].volt=true; probe=1; }},
-  {n:'Нагрузка вольтметра',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0}; blocks=[newBlock([mk('R')]),newBlock([mk('R')])]; blocks[0].br[0].v=1e6; blocks[1].br[0].v=1e6; blocks[1].volt=true; probe=1; }},
-  {n:'RC: заряд конденсатора',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0}; blocks=[newBlock([mk('R')]),newBlock([mk('C')])]; blocks[0].br[0].v=1000; blocks[1].br[0].v=1; blocks[1].volt=true; probe=1; $('spd').value=-0.3; $('win').value=-2; }},
-  {n:'RL: ток в катушке',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0}; blocks=[newBlock([mk('R')]),newBlock([mk('L')])]; blocks[0].br[0].v=100; blocks[1].br[0].v=100; blocks[1].volt=true; probe=1; $('spd').value=-0.3; $('win').value=-2; }},
-  {n:'RC-фильтр на AC',f:function(){ src={type:'ac',emf:6,amp:10,f:200,r:0}; blocks=[newBlock([mk('R')]),newBlock([mk('C')])]; blocks[0].br[0].v=1000; blocks[1].br[0].v=1; blocks[1].volt=true; probe=1; $('spd').value=0.7; $('win').value=-1.7; }},
-  {n:'RLC: резонанс',f:function(){ src={type:'ac',emf:6,amp:10,f:503,r:0}; blocks=[newBlock([mk('R')]),newBlock([mk('L')]),newBlock([mk('C')])]; blocks[0].br[0].v=10; blocks[1].br[0].v=10; blocks[2].br[0].v=10; blocks[2].volt=true; probe=2; $('spd').value=1; $('win').value=-1.7; }},
-  {n:'Диод: выпрямление',f:function(){ src={type:'ac',emf:6,amp:10,f:50,r:0}; blocks=[newBlock([mk('D')]),newBlock([mk('R')])]; blocks[0].br[0].v=0.7; blocks[1].br[0].v=100; blocks[1].volt=true; probe=1; $('spd').value=1.3; $('win').value=-1.3; }},
-  {n:'Транзисторный ключ',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0}; blocks=[newBlock([mk('Q')]),newBlock([mk('R')])]; blocks[0].br[0].v=0.2; blocks[0].br[0].beta=100; blocks[1].br[0].v=100; blocks[0].volt=true; probe=0; }},
-  {n:'Светодиод с ограничением',f:function(){ src={type:'dc',emf:5,amp:10,f:50,r:0}; blocks=[newBlock([mk('R')]),newBlock([mk('D')])]; blocks[0].br[0].v=150; blocks[1].br[0].v=1.8; blocks[1].volt=true; probe=1; }}
+ {n:'Участок цепи (I = U/R)',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0,flip:false}; blocks=[newBlock([mk('R')])]; blocks[0].br[0].v=10; blocks[0].volt=true; probe=0; }},
+ {n:'Полная цепь (I = ℰ/(R+r))',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:1,flip:false}; blocks=[newBlock([mk('R')])]; blocks[0].br[0].v=10; blocks[0].volt=true; probe=0; }},
+ {n:'Короткое замыкание',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:1,flip:false}; blocks=[newBlock([mk('W')])]; probe=0; }},
+ {n:'Последовательные R',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:1,flip:false}; blocks=[newBlock([mk('R')]),newBlock([mk('R')])]; blocks[0].br[0].v=10; blocks[1].br[0].v=20; blocks[1].volt=true; probe=1; }},
+ {n:'Параллельные R',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:1,flip:false}; blocks=[newBlock([mk('R'),mk('R')])]; blocks[0].br[0].v=10; blocks[0].br[1].v=20; blocks[0].volt=true; probe=0; }},
+ {n:'Делитель напряжения',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0,flip:false}; blocks=[newBlock([mk('R')]),newBlock([mk('R')])]; blocks[0].br[0].v=10; blocks[1].br[0].v=20; blocks[1].volt=true; probe=1; }},
+ {n:'Нагрузка вольтметра',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0,flip:false}; blocks=[newBlock([mk('R')]),newBlock([mk('R')])]; blocks[0].br[0].v=1e6; blocks[1].br[0].v=1e6; blocks[1].volt=true; probe=1; }},
+ {n:'RC: заряд конденсатора',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0,flip:false}; blocks=[newBlock([mk('R')]),newBlock([mk('C')])]; blocks[0].br[0].v=1000; blocks[1].br[0].v=1; blocks[1].volt=true; probe=1; $('spd').value=-0.3; $('win').value=-2; }},
+ {n:'RL: ток в катушке',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0,flip:false}; blocks=[newBlock([mk('R')]),newBlock([mk('L')])]; blocks[0].br[0].v=100; blocks[1].br[0].v=100; blocks[1].volt=true; probe=1; $('spd').value=-0.3; $('win').value=-2; }},
+ {n:'RC-фильтр на AC',f:function(){ src={type:'ac',emf:6,amp:10,f:200,r:0,flip:false}; blocks=[newBlock([mk('R')]),newBlock([mk('C')])]; blocks[0].br[0].v=1000; blocks[1].br[0].v=1; blocks[1].volt=true; probe=1; $('spd').value=0.7; $('win').value=-1.7; }},
+ {n:'RLC: резонанс',f:function(){ src={type:'ac',emf:6,amp:10,f:503,r:0,flip:false}; blocks=[newBlock([mk('R')]),newBlock([mk('L')]),newBlock([mk('C')])]; blocks[0].br[0].v=10; blocks[1].br[0].v=10; blocks[2].br[0].v=10; blocks[2].volt=true; probe=2; $('spd').value=1; $('win').value=-1.7; }},
+ {n:'Диод: выпрямление',f:function(){ src={type:'ac',emf:6,amp:10,f:50,r:0,flip:false}; blocks=[newBlock([mk('D')]),newBlock([mk('R')])]; blocks[0].br[0].v=0.7; blocks[1].br[0].v=100; blocks[1].volt=true; probe=1; $('spd').value=1.3; $('win').value=-1.3; }},
+ {n:'Транзисторный ключ',f:function(){ src={type:'dc',emf:6,amp:10,f:50,r:0,flip:false}; blocks=[newBlock([mk('Q')]),newBlock([mk('R')])]; blocks[0].br[0].v=0.2; blocks[0].br[0].beta=100; blocks[1].br[0].v=100; blocks[0].volt=true; probe=0; }},
+ {n:'Светодиод с резистором',f:function(){ src={type:'dc',emf:5,amp:10,f:50,r:0,flip:false}; blocks=[newBlock([mk('R')]),newBlock([mk('D')])]; blocks[0].br[0].v=150; blocks[1].br[0].v=1.8; blocks[1].volt=true; probe=1; }}
 ];
 PRESETS.forEach(function(p,i){ $('preset').insertAdjacentHTML('beforeend','<option value="'+i+'">'+p.n+'</option>'); });
-$('preset').addEventListener('change',function(e){ PRESETS[+e.target.value].f(); selB=0;selR=0; clampBlocks(); syncSrc(); invalidate(); editor(); running=true; setRun(); });
+$('preset').addEventListener('change',function(e){
+  PRESETS[+e.target.value].f(); selB=0; clampAll();
+  hist={}; sat={}; scope=[]; simT=0; elsCache=null; syncEls();
+  acc={n:0,pe:0,pi:0,su:0,si:0,u:0,i:0,peAvg:0,piAvg:0};
+  syncSrc(); buildEditor(); running=!reduce; setRun();
+});
 
-/* ================= отрисовка схемы ================= */
-var sch=$('sch'), sx=sch.getContext('2d'), pl=$('plot'), px=pl.getContext('2d');
+/* ---------- отрисовка ---------- */
+var sch=$('sch'),sx=sch.getContext('2d'),pl=$('plot'),px=pl.getContext('2d');
 var W=900,HS=300,HP=280,dpr=1;
 function resize(){
   W=Math.max(300,Math.round(sch.parentNode.clientWidth-28));
   dpr=Math.min(2,window.devicePixelRatio||1);
   HS=Math.max(240,Math.round(Math.min(340,W*0.36)));
   HP=Math.max(230,Math.round(Math.min(320,W*0.32)));
-  sch.width=W*dpr; sch.height=HS*dpr; sch.style.height=HS+'px'; sx.setTransform(dpr,0,0,dpr,0,0);
-  pl.width=W*dpr; pl.height=HP*dpr; pl.style.height=HP+'px'; px.setTransform(dpr,0,0,dpr,0,0);
+  sch.width=W*dpr;sch.height=HS*dpr;sch.style.height=HS+'px';sx.setTransform(dpr,0,0,dpr,0,0);
+  pl.width=W*dpr;pl.height=HP*dpr;pl.style.height=HP+'px';px.setTransform(dpr,0,0,dpr,0,0);
 }
-function geom(){
-  var K=blocks.length, x0=64, x1=W-24, top=HS*0.34, bot=HS*0.80;
-  var span=(x1-x0-70)/K;
-  return {K:K,x0:x0,x1:x1,top:top,bot:bot,span:span,bx:function(i){ return x0+70+span*(i+0.5); }};
-}
-function sym(kind,x,y,s,br,sol,key){
-  var col='#5fe0ff', o=sol&&sol.out[key], heat=0;
-  if(o&&br.k==='R'&&$('cHeat').checked){ heat=Math.min(1,Math.abs(o.i*o.u)/2); }
-  sx.save(); sx.translate(x,y);
-  sx.lineWidth=2.2; sx.strokeStyle=col; sx.fillStyle='#05080f';
-  var w=Math.min(s*0.62,54), h=13;
+function geom(){ var K=blocks.length,x0=64,x1=W-24,top=HS*0.34,bot=HS*0.80,span=(x1-x0-70)/K;
+  return {K:K,x0:x0,x1:x1,top:top,bot:bot,span:span,bx:function(i){return x0+70+span*(i+0.5);}}; }
+function sym(kind,x,y,s,br,o,key){
+  var col='#5fe0ff',heat=0;
+  if(o&&br&&br.k==='R'&&$('cHeat').checked) heat=Math.min(1,Math.abs(o.i*o.u)/2);
+  sx.save(); sx.translate(x,y); sx.lineWidth=2.2; sx.strokeStyle=col;
+  var w=Math.min(s*0.62,54),hh=13;
   if(kind==='R'){
     if(heat>0.02){ sx.shadowColor='#ffb454'; sx.shadowBlur=18*heat; }
     sx.strokeStyle=heat>0.02?'rgb(255,'+Math.round(180-90*heat)+','+Math.round(84-40*heat)+')':col;
-    sx.fillStyle='#0d1626'; sx.fillRect(-w/2,-h/2,w,h); sx.strokeRect(-w/2,-h/2,w,h);
-    sx.shadowBlur=0;
-  } else if(kind==='C'){
-    sx.beginPath(); sx.moveTo(-4,-14); sx.lineTo(-4,14); sx.moveTo(4,-14); sx.lineTo(4,14); sx.stroke();
-  } else if(kind==='L'){
-    sx.beginPath();
-    for(var i=0;i<4;i++) sx.arc(-18+i*12,0,6,Math.PI,0);
-    sx.stroke();
+    sx.fillStyle='#0d1626'; sx.fillRect(-w/2,-hh/2,w,hh); sx.strokeRect(-w/2,-hh/2,w,hh); sx.shadowBlur=0;
+  } else if(kind==='C'){ sx.beginPath(); sx.moveTo(-4,-14); sx.lineTo(-4,14); sx.moveTo(4,-14); sx.lineTo(4,14); sx.stroke();
+  } else if(kind==='L'){ sx.beginPath(); for(var i=0;i<4;i++) sx.arc(-18+i*12,0,6,Math.PI,0); sx.stroke();
   } else if(kind==='D'){
-    var fwd=o&&o.i>1e-6;
+    var fwd=o&&o.i>1e-6, dir=(br&&br.rev)?-1:1;
+    sx.scale(dir,1);
     sx.strokeStyle=fwd?'#4cc58d':col; sx.fillStyle=fwd?'rgba(76,197,141,.35)':'#0d1626';
     sx.beginPath(); sx.moveTo(-9,-11); sx.lineTo(-9,11); sx.lineTo(9,0); sx.closePath(); sx.fill(); sx.stroke();
     sx.beginPath(); sx.moveTo(9,-11); sx.lineTo(9,11); sx.stroke();
   } else if(kind==='Q'){
-    var on=br.v>0, satq=sat[key];
-    sx.strokeStyle=on?(satq?'#ffb454':'#4cc58d'):col;
+    var on=br.v>0,st=sat[key];
+    sx.strokeStyle=on?(st?'#ffb454':'#4cc58d'):col;
     sx.beginPath(); sx.arc(0,0,14,0,6.2832); sx.stroke();
     sx.beginPath(); sx.moveTo(-6,-8); sx.lineTo(-6,8); sx.moveTo(-6,-4); sx.lineTo(7,-10); sx.moveTo(-6,4); sx.lineTo(7,10); sx.stroke();
   } else if(kind==='A'||kind==='V'){
     sx.beginPath(); sx.arc(0,0,13,0,6.2832); sx.fillStyle='#0d1626'; sx.fill(); sx.stroke();
-    sx.fillStyle=col; sx.font='700 13px '+ "'Unbounded',sans-serif"; sx.textAlign='center'; sx.textBaseline='middle';
-    sx.fillText(kind,0,1);
+    sx.fillStyle=col; sx.font="700 13px 'Unbounded',sans-serif"; sx.textAlign='center'; sx.textBaseline='middle'; sx.fillText(kind,0,1);
   } else if(kind==='S'){
-    sx.beginPath(); sx.arc(-10,0,2.5,0,6.2832); sx.arc(10,0,2.5,0,6.2832); sx.fillStyle=col; sx.fill();
-    sx.beginPath(); sx.moveTo(-10,0);
-    if(br.v) sx.lineTo(10,0); else sx.lineTo(8,-12);
-    sx.stroke();
+    sx.fillStyle=col; sx.beginPath(); sx.arc(-10,0,2.5,0,6.2832); sx.fill(); sx.beginPath(); sx.arc(10,0,2.5,0,6.2832); sx.fill();
+    sx.beginPath(); sx.moveTo(-10,0); if(br.v) sx.lineTo(10,0); else sx.lineTo(8,-12); sx.stroke();
   } else { sx.beginPath(); sx.moveTo(-w/2,0); sx.lineTo(w/2,0); sx.stroke(); }
   sx.restore();
 }
 function drawSch(){
-  var g=geom(), sol=lastSol||operatingPoint();
+  var g=geom(), sol=lastSol||opPoint();
   sx.clearRect(0,0,W,HS); sx.fillStyle='#05080f'; sx.fillRect(0,0,W,HS);
-  var I=-sol.out['src'].i, U=sol.V[1];
+  var sgn=src.flip?-1:1, I=-sol.out['src'].i*sgn, U=sol.V[1]*sgn;
   sx.strokeStyle='rgba(95,224,255,.55)'; sx.lineWidth=2.4;
-  sx.beginPath();
-  sx.moveTo(g.x0,g.top); sx.lineTo(g.x1,g.top);
-  sx.moveTo(g.x1,g.top); sx.lineTo(g.x1,g.bot);
-  sx.moveTo(g.x1,g.bot); sx.lineTo(g.x0,g.bot);
-  sx.moveTo(g.x0,g.bot); sx.lineTo(g.x0,g.top);
-  sx.stroke();
-  // источник: разрыв провода слева
-  sx.fillStyle='#05080f'; sx.fillRect(g.x0-14,(g.top+g.bot)/2-22,28,44);
+  sx.beginPath(); sx.moveTo(g.x0,g.top); sx.lineTo(g.x1,g.top);
+  sx.moveTo(g.x1,g.top); sx.lineTo(g.x1,g.bot); sx.moveTo(g.x1,g.bot); sx.lineTo(g.x0,g.bot);
+  sx.moveTo(g.x0,g.bot); sx.lineTo(g.x0,g.top); sx.stroke();
   var my=(g.top+g.bot)/2;
-  sx.strokeStyle='#5fe0ff'; sx.lineWidth=3;
-  sx.beginPath(); sx.moveTo(g.x0-13,my-8); sx.lineTo(g.x0+13,my-8); sx.stroke();
-  sx.lineWidth=6; sx.beginPath(); sx.moveTo(g.x0-7,my+8); sx.lineTo(g.x0+7,my+8); sx.stroke();
-  sx.fillStyle='#8ba3b8'; sx.font='12px JetBrains Mono, monospace'; sx.textAlign='center'; sx.textBaseline='alphabetic';
-  sx.fillText('−',g.x0-22,my-4); sx.fillText('+',g.x0-22,my+14);
+  sx.fillStyle='#05080f'; sx.fillRect(g.x0-16,my-24,32,48);
+  var plusTop=!src.flip;
+  sx.strokeStyle='#5fe0ff';
+  sx.lineWidth=3; sx.beginPath(); sx.moveTo(g.x0-13,my-8); sx.lineTo(g.x0+13,my-8); sx.stroke();
+  sx.lineWidth=7; sx.beginPath(); sx.moveTo(g.x0-7,my+8); sx.lineTo(g.x0+7,my+8); sx.stroke();
+  sx.fillStyle='#eaf3fa'; sx.font='14px JetBrains Mono, monospace'; sx.textAlign='center'; sx.textBaseline='alphabetic';
+  sx.fillText(plusTop?'+':'−',g.x0-26,my-3);
+  sx.fillText(plusTop?'−':'+',g.x0-26,my+15);
   if($('cLab').checked){
     sx.fillStyle='#ffb454'; sx.textAlign='left';
-    sx.fillText(src.type==='dc'?('ℰ = '+nf(src.emf,1)+' В'):('ℰₘ = '+nf(src.amp,1)+' В, '+src.f+' Гц'),g.x0+20,my+2);
-    sx.fillText('r = '+nf(src.r,1)+' Ом',g.x0+20,my+18);
+    sx.fillText(src.type==='dc'?('ℰ = '+nf(src.emf,1)+' В'):('ℰₘ = '+nf(src.amp,1)+' В, '+src.f+' Гц'),g.x0+22,my+2);
+    sx.fillText('r = '+nf(src.r,1)+' Ом',g.x0+22,my+18);
   }
-  // участки
   blocks.forEach(function(bl,bi){
-    var cx=g.bx(bi), n=bl.br.length, dy=Math.min(30,(g.bot-g.top-24)/Math.max(n,1));
-    var y0=g.top-(n-1)*dy/2;
+    var cx=g.bx(bi),n=bl.br.length,dy=Math.min(30,(g.bot-g.top-24)/Math.max(n,1)),y0=g.top-(n-1)*dy/2;
     if(bi===selB){ sx.fillStyle='rgba(255,180,84,.08)'; sx.fillRect(cx-g.span/2+3,g.top-52,g.span-6,g.bot-g.top+64); }
     sx.strokeStyle='rgba(95,224,255,.55)'; sx.lineWidth=2.4;
-    if(n>1){
-      sx.beginPath(); sx.moveTo(cx-g.span*0.34,y0); sx.lineTo(cx-g.span*0.34,y0+(n-1)*dy);
-      sx.moveTo(cx+g.span*0.34,y0); sx.lineTo(cx+g.span*0.34,y0+(n-1)*dy); sx.stroke();
-      sx.beginPath(); sx.moveTo(cx-g.span/2,g.top); sx.lineTo(cx-g.span*0.34,g.top);
-      sx.moveTo(cx+g.span*0.34,g.top); sx.lineTo(cx+g.span/2,g.top); sx.stroke();
-    }
+    if(n>1){ sx.beginPath();
+      sx.moveTo(cx-g.span*0.34,y0); sx.lineTo(cx-g.span*0.34,y0+(n-1)*dy);
+      sx.moveTo(cx+g.span*0.34,y0); sx.lineTo(cx+g.span*0.34,y0+(n-1)*dy);
+      sx.moveTo(cx-g.span/2,g.top); sx.lineTo(cx-g.span*0.34,g.top);
+      sx.moveTo(cx+g.span*0.34,g.top); sx.lineTo(cx+g.span/2,g.top); sx.stroke(); }
     bl.br.forEach(function(br,ri){
-      var yy=y0+ri*dy, key=bi+'_'+ri;
+      var yy=y0+ri*dy,key=bi+'_'+ri,o=sol.out[key];
       sx.strokeStyle='rgba(95,224,255,.55)'; sx.lineWidth=2.4;
       sx.beginPath(); sx.moveTo(cx-g.span*0.34,yy); sx.lineTo(cx+g.span*0.34,yy); sx.stroke();
       sx.fillStyle='#05080f'; sx.fillRect(cx-30,yy-16,60,32);
-      sym(br.k,cx,yy,g.span,br,sol,key);
+      sym(br.k,cx,yy,g.span,br,o,key);
       if($('cLab').checked){
         sx.fillStyle=bi===selB?'#ffb454':'#8ba3b8'; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='center';
         sx.fillText(valText(br),cx,yy-20);
-        var o=sol.out[key];
-        if(o&&(br.k==='A')){ sx.fillStyle='#5fe0ff'; sx.fillText(amp(o.i),cx,yy+26); }
+        if(o&&br.k==='A'){ sx.fillStyle='#5fe0ff'; sx.fillText(amp(o.i),cx,yy+26); }
       }
-      if($('cFlow').checked&&Math.abs(I)>1e-9){
-        var sp=Math.min(2.2,Math.log(1+Math.abs(I)*200)*0.5);
-        var o2=sol.out[key], frac=Math.abs(o2.i)/(Math.abs(I)||1);
+      if($('cFlow').checked&&o&&Math.abs(o.i)>1e-9){
+        var sp=Math.min(2.2,Math.log(1+Math.abs(o.i)*200)*0.5);
         for(var d=0;d<3;d++){
-          var t=((flow*sp*Math.sign(I)+d/3)%1+1)%1;
-          var fx=cx-g.span*0.34+t*g.span*0.68;
-          sx.fillStyle='rgba(234,252,255,'+(0.25+0.6*Math.min(1,frac)).toFixed(2)+')';
-          sx.beginPath(); sx.arc(fx,yy,2.2,0,6.2832); sx.fill();
+          var t=((flow*sp*Math.sign(o.i)+d/3)%1+1)%1;
+          sx.fillStyle='rgba(234,252,255,.7)';
+          sx.beginPath(); sx.arc(cx-g.span*0.34+t*g.span*0.68,yy,2.2,0,6.2832); sx.fill();
         }
       }
     });
@@ -589,215 +561,190 @@ function drawSch(){
       sx.strokeStyle='rgba(255,180,84,.6)'; sx.lineWidth=1.6; sx.setLineDash([4,4]);
       sx.beginPath(); sx.moveTo(cx-g.span*0.34,g.top); sx.lineTo(cx-g.span*0.34,vy);
       sx.moveTo(cx+g.span*0.34,g.top); sx.lineTo(cx+g.span*0.34,vy); sx.stroke(); sx.setLineDash([]);
-      sym('V',cx,vy,40,{k:'V'},null,null);
+      sym('V',cx,vy,40,null,null,null);
       var a=1+bi,b=(bi<blocks.length-1)?(2+bi):-1;
-      var uv=(sol.V[a]||0)-(b>=0?(sol.V[b]||0):0);
       sx.fillStyle='#ffb454'; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='center';
-      sx.fillText(volt(uv),cx,vy+26);
+      sx.fillText(volt((sol.V[a]||0)-(b>=0?(sol.V[b]||0):0)),cx,vy+26);
     }
     sx.fillStyle=bi===probe?'#ff7ab6':'#8ba3b8'; sx.font='10px JetBrains Mono, monospace'; sx.textAlign='center';
     sx.fillText('У'+(bi+1)+(bi===probe?' · проба':''),cx,g.top-46);
   });
-  // движущийся заряд по общему контуру
   if($('cFlow').checked&&Math.abs(I)>1e-9){
-    var per=2*(g.x1-g.x0)+2*(g.bot-g.top), sp=Math.min(2.2,Math.log(1+Math.abs(I)*200)*0.5);
+    var wT=g.x1-g.x0,hS=g.bot-g.top,per=2*wT+2*hS,sp=Math.min(2.2,Math.log(1+Math.abs(I)*200)*0.5);
     for(var q=0;q<26;q++){
-      var t=((flow*sp*Math.sign(I)+q/26)%1+1)%1, dd=t*per, X,Y;
-      var wTop=g.x1-g.x0, hSide=g.bot-g.top;
-      if(dd<wTop){ X=g.x0+dd; Y=g.top; }
-      else if(dd<wTop+hSide){ X=g.x1; Y=g.top+(dd-wTop); }
-      else if(dd<2*wTop+hSide){ X=g.x1-(dd-wTop-hSide); Y=g.bot; }
-      else { X=g.x0; Y=g.bot-(dd-2*wTop-hSide); }
-      if(Math.abs(X-g.x0)<16&&Math.abs(Y-my)<26) continue;
-      sx.fillStyle='rgba(234,252,255,.5)'; sx.beginPath(); sx.arc(X,Y,2,0,6.2832); sx.fill();
+      var t=((flow*sp*Math.sign(I)+q/26)%1+1)%1,dd=t*per,X,Y;
+      if(dd<wT){X=g.x0+dd;Y=g.top;} else if(dd<wT+hS){X=g.x1;Y=g.top+(dd-wT);}
+      else if(dd<2*wT+hS){X=g.x1-(dd-wT-hS);Y=g.bot;} else {X=g.x0;Y=g.bot-(dd-2*wT-hS);}
+      if(Math.abs(X-g.x0)<18&&Math.abs(Y-my)<28) continue;
+      sx.fillStyle='rgba(234,252,255,.45)'; sx.beginPath(); sx.arc(X,Y,2,0,6.2832); sx.fill();
     }
   }
   sx.fillStyle='#8ba3b8'; sx.font='11px JetBrains Mono, monospace'; sx.textAlign='left';
   sx.fillText('I = '+amp(I)+'   U клемм = '+volt(U),8,16);
-  sx.textAlign='right'; sx.fillText(src.type==='ac'?'AC '+src.f+' Гц':'DC',W-8,16);
+  sx.textAlign='right'; sx.fillText(src.type==='ac'?('AC '+src.f+' Гц'):'DC',W-8,16);
   return sol;
 }
-
-/* ================= график ================= */
+function blockI(bi,u){
+  var tot=0,short=false;
+  blocks[bi].br.forEach(function(br){
+    if(br.k==='R') tot+=u/Math.max(br.v,1e-9);
+    else if(br.k==='A') tot+=u/RA;
+    else if(br.k==='W'||br.k==='L'||(br.k==='S'&&br.v)) short=true;
+    else if(br.k==='D'){ var vv=br.rev?-u:u, d=diodeLin(vv,br.v); tot+=(d[0]*vv+d[1])*(br.rev?-1:1); }
+    else if(br.k==='Q'){ var Ic=br.beta*br.v*1e-3;
+      if(Ic<=0) tot+=u*GMIN;
+      else if(u<=0) tot+=u*GMIN;
+      else if(u<VSAT) tot+=Ic*Math.max(0,u/VSAT);
+      else tot+=Ic; }
+  });
+  if(blocks[bi].volt) tot+=u/RV;
+  return {i:tot,short:short};
+}
 function drawPlot(){
   px.clearRect(0,0,W,HP); px.fillStyle='#05080f'; px.fillRect(0,0,W,HP);
   var L=52,R=12,T=14,B=26;
-  function box(){ px.strokeStyle='rgba(130,200,255,.14)'; px.lineWidth=1;
-    for(var i=0;i<=8;i++){ var X=L+(W-L-R)*i/8; px.beginPath(); px.moveTo(X,T); px.lineTo(X,HP-B); px.stroke(); }
-    for(var j=0;j<=6;j++){ var Y=T+(HP-T-B)*j/6; px.beginPath(); px.moveTo(L,Y); px.lineTo(W-R,Y); px.stroke(); } }
-  box();
-  px.font='10px JetBrains Mono, monospace'; px.fillStyle='#8ba3b8';
+  px.strokeStyle='rgba(130,200,255,.14)'; px.lineWidth=1;
+  for(var i=0;i<=8;i++){ var X=L+(W-L-R)*i/8; px.beginPath(); px.moveTo(X,T); px.lineTo(X,HP-B); px.stroke(); }
+  for(var j=0;j<=6;j++){ var Y=T+(HP-T-B)*j/6; px.beginPath(); px.moveTo(L,Y); px.lineTo(W-R,Y); px.stroke(); }
+  px.font='10px JetBrains Mono, monospace';
   if(plotMode==='scope'){
-    if(scope.length<3){ px.fillText('Нажмите «Пуск» — осциллограф начнёт запись',L+8,HP/2); return; }
-    var win=Math.pow(10,+$('win').value), t1=scope[scope.length-1].t, t0=t1-win;
-    var pts=scope.filter(function(s){ return s.t>=t0; });
-    if(pts.length<2) pts=scope.slice(-2);
-    var mu=0,mi=0; pts.forEach(function(s){ mu=Math.max(mu,Math.abs(s.u)); mi=Math.max(mi,Math.abs(s.i)); });
-    mu=mu||1; mi=mi||1e-3;
-    function X(t){ return L+(t-t0)/win*(W-L-R); }
+    if(scope.length<3){ px.fillStyle='#8ba3b8'; px.fillText('Нажмите «Пуск» — осциллограф начнёт запись',L+8,HP/2); return; }
+    var win=Math.pow(10,+$('win').value), t1=scope[scope.length-1].t;
+    if($('cTrig').checked&&src.type==='ac'){
+      var per=1/src.f, k=Math.floor((t1-win)/per);
+      t1=k*per+win;
+    }
+    var t0=t1-win, pts=scope.filter(function(s){ return s.t>=t0&&s.t<=t1; });
+    if(pts.length<2) pts=scope.slice(-Math.min(200,scope.length));
+    var mu=1e-9,mi=1e-9; pts.forEach(function(s){ mu=Math.max(mu,Math.abs(s.u)); mi=Math.max(mi,Math.abs(s.i)); });
+    function Xs(t){ return L+(t-t0)/win*(W-L-R); }
     function Yu(u){ return T+(HP-T-B)*(0.5-0.44*u/mu); }
-    function Yi(i){ return T+(HP-T-B)*(0.5-0.44*i/mi); }
+    function Yi(v){ return T+(HP-T-B)*(0.5-0.44*v/mi); }
     px.strokeStyle='rgba(234,243,250,.3)'; px.beginPath(); px.moveTo(L,Yu(0)); px.lineTo(W-R,Yu(0)); px.stroke();
-    [[pts,Yu,'u','#ffb454'],[pts,Yi,'i','#5fe0ff']].forEach(function(cfg){
-      px.strokeStyle=cfg[3]; px.lineWidth=2; px.beginPath();
-      cfg[0].forEach(function(s,k){ var xx=X(s.t), yy=cfg[1](s[cfg[2]]); k?px.lineTo(xx,yy):px.moveTo(xx,yy); });
-      px.stroke();
+    [[Yu,'u','#ffb454'],[Yi,'i','#5fe0ff']].forEach(function(c){
+      px.strokeStyle=c[2]; px.lineWidth=2; px.beginPath();
+      pts.forEach(function(s,k){ var xx=Xs(s.t),yy=c[0](s[c[1]]); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
     });
     px.fillStyle='#ffb454'; px.textAlign='left'; px.fillText('U: ±'+volt(mu),L+4,T+12);
     px.fillStyle='#5fe0ff'; px.fillText('I: ±'+amp(mi),L+4,T+24);
     px.fillStyle='#8ba3b8'; px.textAlign='right'; px.fillText('окно '+tsec(win),W-R,HP-8);
-    px.textAlign='left'; px.fillText('t = '+tsec(t1),L,HP-8);
+    px.textAlign='left'; px.fillText('t = '+tsec(scope[scope.length-1].t),L,HP-8);
   } else {
-    var bi=Math.min(selB,blocks.length-1), Umax=Math.max(1,src.type==='dc'?src.emf:src.amp)*1.2;
-    var N=160, cur=[], mx=1e-9;
-    for(var i2=0;i2<=N;i2++){
-      var u=-Umax+2*Umax*i2/N, it=blockCurrent(bi,u);
-      cur.push([u,it]); mx=Math.max(mx,Math.abs(it));
-    }
-    function X2(u){ return L+(u+Umax)/(2*Umax)*(W-L-R); }
-    function Y2(i){ return T+(HP-T-B)*(0.5-0.46*i/mx); }
+    var bi=Math.min(selB,blocks.length-1), Um=Math.max(1,src.type==='dc'?src.emf:src.amp)*1.2;
+    var N=200,cur=[],mx=1e-9,anyShort=false;
+    for(var q=0;q<=N;q++){ var u=-Um+2*Um*q/N, r=blockI(bi,u);
+      if(r.short){ anyShort=true; continue; }
+      cur.push([u,r.i]); mx=Math.max(mx,Math.abs(r.i)); }
+    function Xi(u){ return L+(u+Um)/(2*Um)*(W-L-R); }
+    function Yy(v){ return T+(HP-T-B)*(0.5-0.46*v/mx); }
     px.strokeStyle='rgba(234,243,250,.3)';
-    px.beginPath(); px.moveTo(L,Y2(0)); px.lineTo(W-R,Y2(0)); px.stroke();
-    px.beginPath(); px.moveTo(X2(0),T); px.lineTo(X2(0),HP-B); px.stroke();
-    px.strokeStyle='#ff7ab6'; px.lineWidth=2.4; px.beginPath();
-    cur.forEach(function(p,k){ var xx=X2(p[0]), yy=Y2(p[1]); k?px.lineTo(xx,yy):px.moveTo(xx,yy); });
-    px.stroke();
-    var sol=lastSol||operatingPoint();
-    var a=1+bi,b=(bi<blocks.length-1)?(2+bi):-1;
-    var uu=(sol.V[a]||0)-(b>=0?(sol.V[b]||0):0), ii=0;
-    blocks[bi].br.forEach(function(br,ri){ var o=sol.out[bi+'_'+ri]; if(o) ii+=o.i; });
-    px.fillStyle='#fff'; px.beginPath(); px.arc(X2(Math.max(-Umax,Math.min(Umax,uu))),Y2(Math.max(-mx,Math.min(mx,ii))),5,0,6.2832); px.fill();
-    px.strokeStyle='#5fe0ff'; px.lineWidth=2; px.stroke();
-    px.fillStyle='#ff7ab6'; px.textAlign='left'; px.fillText('I: ±'+amp(mx),L+4,T+12);
-    px.fillStyle='#8ba3b8'; px.textAlign='right'; px.fillText('U: ±'+volt(Umax),W-R,HP-8);
+    px.beginPath(); px.moveTo(L,Yy(0)); px.lineTo(W-R,Yy(0)); px.stroke();
+    px.beginPath(); px.moveTo(Xi(0),T); px.lineTo(Xi(0),HP-B); px.stroke();
+    if(anyShort){
+      px.strokeStyle='#4cc58d'; px.lineWidth=3; px.beginPath(); px.moveTo(Xi(0),T); px.lineTo(Xi(0),HP-B); px.stroke();
+      px.fillStyle='#4cc58d'; px.textAlign='left';
+      px.fillText('В участке есть провод / катушка / замкнутый ключ:',L+6,T+14);
+      px.fillText('на постоянном токе это короткое — ВАХ вертикальна.',L+6,T+28);
+    }
+    if(cur.length>1){
+      px.strokeStyle='#ff7ab6'; px.lineWidth=2.4; px.beginPath();
+      cur.forEach(function(p,k){ var xx=Xi(p[0]),yy=Yy(p[1]); k?px.lineTo(xx,yy):px.moveTo(xx,yy); }); px.stroke();
+    }
+    px.fillStyle='#ff7ab6'; px.textAlign='left'; px.fillText('I: ±'+amp(mx),L+4,HP-B-6);
+    px.fillStyle='#8ba3b8'; px.textAlign='right'; px.fillText('U: ±'+volt(Um),W-R,HP-8);
     px.textAlign='left'; px.fillText('ВАХ участка '+(bi+1),L,HP-8);
   }
 }
-function blockCurrent(bi,u){
-  var tot=0;
-  blocks[bi].br.forEach(function(br){
-    if(br.k==='R') tot+=u/Math.max(br.v,1e-9);
-    else if(br.k==='A') tot+=u/RA;
-    else if(br.k==='W') tot+=u/RW;
-    else if(br.k==='S') tot+=u/(br.v?RW:1e9);
-    else if(br.k==='L') tot+=u/1e-6;
-    else if(br.k==='C') tot+=0;
-    else if(br.k==='D'){ var d=diodeLin(u,br.v); tot+=d[0]*u+d[1]; }
-    else if(br.k==='Q'){
-      var Ic=br.beta*br.v*1e-3;
-      if(Ic<=0) tot+=u*GMIN;
-      else if(u<VSAT) tot+=Math.min(Ic,(u)/RSAT);
-      else tot+=Ic;
-    }
-  });
-  if(blocks[bi].volt) tot+=u/RV;
-  return tot;
-}
-
-/* ================= показания ================= */
 function readouts(sol){
-  var I=-sol.out['src'].i, U=sol.V[1], ur=sol.out['rint'].u;
-  var Rext=0; blocks.forEach(function(b,bi){ var r=blockDCEquiv(bi); if(isFinite(r)) Rext+=r; else Rext=Infinity; });
-  var Pext=0;
-  blocks.forEach(function(b,bi){ b.br.forEach(function(br,ri){ var o=sol.out[bi+'_'+ri]; if(o&&br.k!=='A') Pext+=Math.abs(o.i*o.u); }); });
-  var Pint=Math.abs(ur*I), eta=(Math.abs(U*I)+Pint)>0?Math.abs(U*I)/(Math.abs(U*I)+Pint)*100:0;
+  var sgn=src.flip?-1:1, I=-sol.out['src'].i*sgn, U=sol.V[1]*sgn, ur=sol.out['rint'].u;
+  var R=extR(), dc=isLinearDC();
+  var pe=dc?Math.abs(U*I):acc.peAvg, pi=dc?Math.abs(ur*sol.out['rint'].i):acc.piAvg;
+  var eta=(pe+pi)>1e-15?pe/(pe+pi)*100:0;
   $('r_I').textContent=amp(I); $('r_U').textContent=volt(U); $('r_Ur').textContent=volt(ur);
-  $('r_R').textContent=ohm(Rext); $('r_P').textContent=watt(Pext); $('r_Pr').textContent=watt(Pint);
-  $('r_eff').textContent=isFinite(eta)?nf(eta,1)+' %':'—';
+  $('r_R').textContent=ohm(R); $('r_P').textContent=watt(pe); $('r_Pr').textContent=watt(pi);
+  $('r_eff').textContent=(pe+pi)>1e-15?nf(eta,1)+' %':'—';
   $('r_t').textContent=tsec(simT);
   blocks.forEach(function(b,bi){ b.br.forEach(function(br,ri){
-    var el=$('m_'+bi+'_'+ri); if(!el) return;
-    var o=sol.out[bi+'_'+ri]; if(!o){ el.textContent='—'; return; }
-    el.textContent=amp(o.i)+' · '+volt(o.u);
+    var el=$('m'+bi+'_'+ri); if(!el) return;
+    var o=sol.out[bi+'_'+ri]; el.textContent=o?(amp(o.i)+' · '+volt(o.u)):'—';
   }); });
-  var st=$('stat'); st.className='status';
-  var shortNow=isFinite(Rext)&&Rext<0.05&&src.r<0.05;
-  var msgs=[];
-  if(shortNow){ st.classList.add('warn'); msgs.push('Короткое замыкание: и внешнее, и внутреннее сопротивление почти нулевые — ток ограничен только модельным минимумом. В реальности его ограничивают провода и источник.'); }
-  else if(Math.abs(I)>50){ st.classList.add('warn'); msgs.push('Ток '+amp(I)+' — очень большой. Проверьте сопротивления.'); }
-  else if(src.type==='dc'&&Math.abs(I)<1e-9){ msgs.push('Тока нет: цепь разомкнута (ключ, диод в обратном включении или конденсатор в установившемся режиме).'); }
-  else { st.classList.add('ok'); msgs.push('Цепь решена: I = '+amp(I)+', U клемм = '+volt(U)+', η = '+nf(eta,1)+' %.'); }
-  if(src.type==='dc'){
-    var theo=isFinite(Rext)?src.emf/(Rext+src.r):0;
-    msgs.push('Проверка закона Ома для полной цепи: ℰ/(R+r) = '+amp(theo)+'.');
-  }
-  st.textContent=msgs.join(' ');
+  var st=$('stat'); st.className='status'; var m=[];
+  if(isFinite(R)&&R<0.02&&src.r<0.05){ st.classList.add('warn');
+    m.push('Короткое замыкание: сопротивление цепи почти нулевое, ток ограничен только модельным минимумом провода и источника. В реальности его ограничивают провода, контакты и сам источник.'); }
+  else if(Math.abs(I)>50){ st.classList.add('warn'); m.push('Ток '+amp(I)+' очень велик — проверьте сопротивления.'); }
+  else if(Math.abs(I)<1e-9&&src.type==='dc'){ m.push('Тока нет: цепь разомкнута, диод включён обратно или конденсатор заряжен до ЭДС.'); }
+  else { st.classList.add('ok'); m.push('Цепь решена: I = '+amp(I)+', U клемм = '+volt(U)+(dc?(', η = '+nf(eta,1)+' %'):'')+'.'); }
+  if(dc&&isFinite(R)) m.push('Проверка: ℰ/(R+r) = '+amp(Math.abs(src.emf)/(R+Math.max(src.r,1e-4)))+'.');
+  else if(!dc) m.push('В цепи есть реактивные или нелинейные элементы, поэтому формула ℰ/(R+r) в чистом виде неприменима: решатель считает уравнения цепи, а не готовую формулу.');
+  st.textContent=m.join(' ');
   $('probeTag').textContent='Проба: участок '+(Math.min(probe,blocks.length-1)+1);
   var an=[];
   if(src.type==='ac'){
-    an.push('Действующие значения за последние 400 отсчётов: U ≈ '+volt(rms.u)+', I ≈ '+amp(rms.i)+'. Амплитуда источника '+nf(src.amp,1)+' В, частота '+src.f+' Гц.');
-    var Lsum=0,Csum=0;
-    blocks.forEach(function(b){ b.br.forEach(function(br){ if(br.k==='L') Lsum+=br.v*1e-3; if(br.k==='C') Csum+=br.v*1e-6; }); });
-    if(Lsum>0&&Csum>0){
-      var f0=1/(2*Math.PI*Math.sqrt(Lsum*Csum));
-      an.push('При последовательных L и C резонанс наступает на f₀ = 1/(2π√(LC)) = '+nf(f0,1)+' Гц. Сейчас '+src.f+' Гц.');
-    }
-    var xl=2*Math.PI*src.f*Lsum, xc=Csum>0?1/(2*Math.PI*src.f*Csum):Infinity;
-    if(Lsum>0) an.push('X_L = 2πfL = '+ohm(xl)+'.');
-    if(Csum>0) an.push('X_C = 1/(2πfC) = '+ohm(xc)+'.');
-  } else {
-    an.push('Постоянный ток: конденсатор в установившемся режиме — разрыв, катушка — провод. Поэтому Rэкв считается только по резистивным ветвям.');
-  }
-  an.push('Транзистор показан как ключ коллектор–эмиттер: ток базы задаётся ползунком, β — коэффициент передачи. При I_c < β·I_b модель переходит в насыщение с U_ce ≈ 0,2 В.');
+    an.push('Действующие значения (окно 500 отсчётов): U ≈ '+volt(acc.u)+', I ≈ '+amp(acc.i)+'. Активная мощность — среднее u·i, реактивная в неё не входит.');
+    var Ls=0,Cs=0;
+    blocks.forEach(function(b){ b.br.forEach(function(br){ if(br.k==='L') Ls+=br.v*1e-3; if(br.k==='C') Cs+=br.v*1e-6; }); });
+    if(Ls>0&&Cs>0) an.push('Резонанс последовательного контура: f₀ = 1/(2π√(LC)) = '+nf(1/(2*Math.PI*Math.sqrt(Ls*Cs)),1)+' Гц, сейчас '+src.f+' Гц.');
+    if(Ls>0) an.push('X_L = 2πfL = '+ohm(2*Math.PI*src.f*Ls)+'.');
+    if(Cs>0) an.push('X_C = 1/(2πfC) = '+ohm(1/(2*Math.PI*src.f*Cs))+'.');
+  } else an.push('Постоянный ток: конденсатор в установившемся режиме — разрыв, катушка — короткое. Rэкв считается по резистивным ветвям.');
+  var hasQ=blocks.some(function(b){ return b.br.some(function(br){ return br.k==='Q'; }); });
+  if(hasQ) an.push('Транзистор — ключ коллектор–эмиттер: при I_c < β·I_b модель переходит в насыщение с U_ce ≈ 0,2 В.');
   $('acNote').textContent=an.join(' ');
 }
 function syncSrc(){
-  $('sType').value=src.type; $('sEmf').value=src.emf; $('sAmp').value=src.amp; $('sF').value=src.f; $('sR').value=src.r;
+  $('sType').value=src.type; $('sEmf').value=src.emf; $('sAmp').value=src.amp; $('sF').value=src.f; $('sR').value=src.r; $('sFlip').checked=src.flip;
   $('oEmf').textContent=nf(src.emf,1)+' В'; $('oAmp').textContent=nf(src.amp,1)+' В';
   $('oF').textContent=src.f+' Гц'; $('oR').textContent=nf(src.r,1)+' Ом';
   var ac=src.type==='ac';
   ['lAmp','sAmp','lF','sF'].forEach(function(id){ $(id).classList.toggle('hide',!ac); });
   $('lEmf').classList.toggle('hide',ac); $('sEmf').classList.toggle('hide',ac);
-  $('srcNote').textContent=ac?'Мгновенное значение ℰ(t) = ℰₘ·sin(2πft). Действующее значение ℰₘ/√2 = '+nf(src.amp/Math.SQRT2,2)+' В.'
-    :'ℰ — ЭДС, r — внутреннее сопротивление. Напряжение на клеммах U = ℰ − I·r.';
+  $('srcNote').textContent=ac?('ℰ(t) = ℰₘ·sin(2πft), действующее ℰₘ/√2 = '+nf(src.amp/Math.SQRT2,2)+' В.')
+    :'Напряжение на клеммах U = ℰ − I·r. При r = 0 оно равно ЭДС.';
   $('oSpd').textContent=nf(Math.pow(10,+$('spd').value)*1000,2)+' мс/с';
   $('oWin').textContent=tsec(Math.pow(10,+$('win').value));
 }
 function setRun(){ $('run').textContent=running?'❚❚ Пауза':'▶ Пуск'; $('run').classList.toggle('pri',!running); }
-
-/* ================= цикл ================= */
-var lastT=0, acc=0;
+var lastT=0;
 function loop(t){
   requestAnimationFrame(loop);
   var dt=Math.min(.05,(t-lastT)/1000||0); lastT=t;
-  var win=Math.pow(10,+$('win').value), h=win/1200;
   if(running){
-    var adv=Math.pow(10,+$('spd').value)*dt;
-    var n=Math.max(1,Math.min(600,Math.round(adv/h)));
+    var h=Math.pow(10,+$('win').value)/1200;
+    var n=Math.max(1,Math.min(400,Math.round(Math.pow(10,+$('spd').value)*dt/h)));
     for(var i=0;i<n;i++) stepSim(h);
     flow+=dt;
   }
   var sol=drawSch(); readouts(sol); drawPlot();
 }
-
-/* ================= события ================= */
-$('sType').addEventListener('change',function(e){ src.type=e.target.value; syncSrc(); invalidate(); });
+$('sType').addEventListener('change',function(e){ src.type=e.target.value; scope=[]; syncSrc(); });
 $('sEmf').addEventListener('input',function(e){ src.emf=+e.target.value; syncSrc(); });
-$('sAmp').addEventListener('input',function(e){ src.amp=+e.target.value; syncSrc(); invalidate(); });
-$('sF').addEventListener('input',function(e){ src.f=+e.target.value; syncSrc(); invalidate(); });
+$('sAmp').addEventListener('input',function(e){ src.amp=+e.target.value; syncSrc(); });
+$('sF').addEventListener('input',function(e){ src.f=+e.target.value; scope=[]; syncSrc(); });
 $('sR').addEventListener('input',function(e){ src.r=+e.target.value; syncSrc(); });
+$('sFlip').addEventListener('change',function(e){ src.flip=e.target.checked; scope=[]; syncSrc(); });
 $('spd').addEventListener('input',syncSrc); $('win').addEventListener('input',syncSrc);
-['cFlow','cHeat','cLab'].forEach(function(id){ $(id).addEventListener('change',function(){}); });
 $('run').addEventListener('click',function(){ running=!running; setRun(); });
 $('step').addEventListener('click',function(){ running=false; setRun(); stepSim(Math.pow(10,+$('win').value)/1200); });
-$('reset').addEventListener('click',function(){ invalidate(); });
-$('addBlk').addEventListener('click',function(){ if(blocks.length<6){ blocks.push(newBlock()); selB=blocks.length-1; selR=0; invalidate(); editor(); } });
+$('reset').addEventListener('click',function(){ hist={};sat={};scope=[];simT=0;lastSol=null;
+  acc={n:0,pe:0,pi:0,su:0,si:0,u:0,i:0,peAvg:0,piAvg:0}; });
+$('disch').addEventListener('click',function(){ Object.keys(hist).forEach(function(k){ hist[k]=0; }); });
+$('addBlk').addEventListener('click',function(){ if(blocks.length<6){ blocks.push(newBlock()); selB=blocks.length-1; structural(); buildEditor(); } });
 $('mScope').addEventListener('click',function(){ plotMode='scope'; $('mScope').setAttribute('aria-pressed','true'); $('mIV').setAttribute('aria-pressed','false'); });
 $('mIV').addEventListener('click',function(){ plotMode='iv'; $('mScope').setAttribute('aria-pressed','false'); $('mIV').setAttribute('aria-pressed','true'); });
 sch.addEventListener('pointerdown',function(e){
-  var b=sch.getBoundingClientRect(), X=(e.clientX-b.left)*(W/b.width), g=geom();
-  for(var i=0;i<blocks.length;i++){ if(Math.abs(X-g.bx(i))<g.span/2){ selB=i; selR=0; editor(); break; } }
+  var b=sch.getBoundingClientRect(),X=(e.clientX-b.left)*(W/b.width),g=geom();
+  for(var i=0;i<blocks.length;i++) if(Math.abs(X-g.bx(i))<g.span/2){ selB=i; labels(); break; }
 });
 window.addEventListener('keydown',function(e){
   var t=e.target.tagName; if(t==='INPUT'||t==='SELECT'||t==='TEXTAREA') return;
   if(e.code==='Space'){ e.preventDefault(); running=!running; setRun(); }
-  else if(e.key==='s'||e.key==='S'||e.key==='ы'){ $('step').click(); }
-  else if(e.key==='r'||e.key==='R'||e.key==='к'){ invalidate(); }
+  else if(e.key==='s'||e.key==='S'||e.key==='ы') $('step').click();
+  else if(e.key==='r'||e.key==='R'||e.key==='к') $('reset').click();
 });
 var rt=null; window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(resize,150); });
 
-PRESETS[1].f(); clampBlocks(); syncSrc(); editor(); resize(); setRun(); running=true; setRun();
-lastT=performance.now(); requestAnimationFrame(loop);
+PRESETS[1].f(); clampAll(); syncEls(); syncSrc(); buildEditor(); resize();
+running=!reduce; setRun(); lastT=performance.now(); requestAnimationFrame(loop);
 })();
 </script>
 </body>

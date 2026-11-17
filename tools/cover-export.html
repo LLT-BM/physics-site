@@ -1,40 +1,44 @@
-<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><title>Экспорт обложки 1200×630</title>
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><title>Экспорт SVG → PNG</title>
 <style>body{background:#0d1626;color:#eaf3fa;font:15px system-ui;padding:20px;max-width:1000px;margin:0 auto}
-textarea{width:100%;height:200px;background:#05080f;color:#eaf3fa;border:1px solid #2a3a52;border-radius:8px;padding:10px;font:12px monospace}
-canvas{width:100%;max-width:600px;background:#05080f;border:1px solid #2a3a52;border-radius:8px;margin-top:12px}
+textarea{width:100%;height:190px;background:#05080f;color:#eaf3fa;border:1px solid #2a3a52;border-radius:8px;padding:10px;font:12px monospace}
+canvas{max-width:100%;background:#05080f;border:1px solid #2a3a52;border-radius:8px;margin-top:12px}
 button,select,input{font:inherit;padding:8px 12px;border-radius:8px;border:1px solid #2a3a52;background:#132033;color:#eaf3fa;margin:6px 6px 0 0}
-button{background:#5fe0ff;color:#07121c;font-weight:600;cursor:pointer}</style></head><body>
-<h2>Экспорт обложки → PNG 1200×630</h2>
-<p>Вставьте содержимое .svg файла целиком (от &lt;svg до &lt;/svg&gt;).</p>
-<textarea id="src" placeholder="&lt;svg xmlns=..."></textarea>
-<div>Режим:
-<select id="mode"><option value="fit">вписать с полями (ничего не теряется)</option><option value="cover">заполнить с обрезкой</option></select>
-Фон: <input type="color" id="bg" value="#070f1d">
-<input type="text" id="name" value="cover" style="width:120px">
+button{background:#5fe0ff;color:#07121c;font-weight:600;cursor:pointer}
+input[type=number]{width:100px}</style></head><body>
+<h2>Экспорт SVG → PNG точного размера</h2>
+<p>Обложка соцсетей: <b>1200×630</b>. Иконка Apple: <b>180×180</b>. Иконка PNG: <b>32×32</b>.</p>
+<textarea id="src" placeholder="&lt;svg xmlns=...&gt; ... &lt;/svg&gt;"></textarea>
+<div>Ш×В:
+<input type="number" id="w" value="1200" min="16" max="4096">
+<input type="number" id="h" value="630" min="16" max="4096">
+<select id="mode"><option value="fit">вписать с полями</option><option value="cover">заполнить с обрезкой</option></select>
+Фон <input type="color" id="bg" value="#070f1d">
+Имя <input type="text" id="name" value="cover" style="width:130px">
 <button id="go">Скачать PNG</button></div>
 <canvas id="cv" width="1200" height="630"></canvas>
 <script>
 var cv=document.getElementById('cv'),cx=cv.getContext('2d');
 function render(cb){
   var s=document.getElementById('src').value.trim(); if(!s) return;
-  var m=s.match(/viewBox\s*=\s*"([\d.\-\s]+)"/), vb=m?m[1].split(/\s+/).map(Number):[0,0,1200,750];
-  var vw=vb[2],vh=vb[3];
-  var blob=new Blob([s],{type:'image/svg+xml;charset=utf-8'}), url=URL.createObjectURL(blob), img=new Image();
+  var W=+document.getElementById('w').value||1200, H=+document.getElementById('h').value||630;
+  cv.width=W; cv.height=H;
+  var m=s.match(/viewBox\s*=\s*"([\d.\-\s]+)"/), vb=m?m[1].split(/\s+/).map(Number):[0,0,W,H];
+  var url=URL.createObjectURL(new Blob([s],{type:'image/svg+xml;charset=utf-8'})), img=new Image();
   img.onload=function(){
-    cx.fillStyle=document.getElementById('bg').value; cx.fillRect(0,0,1200,630);
-    var k=document.getElementById('mode').value==='cover'?Math.max(1200/vw,630/vh):Math.min(1200/vw,630/vh);
-    var w=vw*k,h=vh*k; cx.drawImage(img,(1200-w)/2,(630-h)/2,w,h);
+    cx.fillStyle=document.getElementById('bg').value; cx.fillRect(0,0,W,H);
+    var k=document.getElementById('mode').value==='cover'?Math.max(W/vb[2],H/vb[3]):Math.min(W/vb[2],H/vb[3]);
+    var w=vb[2]*k,h=vb[3]*k; cx.drawImage(img,(W-w)/2,(H-h)/2,w,h);
     URL.revokeObjectURL(url); cb&&cb();
   };
-  img.onerror=function(){ alert('Не удалось разобрать SVG. Проверьте, что вставлен весь тег svg.'); };
+  img.onerror=function(){ alert('Не разобран SVG. Вставьте тег svg целиком.'); };
   img.src=url;
 }
-document.getElementById('src').addEventListener('input',function(){render()});
-document.getElementById('mode').addEventListener('change',function(){render()});
-document.getElementById('bg').addEventListener('input',function(){render()});
+['src','w','h','mode','bg'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',function(){render()});
+});
 document.getElementById('go').addEventListener('click',function(){
   render(function(){ var a=document.createElement('a');
-    a.download=(document.getElementById('name').value||'cover')+'.png';
+    a.download=(document.getElementById('name').value||'image')+'.png';
     a.href=cv.toDataURL('image/png'); a.click(); });
 });
 </script></body></html>

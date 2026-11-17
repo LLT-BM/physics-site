@@ -1,11 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { fmtDate } from '../lib/date';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const models = (await getCollection('models'))
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const models = (await getCollection('models')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime() || a.id.localeCompare(b.id)
+);
 const tags = [...new Set(models.flatMap(m => m.data.tags))].sort();
 
 const inlineCover = (file?: string) => {
@@ -32,7 +34,7 @@ const inlineCover = (file?: string) => {
           {svg ? <div class="cover" set:html={svg} /> : <div class="nocover"><span>{m.data.title.charAt(0)}</span></div>}
           <div class="card-body">
             <div class="meta">
-              <time datetime={m.data.date.toISOString()}>{m.data.date.toLocaleDateString('ru-RU')}</time>
+              <time datetime={m.data.date.toISOString()}>{fmtDate(m.data.date)}</time>
               {m.data.tags.map(t => <span class="tag">#{t}</span>)}
             </div>
             <h2>{m.data.title}</h2>

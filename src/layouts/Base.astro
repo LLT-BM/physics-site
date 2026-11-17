@@ -9,14 +9,14 @@ interface Props {
 
 const {
   title,
-  description = 'Интерактивные физические модели в браузере: механика, электродинамика, оптика. Запускаются без установки.',
-  image = '/covers/pendulum.svg',
+  description = 'Интерактивные физические модели в браузере: механика, электродинамика, оптика, квантовая физика. Запускаются без установки.',
+  image = '/covers/atom.svg',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 
-// На сайте обложки — лёгкие SVG. Но Telegram/VK/Facebook не показывают SVG в превью,
-// поэтому для Open Graph подставляем одноимённый PNG (например /covers/ohm.svg -> /covers/ohm.png).
+// На сайте обложки — лёгкие SVG. Telegram/VK/Facebook SVG не показывают,
+// поэтому для Open Graph подставляем одноимённый PNG.
 const ogImageUrl = image.replace('.svg', '.png');
 const ogImage = new URL(ogImageUrl, Astro.site);
 ---
@@ -25,24 +25,31 @@ const ogImage = new URL(ogImageUrl, Astro.site);
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#070c15" />
 
   <title>{title}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
 
-  <!-- Open Graph: превью ссылки в соцсетях -->
+  <!-- Иконки: монограмма LLT -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- Open Graph -->
   <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ru_RU" />
   <meta property="og:site_name" content="LibLabTab — интерактивная физика" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
   <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="LibLabTab — интерактивные модели физики" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content={ogImage} />
 
-  <!-- RSS-лента -->
   <link rel="alternate" type="application/rss+xml" title="LibLabTab RSS" href="/rss.xml" />
-
-  <!-- Локальные шрифты: отдаются с нашего домена, без блокирующих запросов к Google -->
   <link rel="stylesheet" href="/fonts/fonts.css" />
 </head>
 <body>
@@ -54,7 +61,8 @@ const ogImage = new URL(ogImageUrl, Astro.site);
   <main><slot /></main>
 
   <footer class="site-foot">
-    © {new Date().getFullYear()} · LibLabTab · сделано на Astro · модели работают прямо в браузере
+    © {new Date().getFullYear()} · LibLabTab · сделано на Astro · модели работают прямо в браузере ·
+    <a href="https://github.com/LLT-BM/physics-site">исходники</a>
   </footer>
 </body>
 </html>

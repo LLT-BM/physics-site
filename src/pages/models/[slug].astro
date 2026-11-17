@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, getEntry, render } from 'astro:content';
+import { fmtDate } from '../../lib/date';
 
 export async function getStaticPaths() {
   const models = await getCollection('models');
@@ -15,7 +16,7 @@ const { Content } = await render(m);
 <Base title={`${m.data.title} — интерактивная модель`} description={m.data.description} image={m.data.cover}>
   <article>
     <div class="meta">
-      <time datetime={m.data.date.toISOString()}>{m.data.date.toLocaleDateString('ru-RU')}</time>
+      <time datetime={m.data.date.toISOString()}>{fmtDate(m.data.date)}</time>
       {m.data.tags.map(t => <a class="tag" href={`/tags/${t}/`}>#{t}</a>)}
     </div>
     <h1>{m.data.title}</h1>
