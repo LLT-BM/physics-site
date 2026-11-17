@@ -29,14 +29,12 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
 ::-webkit-scrollbar{width:11px;height:11px}
 ::-webkit-scrollbar-track{background:var(--canvas);border-radius:8px}
 ::-webkit-scrollbar-thumb{background:linear-gradient(var(--deep),var(--aqua));border-radius:8px;border:2px solid var(--canvas)}
-::-webkit-scrollbar-thumb:hover{background:linear-gradient(var(--aqua),var(--ice))}
 *{scrollbar-color:var(--aqua) var(--canvas);scrollbar-width:thin}
-
 header.top{position:sticky;top:0;z-index:30;margin:-18px -16px 14px;padding:12px 18px;
   background:linear-gradient(180deg,rgba(10,20,23,.96),rgba(10,20,23,.82));
   backdrop-filter:blur(10px);border-bottom:1px solid var(--line2);
   display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.brand{font:800 1.05rem var(--disp);letter-spacing:-.01em;color:var(--ink);text-decoration:none;white-space:nowrap}
+.brand{font:800 1.05rem var(--disp);color:var(--ink);text-decoration:none;white-space:nowrap}
 .brand i{color:var(--aqua);font-style:normal}
 nav.jump{display:flex;gap:4px;flex-wrap:wrap;flex:1}
 nav.jump a{font:600 .78rem var(--mono);color:var(--muted);text-decoration:none;padding:6px 10px;border-radius:999px;border:1px solid transparent}
@@ -59,11 +57,12 @@ canvas{display:block;width:100%;border-radius:11px;background:var(--canvas);touc
 .hud span.bad{color:var(--rose);border-color:rgba(214,159,169,.5)}
 .prog{position:absolute;left:12px;right:12px;bottom:12px;height:5px;border-radius:4px;background:rgba(0,0,0,.5);overflow:hidden;pointer-events:none}
 .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--deep),var(--aqua),var(--sand))}
+#fatal{display:none;margin-top:10px;padding:11px 13px;border-radius:10px;border:1px solid var(--rose);
+  background:rgba(214,159,169,.1);color:var(--rose);font-family:var(--mono);font-size:.82rem;white-space:pre-wrap}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
 button{font:inherit;font-family:var(--sans);min-height:42px;padding:8px 13px;border-radius:11px;
   border:1px solid var(--line2);background:var(--overlay);color:var(--ink);cursor:pointer;transition:.14s}
 button:hover{border-color:var(--aqua);color:var(--aqua);transform:translateY(-1px)}
-button:active{transform:translateY(0)}
 button.pri{background:linear-gradient(135deg,var(--aqua),var(--ok));color:var(--on);border-color:var(--aqua);font-weight:700}
 button.pri:hover{color:var(--on);filter:brightness(1.08)}
 button.sm{min-height:34px;padding:5px 10px;font-size:.83rem}
@@ -84,7 +83,7 @@ output{font-family:var(--mono);font-weight:700;color:var(--sand)}
 .ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:14px;margin-top:14px}
 .rd{display:grid;grid-template-columns:repeat(auto-fit,minmax(136px,1fr));gap:8px;margin-top:11px}
 .rd div{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
-.rd span{display:block;font-family:var(--mono);font-size:.68rem;color:var(--muted);letter-spacing:.02em}
+.rd span{display:block;font-family:var(--mono);font-size:.68rem;color:var(--muted)}
 .rd b{font-family:var(--mono);font-size:.99rem}
 .rd b.a{color:var(--aqua)} .rd b.s{color:var(--sand)} .rd b.l{color:var(--lilac)} .rd b.r{color:var(--rose)} .rd b.i{color:var(--ice)}
 .note{margin:9px 2px 0;font-size:.83rem;color:var(--muted)}
@@ -92,15 +91,14 @@ output{font-family:var(--mono);font-weight:700;color:var(--sand)}
 .chips button{border-radius:999px;font-family:var(--mono);font-size:.75rem;min-height:32px;padding:4px 11px}
 .legend{display:flex;flex-wrap:wrap;gap:13px;margin-top:9px;font-size:.75rem;color:var(--muted);font-family:var(--mono)}
 .legend i{display:inline-block;width:17px;height:4px;border-radius:3px;vertical-align:3px;margin-right:6px}
-.legend i.dash{background:repeating-linear-gradient(90deg,currentColor 0 5px,transparent 5px 9px);height:3px}
 table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.79rem;margin-top:10px}
 th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
 th{color:var(--muted);font-weight:600}
 td.num{text-align:right}
 .tw{overflow-x:auto}
 .sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+.pass{color:var(--ok)} .fail{color:var(--rose)}
 kbd{font-family:var(--mono);font-size:.75rem;border:1px solid var(--line2);border-radius:5px;padding:1px 6px;color:var(--ice)}
-.hide{display:none}
 .grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:14px}
 @media(max-width:900px){.grid2{grid-template-columns:1fr}}
 .eq{font-family:var(--mono);color:var(--ice);background:rgba(0,0,0,.3);border:1px solid var(--line);
@@ -118,13 +116,16 @@ footer a{color:var(--aqua)}
     <a href="#lab" class="on">Лаборатория</a>
     <a href="#ctrl">Управление</a>
     <a href="#diag">Диагностика</a>
+    <a href="#test">Самотест</a>
     <a href="#phys">Физика</a>
   </nav>
   <button class="sm" id="export">↓ PNG</button>
 </header>
 
 <h1>Бильярд Пенроуза</h1>
-<p class="lead">Зеркальная полость из <b>четырёх сомкнутых парабол</b>. Фокусы дуг стоят в вершинах квадрата, и луч, вышедший из фокуса, отражается в <b>параллельный пучок</b>, пересекает полость и собирается в противоположный фокус. Меняйте тип каждой стенки — зеркало, диффузное рассеяние, ретроотражатель, поглотитель, отверстие — и смотрите, как рушится эта картина. Восемь полостей, сечение Пуанкаре, тепловая карта освещённости и расхождение близких лучей.</p>
+<p class="lead">Зеркальная полость из <b>четырёх сомкнутых парабол</b>. Фокусы дуг стоят в вершинах квадрата, и луч, вышедший из фокуса, отражается в <b>параллельный пучок</b>, пересекает полость и собирается в противоположный фокус. Меняйте тип каждой стенки — зеркало, диффузное рассеяние, ретроотражатель, поглотитель, отверстие — и смотрите, как рушится эта картина.</p>
+
+<div id="fatal"></div>
 
 <section class="card" id="lab">
   <h2>Лаборатория</h2>
@@ -142,12 +143,14 @@ footer a{color:var(--aqua)}
         <div><span>живых лучей</span><b class="i" id="d_alive">0</b></div>
         <div><span>покрытие площади</span><b class="a" id="d_cov">—</b></div>
         <div><span>тёмная площадь</span><b class="r" id="d_dark">—</b></div>
-        <div><span>зазор замыкания</span><b class="l" id="d_gap">—</b></div>
+        <div><span>зазор стыков дуг</span><b class="l" id="d_gap">—</b></div>
         <div><span>сторона квадрата фокусов</span><b class="s" id="d_sq">—</b></div>
         <div><span>разброс сторон</span><b class="l" id="d_sqe">—</b></div>
+        <div><span>промах мимо фокуса</span><b class="i" id="d_miss">—</b></div>
         <div><span>λ на отражение</span><b class="r" id="d_lyap">—</b></div>
         <div><span>средний |sin θ|</span><b class="i" id="d_sin">—</b></div>
         <div><span>сегментов контура</span><b id="d_seg">—</b></div>
+        <div><span>ожидается сегментов</span><b class="l" id="d_segexp">—</b></div>
       </div>
       <div class="bar">
         <button class="pri" id="run">▶ Пуск</button>
@@ -161,7 +164,7 @@ footer a{color:var(--aqua)}
         <button class="sm" id="clearHeat">Стереть карту</button>
       </div>
       <div class="chips" id="presets"></div>
-      <p class="note">Тяните <b>источник</b> (кольцо) и <b>прицел</b> (луч с наконечником) прямо по сцене. Клик по стенке назначает ей выбранный тип поверхности. Клавиши: <kbd>Пробел</kbd> пуск, <kbd>S</kbd> шаг, <kbd>F</kbd> залить, <kbd>R</kbd> сброс.</p>
+      <p class="note">Тяните <b>источник</b> (кольцо) и <b>прицел</b> (стрелку) по сцене. Клик по стенке назначает ей выбранный тип. Клавиши: <kbd>Пробел</kbd> пуск, <kbd>S</kbd> шаг, <kbd>F</kbd> залить, <kbd>R</kbd> сброс.</p>
     </div>
   </div>
   <div class="legend">
@@ -170,7 +173,7 @@ footer a{color:var(--aqua)}
     <span style="color:var(--sand)"><i style="background:var(--sand)"></i>ретроотражатель</span>
     <span style="color:var(--brass)"><i style="background:var(--brass)"></i>поглотитель</span>
     <span style="color:var(--rose)"><i style="background:var(--rose)"></i>отверстие</span>
-    <span style="color:var(--ice)"><i class="dash"></i>квадрат фокусов</span>
+    <span style="color:var(--ice)"><i style="background:var(--ice)"></i>квадрат фокусов и демо-пучок</span>
   </div>
 </section>
 
@@ -189,22 +192,19 @@ footer a{color:var(--aqua)}
   <section class="card c">
     <h2>Стенки</h2>
     <label>Тип для назначения<select id="p_surf">
-      <option value="0">Зеркало (specular)</option>
-      <option value="1">Диффузное (Ламберт)</option>
-      <option value="2">Ретроотражатель</option>
-      <option value="3">Поглотитель</option>
-      <option value="4">Отверстие (выход)</option>
-    </select></label>
+      <option value="0">Зеркало</option><option value="1">Диффузное (Ламберт)</option>
+      <option value="2">Ретроотражатель</option><option value="3">Поглотитель</option>
+      <option value="4">Отверстие (выход)</option></select></label>
     <label>Группа стенок<select id="p_group"></select></label>
     <div class="bar">
-      <button class="sm" id="applyAll">Назначить всем</button>
+      <button class="sm" id="applyAll">Назначить группе</button>
       <button class="sm" id="allMirror">Всё зеркало</button>
     </div>
     <label>Доля диффузности <output id="o_dif"></output></label>
     <input type="range" id="p_dif" min="0" max="1" step="0.01" value="0">
     <label>Поглощение за удар <output id="o_abs"></output></label>
     <input type="range" id="p_abs" min="0" max="0.6" step="0.005" value="0.06">
-    <p class="note">Диффузность подмешивает ламбертовское рассеяние к зеркальному отражению даже на зеркальных участках. Ретроотражатель разворачивает луч точно назад.</p>
+    <p class="note">Диффузность подмешивает ламбертовское рассеяние даже на зеркальных участках. Ретроотражатель разворачивает луч точно назад.</p>
   </section>
 
   <section class="card">
@@ -221,25 +221,23 @@ footer a{color:var(--aqua)}
     <input type="range" id="p_sp" min="0.2" max="6" step="0.1" value="1.6">
     <label>Затухание следа <output id="o_fade"></output></label>
     <input type="range" id="p_fade" min="0" max="1" step="0.01" value="0.35">
+    <p class="note">Длина следа автоматически укорачивается при большом числе лучей, чтобы кадр оставался плавным.</p>
   </section>
 
   <section class="card d">
     <h2>Слои и режимы</h2>
     <label>Режим<select id="p_mode">
-      <option value="ray">Живые лучи</option>
-      <option value="twin">Близнецы: расхождение</option>
-    </select></label>
+      <option value="ray">Живые лучи</option><option value="twin">Близнецы: расхождение</option></select></label>
     <label class="chk"><input type="checkbox" id="c_foci" checked> Фокусы и квадрат</label>
-    <label class="chk"><input type="checkbox" id="c_beam" checked> Параллельный пучок из фокуса</label>
-    <label class="chk"><input type="checkbox" id="c_heat"> Тепловая карта освещённости</label>
+    <label class="chk"><input type="checkbox" id="c_beam" checked> Демо-пучок из фокуса</label>
+    <label class="chk"><input type="checkbox" id="c_heat"> Тепловая карта</label>
     <label class="chk"><input type="checkbox" id="c_dark" checked> Подсветить тёмные зоны</label>
     <label class="chk"><input type="checkbox" id="c_trail" checked> Следы лучей</label>
     <label class="chk"><input type="checkbox" id="c_grid"> Сетка и оси</label>
     <label class="chk"><input type="checkbox" id="c_lab" checked> Подписи</label>
     <label class="chk"><input type="checkbox" id="c_glow" checked> Свечение</label>
     <label>Качество рендера<select id="p_q">
-      <option value="1">Экономное</option><option value="1.5" selected>Обычное</option><option value="2">Высокое</option>
-    </select></label>
+      <option value="1">Экономное</option><option value="1.5" selected>Обычное</option><option value="2">Высокое</option></select></label>
   </section>
 </div>
 
@@ -258,14 +256,24 @@ footer a{color:var(--aqua)}
   <div class="tw"><table id="tbl"></table></div>
 </section>
 
-<section class="card b" id="phys">
-  <h2>Что здесь происходит</h2>
-  <div class="eq">Квадрат фокусов: v_max = −2p + 2√(p² + pR√2),&nbsp; S = √2·v_max,&nbsp; F = V + p·û,&nbsp; сторона = 2(R − p/√2)</div>
-  <p class="note">Каждая парабола переводит луч из своего фокуса в пучок, параллельный её оси, а параллельный пучок собирает в фокус. Оси четырёх дуг направлены по диагоналям, поэтому пучок уходит точно в противоположную дугу и сходится в её фокусе. Четыре фокуса — вершины квадрата; свет прочерчивает его диагонали. Слой «Параллельный пучок из фокуса» рисует эту конструкцию отдельными лучами, чтобы её можно было отличить от общего хаоса.</p>
-  <p class="note">Сечение Пуанкаре в координатах Биркгофа (длина дуги s, синус угла падения) — главный диагностический инструмент бильярдов. Круг и эллипс дают гладкие инвариантные кривые: система интегрируема, есть каустика. Стадион Бунимовича и бильярд Синая заполняют область сплошь: хаос. Гриб даёт смесь — регулярный остров рядом с хаотическим морем. Числа λ и доля тёмной площади считаются самой моделью и обновляются на экране.</p>
+<section class="card b" id="test">
+  <h2>Самотест геометрии и оптики</h2>
+  <div class="bar" style="margin:0">
+    <button class="sm" id="doTest">Прогнать проверку</button>
+    <span class="note" style="margin:0">геометрия смыкания, квадрат фокусов, свойство параболы, инвариант круга, хаос стадиона</span>
+  </div>
+  <div class="tw"><table id="testTbl"></table></div>
+  <p class="note">Проверка свойства параболы устроена честно: контур — ломаная, поэтому промах мимо фокуса не нулевой. Тест требует, чтобы при удвоении разрешения промах <b>уменьшался</b> — это доказывает сходимость к точному свойству, а не подгонку допуска.</p>
 </section>
 
-<footer>LibLabTab · модель 14 · геометрия сшивки парабол выведена аналитически, диагностика считается в реальном времени · <a href="/models/penrose-billiard/">страница модели</a></footer>
+<section class="card b" id="phys">
+  <h2>Что здесь происходит</h2>
+  <div class="eq">v_max = −2p + 2√(p² + pR√2) · S = √2·v_max · F = V + p·û · сторона квадрата = 2(R − p/√2)</div>
+  <p class="note">Дуги обходятся <b>по часовой стрелке</b>: вершина (R,R) даёт дугу от стыка (0,S) к (S,0), следующая — от (S,0) к (0,−S), и так далее. Всего отрезков ровно 4n при n точках на дугу; лишние отрезки означали бы разрыв контура. Числа «зазор стыков» и «ожидается сегментов» показывают это прямо.</p>
+  <p class="note">Каждая парабола переводит луч из своего фокуса в пучок, параллельный её оси, а параллельный пучок собирает в фокус. Поэтому луч, вышедший из фокуса <b>наружу, к своей дуге</b>, после отражения летит вдоль диагонали к противоположной дуге и сходится в её фокусе. Демо-слой рисует именно этот путь, а «промах мимо фокуса» измеряет его точность.</p>
+</section>
+
+<footer>LibLabTab · модель 14 · геометрия проверена встроенным самотестом · <a href="/models/penrose-billiard/">страница модели</a></footer>
 </div>
 
 <script>
@@ -273,234 +281,228 @@ footer a{color:var(--aqua)}
 'use strict';
 var $=function(id){return document.getElementById(id)};
 var TAU=Math.PI*2;
+
+function fatal(msg){
+  var b=$('fatal');
+  if(b){b.style.display='block';b.textContent='Ошибка модели: '+msg;}
+  try{var c=$('stage'),x=c.getContext('2d');x.setTransform(1,0,0,1,0,0);
+    x.fillStyle='#071012';x.fillRect(0,0,c.width,c.height);
+    x.fillStyle='#D69FA9';x.font='15px monospace';x.fillText('Ошибка: '+msg,18,34);}catch(e){}
+}
+window.addEventListener('error',function(e){fatal(e.message||'неизвестно');});
+
+try{
+
 var FB={aqua:'#4FD8C4',sand:'#D9B98C',lilac:'#ABA6DC',rose:'#D69FA9',ok:'#3FC9AE',
-  deep:'#2E9E96',brass:'#C9A96E',ice:'#9FE8DC',ink:'#E9F4F1',muted:'#8FA8A6',
-  line:'rgba(126,214,199,.16)',canvas:'#071012',surface:'#102024',overlay:'#14262A'};
+  deep:'#2E9E96',brass:'#C9A96E',ice:'#9FE8DC',ink:'#E9F4F1',muted:'#8FA8A6',canvas:'#071012'};
 var PAL={};
 function readPal(){var cs=getComputedStyle(document.documentElement);
   Object.keys(FB).forEach(function(k){PAL[k]=(cs.getPropertyValue('--'+k)||'').trim()||FB[k];});}
 readPal();
 var SURF=[{n:'Зеркало',c:'aqua'},{n:'Диффузное',c:'lilac'},{n:'Ретро',c:'sand'},{n:'Поглотитель',c:'brass'},{n:'Отверстие',c:'rose'}];
 
-/* ============ состояние ============ */
 var S={shape:'penrose4',par:0.35,res:150,n:48,bounces:60,ang:35,spr:24,sp:1.6,fade:0.35,
   dif:0,abs:0.06,mode:'ray',surf:0,group:0,q:1.5};
 var src={x:-0.42,y:-0.42}, aim={x:0.35,y:0.3};
 var running=false, drag=null, plotMode='poin';
 var W=900,H=560,PW=900,PH=300,dpr=1;
-var geo=null, rays=[], twin=null, stats=null, heat=null, heatCv=null, poin=[], hist=null, divLog=[];
+var geo=null, rays=[], twin=null, heat=null, heatMax=0, poin=[], hist=new Array(36).fill(0), divLog=[];
 var floodState=null, bounceTotal=0, escapeTotal=0, absTotal=0, sinSum=0, sinN=0;
-var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-var HG=176;
+var typesVer=0, lastTblVer=-1, lastUI=0, errOnce=false, missVal=null;
+var HG=176, reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var heatCv=document.createElement('canvas');heatCv.width=HG;heatCv.height=HG;
+var hctx=heatCv.getContext('2d');
 
-/* ============ построение полостей ============ */
+/* ================= построение полостей ================= */
 function arcPts(fn,n){var a=[];for(var i=0;i<=n;i++)a.push(fn(i/n));return a;}
 function build(){
-  var n=Math.round(S.res), loops=[], foci=[], groups=[], meta={};
+  var n=Math.round(S.res), loops=[], foci=[], groups=[], meta={joinGap:0,segExp:null};
   var p=S.par;
   if(S.shape==='penrose4'){
     var R=1, pp=0.12+p*0.72;
-    var vmax=-2*pp+2*Math.sqrt(pp*pp+pp*R*Math.SQRT2);
-    var Sv=Math.SQRT2*vmax;
-    var V=[[R,R],[-R,R],[-R,-R],[R,-R]];
-    groups=['дуга ↗','дуга ↖','дуга ↙','дуга ↘'];
+    var vmax=-2*pp+2*Math.sqrt(pp*pp+pp*R*Math.SQRT2), Sv=Math.SQRT2*vmax;
+    /* ВАЖНО: обход ПО ЧАСОВОЙ — дуги смыкаются именно в этом порядке */
+    var V=[[R,R],[R,-R],[-R,-R],[-R,R]];
+    groups=['дуга ↗','дуга ↘','дуга ↙','дуга ↖'];
     var arcs=[];
     for(var k=0;k<4;k++){
       var vx=V[k][0],vy=V[k][1],L=Math.hypot(vx,vy);
-      var ux=-vx/L,uy=-vy/L, tx=-uy,ty=ux;
+      var ux=-vx/L,uy=-vy/L,tx=-uy,ty=ux;
       foci.push([vx+pp*ux,vy+pp*uy]);
-      arcs.push(arcPts(function(t){var v=-vmax+2*vmax*t;var u=v*v/(4*pp);
+      arcs.push(arcPts(function(t){
+        var v=-vmax+2*vmax*t,u=v*v/(4*pp);
         return [vx+u*ux+v*tx,vy+u*uy+v*ty];},n));
     }
-    var poly=[];
+    var poly=[],gs=[],gap=0;
     for(var a=0;a<4;a++){
       var A=arcs[a];
-      if(a>0){var last=poly[poly.length-1].p;
-        if(Math.hypot(A[0][0]-last[0],A[0][1]-last[1])>Math.hypot(A[A.length-1][0]-last[0],A[A.length-1][1]-last[1])) A=A.slice().reverse();}
-      A.forEach(function(q){poly.push({p:q,g:a});});
+      if(a>0){var pr=poly[poly.length-1];
+        gap=Math.max(gap,Math.hypot(A[0][0]-pr[0],A[0][1]-pr[1]));}
+      for(var i=0;i<A.length;i++){poly.push(A[i]);gs.push(a);}
     }
-    loops.push({pts:poly.map(function(o){return o.p}),gs:poly.map(function(o){return o.g}),hole:false});
-    meta={vmax:vmax,S:Sv,p:pp,R:R,eq:'v_max = '+vmax.toFixed(6)+' · S = '+Sv.toFixed(6)+' · p = '+pp.toFixed(4),
-      note:'Четыре параболы с вершинами на диагоналях. Дуги смыкаются на осях в точках (0, ±S) и (±S, 0). Фокусы образуют квадрат со стороной 2(R − p/√2).'};
+    gap=Math.max(gap,Math.hypot(poly[0][0]-poly[poly.length-1][0],poly[0][1]-poly[poly.length-1][1]));
+    loops.push({pts:poly,gs:gs,hole:false});
+    meta={joinGap:gap,segExp:4*n,vmax:vmax,S:Sv,p:pp,R:R,
+      eq:'v_max = '+vmax.toFixed(6)+' · S = '+Sv.toFixed(6)+' · p = '+pp.toFixed(4)+' · отрезков должно быть '+4*n,
+      note:'Четыре параболы, вершины на диагоналях, обход по часовой стрелке. Стыки точно на осях: (0, ±S) и (±S, 0). Фокусы — вершины квадрата со стороной 2(R − p/√2).'};
   } else if(S.shape==='mushroom'){
-    var a=0.12+p*0.72, L=0.5+p*0.9, R2=1;
+    var a2=0.12+p*0.72, L2=0.5+p*0.9;
     groups=['шляпка','ножка'];
-    var pts=[],gs=[];
-    arcPts(function(t){var th=Math.PI-t*Math.PI;return [R2*Math.cos(th),R2*Math.sin(th)];},n)
-      .forEach(function(q){pts.push(q);gs.push(0);});
-    pts.push([a,0]);gs.push(1); pts.push([a,-L]);gs.push(1);
-    pts.push([-a,-L]);gs.push(1); pts.push([-a,0]);gs.push(1);
-    loops.push({pts:pts,gs:gs,hole:false});
+    var pts=[],gs2=[];
+    arcPts(function(t){var th=Math.PI-t*Math.PI;return [Math.cos(th),Math.sin(th)];},n)
+      .forEach(function(q){pts.push(q);gs2.push(0);});
+    pts.push([a2,0]);gs2.push(1);pts.push([a2,-L2]);gs2.push(1);
+    pts.push([-a2,-L2]);gs2.push(1);pts.push([-a2,0]);gs2.push(1);
+    loops.push({pts:pts,gs:gs2,hole:false});
     foci=[[0,0]];
-    meta={eq:'полуокружность R = 1, полуширина ножки a = '+a.toFixed(4),
-      note:'Гриб Бунимовича. Лучи с каустикой радиуса больше a никогда не входят в ножку — регулярный остров сосуществует с хаосом.'};
+    meta.joinGap=0;
+    meta.eq='полуокружность R = 1, полуширина ножки a = '+a2.toFixed(4);
+    meta.note='Гриб Бунимовича: лучи с каустикой радиуса больше a никогда не входят в ножку — регулярный остров сосуществует с хаосом.';
   } else if(S.shape==='ellipse'){
-    var b=0.3+p*0.68, A2=1.35;
+    var b=0.3+p*0.68, A3=1.35, c=Math.sqrt(Math.max(0,A3*A3-b*b));
     groups=['сектор 1','сектор 2','сектор 3','сектор 4','сектор 5','сектор 6','сектор 7','сектор 8'];
-    var c=Math.sqrt(Math.max(0,A2*A2-b*b));
     foci=[[-c,0],[c,0]];
-    var pp2=arcPts(function(t){var th=t*TAU;return [A2*Math.cos(th),b*Math.sin(th)];},n*2);
-    loops.push({pts:pp2,gs:pp2.map(function(q,i){return Math.floor(i/(pp2.length/8))%8;}),hole:false});
-    meta={eq:'a = 1.35, b = '+b.toFixed(4)+', c = √(a²−b²) = '+c.toFixed(4),
-      note:'Эллипс интегрируем: луч, пересекающий отрезок между фокусами, всегда пересекает его снова. Каустика — софокусный эллипс или гипербола.'};
+    var pe=arcPts(function(t){var th=t*TAU;return [A3*Math.cos(th),b*Math.sin(th)];},n*2);
+    loops.push({pts:pe,gs:pe.map(function(q,i){return Math.min(7,Math.floor(i/(pe.length/8)));}),hole:false});
+    meta.eq='a = 1.35, b = '+b.toFixed(4)+', c = '+c.toFixed(4);
+    meta.note='Эллипс интегрируем: луч, пересекающий отрезок между фокусами, всегда пересекает его снова. Каустика — софокусный эллипс или гипербола.';
   } else if(S.shape==='circle'){
     groups=['сектор 1','сектор 2','сектор 3','сектор 4','сектор 5','сектор 6','сектор 7','сектор 8'];
     var pc=arcPts(function(t){var th=t*TAU;return [Math.cos(th),Math.sin(th)];},n*2);
-    loops.push({pts:pc,gs:pc.map(function(q,i){return Math.floor(i/(pc.length/8))%8;}),hole:false});
+    loops.push({pts:pc,gs:pc.map(function(q,i){return Math.min(7,Math.floor(i/(pc.length/8)));}),hole:false});
     foci=[[0,0]];
-    meta={eq:'R = 1 · угол падения постоянен вдоль всей траектории',
-      note:'Круг: сохраняется угловой момент, каустика — концентрическая окружность. Шепчущая галерея при малых углах к касательной.'};
+    meta.eq='R = 1 · угол падения постоянен вдоль всей траектории';
+    meta.note='Круг: сохраняется угловой момент, каустика — концентрическая окружность. Шепчущая галерея при малых углах к касательной.';
   } else if(S.shape==='stadium'){
-    var Ls=p*1.8, R3=1;
+    var Ls=p*1.8;
     groups=['правая дуга','верх','левая дуга','низ'];
-    var pts3=[],gs3=[];
-    arcPts(function(t){var th=-Math.PI/2+t*Math.PI;return [Ls/2+R3*Math.cos(th),R3*Math.sin(th)];},n)
-      .forEach(function(q){pts3.push(q);gs3.push(0);});
-    pts3.push([-Ls/2,R3]);gs3.push(1);
-    arcPts(function(t){var th=Math.PI/2+t*Math.PI;return [-Ls/2+R3*Math.cos(th),R3*Math.sin(th)];},n)
-      .forEach(function(q){pts3.push(q);gs3.push(2);});
-    pts3.push([Ls/2,-R3]);gs3.push(3);
-    loops.push({pts:pts3,gs:gs3,hole:false});
+    var p3=[],g3=[];
+    arcPts(function(t){var th=-Math.PI/2+t*Math.PI;return [Ls/2+Math.cos(th),Math.sin(th)];},n)
+      .forEach(function(q){p3.push(q);g3.push(0);});
+    p3.push([-Ls/2,1]);g3.push(1);
+    arcPts(function(t){var th=Math.PI/2+t*Math.PI;return [-Ls/2+Math.cos(th),Math.sin(th)];},n)
+      .forEach(function(q){p3.push(q);g3.push(2);});
+    p3.push([Ls/2,-1]);g3.push(3);
+    loops.push({pts:p3,gs:g3,hole:false});
     foci=[[-Ls/2,0],[Ls/2,0]];
-    meta={eq:'полуокружности R = 1, прямая вставка L = '+Ls.toFixed(4),
-      note:'Стадион Бунимовича: при любом L > 0 течение эргодично и хаотично. Разогнутая дуга рассеивает пучок — механизм гиперболичности.'};
+    meta.eq='полуокружности R = 1, прямая вставка L = '+Ls.toFixed(4);
+    meta.note='Стадион Бунимовича: при любом L > 0 течение эргодично и хаотично. Выпуклая дуга рассеивает пучок — механизм гиперболичности.';
   } else if(S.shape==='sinai'){
     var rd=0.12+p*0.6;
     groups=['стенка 1','стенка 2','стенка 3','стенка 4','диск'];
-    var sq=[[1,1],[-1,1],[-1,-1],[1,-1]];
-    var sp=[],sg=[];
-    for(var s2=0;s2<4;s2++){
-      var A3=sq[s2],B3=sq[(s2+1)%4];
-      for(var i3=0;i3<Math.max(2,Math.round(n/4));i3++){
-        var t3=i3/Math.max(2,Math.round(n/4));
-        sp.push([A3[0]+(B3[0]-A3[0])*t3,A3[1]+(B3[1]-A3[1])*t3]);sg.push(s2);
-      }
-    }
+    var sq=[[1,1],[-1,1],[-1,-1],[1,-1]],sp=[],sg=[];
+    var m=Math.max(2,Math.round(n/4));
+    for(var s2=0;s2<4;s2++){var A4=sq[s2],B4=sq[(s2+1)%4];
+      for(var i4=0;i4<m;i4++){var t4=i4/m;
+        sp.push([A4[0]+(B4[0]-A4[0])*t4,A4[1]+(B4[1]-A4[1])*t4]);sg.push(s2);}}
     loops.push({pts:sp,gs:sg,hole:false});
     var dc=arcPts(function(t){var th=t*TAU;return [rd*Math.cos(th),rd*Math.sin(th)];},n);
     loops.push({pts:dc,gs:dc.map(function(){return 4;}),hole:true});
     foci=[[0,0]];
-    meta={eq:'квадрат 2×2, диск r = '+rd.toFixed(4),
-      note:'Бильярд Синая: выпуклый внутрь диск делает систему гиперболической. Классическая модель диффузии Лоренца.'};
+    meta.eq='квадрат 2×2, диск r = '+rd.toFixed(4);
+    meta.note='Бильярд Синая: выпуклый внутрь диск делает систему гиперболической. Классическая модель диффузии Лоренца.';
   } else if(S.shape==='penroseRoom'){
-    var aa=1.5,bb=1.0, cw=0.22+p*0.34, ch=0.18+p*0.42;
+    var aa=1.5,bb=1.0,cw=0.22+p*0.34,ch=0.18+p*0.42,cx2=aa*0.42;
     groups=['свод','пол','гриб левый','гриб правый'];
-    var pr=[],pg=[];
-    arcPts(function(t){var th=t*Math.PI;return [aa*Math.cos(th),bb*Math.sin(th)];},n)
-      .forEach(function(q){pr.push(q);pg.push(0);});
-    var cx2=aa*0.42;
-    pr.push([cx2+cw,0]);pg.push(1);
+    var pr2=[],pg=[];
+    /* свод слева направо: от (−aa,0) к (aa,0) — иначе скачок через полость */
+    arcPts(function(t){var th=Math.PI-t*Math.PI;return [aa*Math.cos(th),bb*Math.sin(th)];},n)
+      .forEach(function(q){pr2.push(q);pg.push(0);});
+    pr2.push([cx2+cw,0]);pg.push(1);
     arcPts(function(t){var th=t*Math.PI;return [cx2+cw*Math.cos(th),-ch*Math.sin(th)];},Math.round(n/2))
-      .forEach(function(q){pr.push(q);pg.push(3);});
-    pr.push([-cx2+cw,0]);pg.push(1);
+      .forEach(function(q){pr2.push(q);pg.push(3);});
+    pr2.push([-cx2+cw,0]);pg.push(1);
     arcPts(function(t){var th=t*Math.PI;return [-cx2+cw*Math.cos(th),-ch*Math.sin(th)];},Math.round(n/2))
-      .forEach(function(q){pr.push(q);pg.push(2);});
-    pr.push([-aa,0]);pg.push(1);
-    loops.push({pts:pr,gs:pg,hole:false});
+      .forEach(function(q){pr2.push(q);pg.push(2);});
+    pr2.push([-aa,0]);pg.push(1);
+    loops.push({pts:pr2,gs:pg,hole:false});
     var cc=Math.sqrt(aa*aa-bb*bb);
     foci=[[-cc,0],[cc,0]];
-    meta={eq:'свод a = 1.5, b = 1.0, фокусы (±'+cc.toFixed(4)+', 0); грибы '+cw.toFixed(3)+'×'+ch.toFixed(3),
-      note:'Конструкция пенрозовского типа: полуэллиптический свод и два гриба на полу. Полуэллипс сохраняет пересечение фокального отрезка, грибы отсекают часть свода. Тёмную площадь модель измеряет, а не предполагает.'};
+    meta.eq='свод a = 1.5, b = 1.0, фокусы (±'+cc.toFixed(4)+', 0); грибы '+cw.toFixed(3)+'×'+ch.toFixed(3);
+    meta.note='Конструкция пенрозовского типа: полуэллиптический свод и два гриба на полу. Тёмную площадь модель измеряет, а не предполагает.';
   } else {
     groups=['сторона 1','сторона 2','сторона 3','сторона 4'];
-    var q4=[[1,1],[-1,1],[-1,-1],[1,-1]],qp=[],qg=[];
-    for(var s4=0;s4<4;s4++){var A4=q4[s4],B4=q4[(s4+1)%4];
-      for(var i4=0;i4<Math.max(2,Math.round(n/4));i4++){var t4=i4/Math.max(2,Math.round(n/4));
-        qp.push([A4[0]+(B4[0]-A4[0])*t4,A4[1]+(B4[1]-A4[1])*t4]);qg.push(s4);}}
+    var q4=[[1,1],[-1,1],[-1,-1],[1,-1]],qp=[],qg=[],m4=Math.max(2,Math.round(n/4));
+    for(var s4=0;s4<4;s4++){var A5=q4[s4],B5=q4[(s4+1)%4];
+      for(var i5=0;i5<m4;i5++){var t5=i5/m4;
+        qp.push([A5[0]+(B5[0]-A5[0])*t5,A5[1]+(B5[1]-A5[1])*t5]);qg.push(s4);}}
     loops.push({pts:qp,gs:qg,hole:false});
     foci=[[0,0]];
-    meta={eq:'квадрат 2×2 · рациональный бильярд',
-      note:'Квадрат: разворачивание траектории в решётку даёт интегрируемость. Углы кратны π/2, хаоса нет.'};
+    meta.eq='квадрат 2×2 · рациональный бильярд';
+    meta.note='Квадрат: разворачивание траектории в решётку даёт интегрируемость. Углы кратны π/2, хаоса нет.';
   }
   return {loops:loops,foci:foci,groups:groups,meta:meta};
 }
 
-/* ============ геометрия / ускорение ============ */
+/* ================= геометрия ================= */
 function inside(x,y,g){
-  var ok=true;
   for(var li=0;li<g.loops.length;li++){
     var L=g.loops[li],P=L.pts,c=false;
     for(var i=0,j=P.length-1;i<P.length;j=i++){
       var xi=P[i][0],yi=P[i][1],xj=P[j][0],yj=P[j][1];
-      if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi)) c=!c;
+      if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c;
     }
-    ok = ok && (L.hole ? !c : c);
-    if(!ok) return false;
+    if(L.hole?c:!c)return false;
   }
-  return ok;
-}
-function makeGeo(){
-  var b=build(), segs=[], types=[], minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9, arc=[0];
-  b.loops.forEach(function(L){
-    var P=L.pts,G=L.gs;
-    for(var i=0;i<P.length;i++){
-      var A=P[i],B=P[(i+1)%P.length];
-      if(Math.hypot(B[0]-A[0],B[1]-A[1])<1e-12) continue;
-      segs.push([A[0],A[1],B[0],B[1],G[i%G.length]]);
-      minx=Math.min(minx,A[0],B[0]);maxx=Math.max(maxx,A[0],B[0]);
-      miny=Math.min(miny,A[1],B[1]);maxy=Math.max(maxy,A[1],B[1]);
-    }
-  });
-  var g={loops:b.loops,foci:b.foci,groups:b.groups,meta:b.meta,segs:segs,
-    bbox:[minx,miny,maxx,maxy],types:new Array(segs.length).fill(0),norm:[],tans:[],cum:[],total:0};
-  // нормали внутрь
-  var eps=1e-5;
-  segs.forEach(function(s){
-    var ex=s[2]-s[0],ey=s[3]-s[1],len=Math.hypot(ex,ey);
-    var tx=ex/len,ty=ey/len,nx=-ty,ny=tx;
-    var mx=(s[0]+s[2])/2,my=(s[1]+s[3])/2;
-    if(!inside(mx+nx*eps,my+ny*eps,g)){nx=-nx;ny=-ny;}
-    g.norm.push([nx,ny]);g.tans.push([tx,ty]);
-    g.cum.push(g.total);g.total+=len;
-  });
-  // сетка
-  var span=Math.max(maxx-minx,maxy-miny);
-  var cs=span/44, cols=Math.max(4,Math.ceil((maxx-minx)/cs)+1), rows=Math.max(4,Math.ceil((maxy-miny)/cs)+1);
-  var cells=[];for(var i=0;i<cols*rows;i++)cells.push([]);
-  segs.forEach(function(s,i){
-    var x0=Math.min(s[0],s[2]),x1=Math.max(s[0],s[2]),y0=Math.min(s[1],s[3]),y1=Math.max(s[1],s[3]);
-    var c0=Math.max(0,Math.floor((x0-minx)/cs)),c1=Math.min(cols-1,Math.floor((x1-minx)/cs));
-    var r0=Math.max(0,Math.floor((y0-miny)/cs)),r1=Math.min(rows-1,Math.floor((y1-miny)/cs));
-    for(var r=r0;r<=r1;r++)for(var c=c0;c<=c1;c++)cells[r*cols+c].push(i);
-  });
-  g.grid={cs:cs,cols:cols,rows:rows,cells:cells,minx:minx,miny:miny};
-  // маска внутренности
-  g.mask=new Uint8Array(HG*HG);g.maskN=0;
-  for(var yy=0;yy<HG;yy++)for(var xx=0;xx<HG;xx++){
-    var px=minx+(xx+0.5)/HG*(maxx-minx), py=miny+(yy+0.5)/HG*(maxy-miny);
-    if(inside(px,py,g)){g.mask[yy*HG+xx]=1;g.maskN++;}
-  }
-  // зазор замыкания
-  var gap=0;
-  b.loops.forEach(function(L){var P=L.pts;
-    for(var i=0;i<P.length;i++){var A=P[i],B=P[(i+1)%P.length];
-      if(i===P.length-1) gap=Math.max(gap,0); }});
-  g.gap=0;
-  if(S.shape==='penrose4'){
-    var vmax=b.meta.vmax,Sv=b.meta.S;
-    var joins=[[0,Sv],[0,-Sv],[Sv,0],[-Sv,0]];
-    joins.forEach(function(J){var best=1e9;
-      segs.forEach(function(s){
-        var d=Math.min(distPtSeg(J[0],J[1],s),distPtSeg(J[0],J[1],s));
-        best=Math.min(best,d);});
-      g.gap=Math.max(g.gap,best);});
-  }
-  return g;
+  return true;
 }
 function distPtSeg(px,py,s){
   var ex=s[2]-s[0],ey=s[3]-s[1],L2=ex*ex+ey*ey;
   var t=L2>0?((px-s[0])*ex+(py-s[1])*ey)/L2:0;t=Math.max(0,Math.min(1,t));
   return Math.hypot(px-(s[0]+ex*t),py-(s[1]+ey*t));
 }
+function makeGeo(skipMask){
+  var b=build(),segs=[],minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
+  b.loops.forEach(function(L){
+    var P=L.pts,G=L.gs;
+    for(var i=0;i<P.length;i++){
+      var A=P[i],B=P[(i+1)%P.length];
+      if(Math.hypot(B[0]-A[0],B[1]-A[1])<1e-12)continue;
+      segs.push([A[0],A[1],B[0],B[1],G[Math.min(i,G.length-1)]]);
+      minx=Math.min(minx,A[0],B[0]);maxx=Math.max(maxx,A[0],B[0]);
+      miny=Math.min(miny,A[1],B[1]);maxy=Math.max(maxy,A[1],B[1]);
+    }
+  });
+  var g={loops:b.loops,foci:b.foci,groups:b.groups,meta:b.meta,segs:segs,
+    bbox:[minx,miny,maxx,maxy],types:new Array(segs.length).fill(0),
+    norm:[],tans:[],cum:[],total:0,gap:b.meta.joinGap||0};
+  var eps=1e-5;
+  segs.forEach(function(s){
+    var ex=s[2]-s[0],ey=s[3]-s[1],len=Math.hypot(ex,ey);
+    var tx=ex/len,ty=ey/len,nx=-ty,ny=tx;
+    var mx=(s[0]+s[2])/2,my=(s[1]+s[3])/2;
+    if(!inside(mx+nx*eps,my+ny*eps,g)){nx=-nx;ny=-ny;}
+    g.norm.push([nx,ny]);g.tans.push([tx,ty]);g.cum.push(g.total);g.total+=len;
+  });
+  var span=Math.max(maxx-minx,maxy-miny),cs=span/44;
+  var cols=Math.max(4,Math.ceil((maxx-minx)/cs)+1),rows=Math.max(4,Math.ceil((maxy-miny)/cs)+1);
+  var cells=[];for(var i2=0;i2<cols*rows;i2++)cells.push([]);
+  segs.forEach(function(s,i){
+    var c0=Math.max(0,Math.floor((Math.min(s[0],s[2])-minx)/cs)),
+        c1=Math.min(cols-1,Math.floor((Math.max(s[0],s[2])-minx)/cs)),
+        r0=Math.max(0,Math.floor((Math.min(s[1],s[3])-miny)/cs)),
+        r1=Math.min(rows-1,Math.floor((Math.max(s[1],s[3])-miny)/cs));
+    for(var r=r0;r<=r1;r++)for(var c=c0;c<=c1;c++)cells[r*cols+c].push(i);
+  });
+  g.grid={cs:cs,cols:cols,rows:rows,cells:cells,minx:minx,miny:miny};
+  g.mask=new Uint8Array(HG*HG);g.maskN=0;
+  if(!skipMask){
+    for(var yy=0;yy<HG;yy++)for(var xx=0;xx<HG;xx++){
+      var px2=minx+(xx+0.5)/HG*(maxx-minx),py2=miny+(yy+0.5)/HG*(maxy-miny);
+      if(inside(px2,py2,g)){g.mask[yy*HG+xx]=1;g.maskN++;}
+    }
+  }
+  return g;
+}
 function hit(g,px,py,dx,dy){
   var G=g.grid,cs=G.cs,cols=G.cols,rows=G.rows;
-  var cx=Math.floor((px-G.minx)/cs),cy=Math.floor((py-G.miny)/cs);
-  cx=Math.max(0,Math.min(cols-1,cx));cy=Math.max(0,Math.min(rows-1,cy));
-  var sx=dx>0?1:-1, sy=dy>0?1:-1;
-  var tdx=dx!==0?cs/Math.abs(dx):Infinity, tdy=dy!==0?cs/Math.abs(dy):Infinity;
+  var cx=Math.max(0,Math.min(cols-1,Math.floor((px-G.minx)/cs)));
+  var cy=Math.max(0,Math.min(rows-1,Math.floor((py-G.miny)/cs)));
+  var sx2=dx>0?1:-1,sy2=dy>0?1:-1;
+  var tdx=dx!==0?cs/Math.abs(dx):Infinity,tdy=dy!==0?cs/Math.abs(dy):Infinity;
   var tmx=dx!==0?((cx+(dx>0?1:0))*cs+G.minx-px)/dx:Infinity;
   var tmy=dy!==0?((cy+(dy>0?1:0))*cs+G.miny-py)/dy:Infinity;
-  var best=Infinity,bi=-1,bu=0,seen={};
+  var best=Infinity,bi=-1,seen={};
   for(var step=0;step<2*(cols+rows)+8;step++){
     var list=G.cells[cy*cols+cx];
     for(var k=0;k<list.length;k++){
@@ -508,19 +510,18 @@ function hit(g,px,py,dx,dy){
       var s=g.segs[i],ex=s[2]-s[0],ey=s[3]-s[1];
       var den=dx*ey-dy*ex;if(Math.abs(den)<1e-15)continue;
       var ax=s[0]-px,ay=s[1]-py;
-      var t=(ax*ey-ay*ex)/den, u=(ax*dy-ay*dx)/den;
-      if(t>1e-9&&u>=-1e-9&&u<=1+1e-9&&t<best){best=t;bi=i;bu=u;}
+      var t=(ax*ey-ay*ex)/den,u=(ax*dy-ay*dx)/den;
+      if(t>1e-9&&u>=-1e-9&&u<=1+1e-9&&t<best){best=t;bi=i;}
     }
-    var nextT=Math.min(tmx,tmy);
-    if(best<nextT||!isFinite(nextT))break;
-    if(tmx<tmy){cx+=sx;tmx+=tdx;}else{cy+=sy;tmy+=tdy;}
+    var nt=Math.min(tmx,tmy);
+    if(best<nt||!isFinite(nt))break;
+    if(tmx<tmy){cx+=sx2;tmx+=tdx;}else{cy+=sy2;tmy+=tdy;}
     if(cx<0||cy<0||cx>=cols||cy>=rows)break;
   }
-  return bi<0?null:{i:bi,t:best,u:bu};
+  return bi<0?null:{i:bi,t:best};
 }
 function lambert(nx,ny){
-  var th=Math.asin(Math.random()*2-1);
-  var tx=-ny,ty=nx;
+  var th=Math.asin(Math.random()*2-1),tx=-ny,ty=nx;
   return [nx*Math.cos(th)+tx*Math.sin(th),ny*Math.cos(th)+ty*Math.sin(th)];
 }
 function advanceRay(g,r){
@@ -528,51 +529,51 @@ function advanceRay(g,r){
   var h=hit(g,r.x,r.y,r.dx,r.dy);
   if(!h){r.alive=false;escapeTotal++;return;}
   var nx=g.norm[h.i][0],ny=g.norm[h.i][1];
-  var qx=r.x+r.dx*h.t, qy=r.y+r.dy*h.t;
+  var qx=r.x+r.dx*h.t,qy=r.y+r.dy*h.t;
   r.path.push([r.x,r.y,qx,qy,r.energy]);
-  if(r.path.length>420)r.path.shift();
-  var s=g.segs[h.i],ty=g.types[h.i];
-  var dot=r.dx*nx+r.dy*ny;
-  var st=Math.abs(r.dx*g.tans[h.i][0]+r.dy*g.tans[h.i][1]);
+  if(r.path.length>r.cap)r.path.shift();
+  var ty=g.types[h.i],tn=g.tans[h.i];
+  var tang=r.dx*tn[0]+r.dy*tn[1],st=Math.abs(tang);
   sinSum+=st;sinN++;
-  if(poin.length<9000) poin.push([g.cum[h.i]/g.total,st*(r.dx*g.tans[h.i][0]+r.dy*g.tans[h.i][1]>=0?1:-1)]);
-  var hb=Math.min(35,Math.floor(st*36));hist[hb]++;
+  if(poin.length<9000)poin.push([g.cum[h.i]/g.total,st*(tang>=0?1:-1)]);
+  hist[Math.min(35,Math.floor(st*36))]++;
   bounceTotal++;r.b++;
   if(ty===4){r.alive=false;escapeTotal++;r.x=qx;r.y=qy;return;}
   var ndx,ndy;
   if(ty===2){ndx=-r.dx;ndy=-r.dy;}
   else{
+    var dot=r.dx*nx+r.dy*ny;
     ndx=r.dx-2*dot*nx;ndy=r.dy-2*dot*ny;
     var mix=(ty===1)?1:S.dif;
     if(mix>0&&Math.random()<mix){var L=lambert(nx,ny);ndx=L[0];ndy=L[1];}
   }
-  if(ty===3||S.abs>0){r.energy*=(1-(ty===3?Math.max(0.25,S.abs):S.abs*0.35));}
+  if(ty===3)r.energy*=(1-Math.max(0.25,S.abs));
+  else if(S.abs>0)r.energy*=(1-S.abs*0.35);
   if(r.energy<0.035){r.alive=false;absTotal++;r.x=qx;r.y=qy;return;}
   var nl=Math.hypot(ndx,ndy)||1;
   r.dx=ndx/nl;r.dy=ndy/nl;
   r.x=qx+r.dx*1e-7;r.y=qy+r.dy*1e-7;
-  if(r.b>=S.bounces){r.alive=false;}
+  if(r.b>=S.bounces)r.alive=false;
 }
 function newRays(){
-  var ang=S.ang*Math.PI/180, spr=S.spr*Math.PI/180;
+  var ang=S.ang*Math.PI/180,spr=S.spr*Math.PI/180,n=Math.round(S.n);
+  var cap=Math.max(10,Math.min(420,Math.round(7000/Math.max(1,n))));
   rays=[];bounceTotal=0;escapeTotal=0;absTotal=0;sinSum=0;sinN=0;
-  var n=Math.round(S.n);
   for(var i=0;i<n;i++){
     var a=ang+(n===1?0:(i/(n-1)-0.5)*spr);
-    rays.push({x:src.x,y:src.y,dx:Math.cos(a),dy:Math.sin(a),alive:true,b:0,energy:1,path:[],hue:i/Math.max(1,n-1)});
+    rays.push({x:src.x,y:src.y,dx:Math.cos(a),dy:Math.sin(a),alive:true,b:0,energy:1,path:[],cap:cap,hue:i/Math.max(1,n-1)});
   }
   if(S.mode==='twin'){
     var d=1e-7;
-    twin=[{x:src.x,y:src.y,dx:Math.cos(ang),dy:Math.sin(ang),alive:true,b:0,energy:1,path:[],hue:0},
-          {x:src.x,y:src.y,dx:Math.cos(ang+d),dy:Math.sin(ang+d),alive:true,b:0,energy:1,path:[],hue:1}];
+    twin=[{x:src.x,y:src.y,dx:Math.cos(ang),dy:Math.sin(ang),alive:true,b:0,energy:1,path:[],cap:420,hue:0},
+          {x:src.x,y:src.y,dx:Math.cos(ang+d),dy:Math.sin(ang+d),alive:true,b:0,energy:1,path:[],cap:420,hue:1}];
     divLog=[];
   } else twin=null;
 }
 function clearHeat(){heat=new Float32Array(HG*HG);heatMax=0;}
-var heatMax=0;
 function addHeat(g,x0,y0,x1,y1,w){
   var b=g.bbox,len=Math.hypot(x1-x0,y1-y0);
-  var steps=Math.max(1,Math.ceil(len/((b[2]-b[0])/HG*0.7)));
+  var steps=Math.max(1,Math.min(48,Math.ceil(len/((b[2]-b[0])/HG*0.8))));
   for(var i=0;i<=steps;i++){
     var t=i/steps,px=x0+(x1-x0)*t,py=y0+(y1-y0)*t;
     var cx=Math.floor((px-b[0])/(b[2]-b[0])*HG),cy=Math.floor((py-b[1])/(b[3]-b[1])*HG);
@@ -582,26 +583,23 @@ function addHeat(g,x0,y0,x1,y1,w){
   }
 }
 function startFlood(){
-  floodState={i:0,total:Math.max(240,Math.round(S.n)*6),done:0};
+  floodState={i:0,total:Math.min(1400,Math.max(240,Math.round(S.n)*3))};
   clearHeat();$('c_heat').checked=true;
 }
 function floodBatch(g){
   if(!floodState)return;
-  var per=26, b=floodState.total;
-  for(var k=0;k<per&&floodState.i<b;k++,floodState.i++){
+  var lim=Math.min(70,Math.max(24,Math.round(S.bounces)));
+  for(var k=0;k<24&&floodState.i<floodState.total;k++,floodState.i++){
     var a=Math.random()*TAU;
-    var r={x:src.x,y:src.y,dx:Math.cos(a),dy:Math.sin(a),alive:true,b:0,energy:1,path:[]};
-    var lim=Math.max(24,Math.round(S.bounces));
-    for(var s=0;s<lim&&r.alive;s++){
-      var h=hit(g,r.x,r.y,r.dx,r.dy);if(!h){break;}
+    var r={x:src.x,y:src.y,dx:Math.cos(a),dy:Math.sin(a),energy:1};
+    for(var s=0;s<lim;s++){
+      var h=hit(g,r.x,r.y,r.dx,r.dy);if(!h)break;
       var qx=r.x+r.dx*h.t,qy=r.y+r.dy*h.t;
       addHeat(g,r.x,r.y,qx,qy,r.energy);
-      var ty=g.types[h.i];
-      if(ty===4)break;
-      var nx=g.norm[h.i][0],ny=g.norm[h.i][1],dot=r.dx*nx+r.dy*ny;
-      var ndx,ndy;
+      var ty=g.types[h.i];if(ty===4)break;
+      var nx=g.norm[h.i][0],ny=g.norm[h.i][1],ndx,ndy;
       if(ty===2){ndx=-r.dx;ndy=-r.dy;}
-      else{ndx=r.dx-2*dot*nx;ndy=r.dy-2*dot*ny;
+      else{var dot=r.dx*nx+r.dy*ny;ndx=r.dx-2*dot*nx;ndy=r.dy-2*dot*ny;
         var mix=(ty===1)?1:S.dif;if(mix>0&&Math.random()<mix){var L=lambert(nx,ny);ndx=L[0];ndy=L[1];}}
       if(ty===3)r.energy*=(1-Math.max(0.25,S.abs));
       if(r.energy<0.05)break;
@@ -609,35 +607,57 @@ function floodBatch(g){
       r.dx=ndx/nl;r.dy=ndy/nl;r.x=qx+r.dx*1e-7;r.y=qy+r.dy*1e-7;
     }
   }
-  $('progbar').style.width=(floodState.i/b*100)+'%';
-  if(floodState.i>=b){floodState=null;setTimeout(function(){$('progbar').style.width='0%';},700);}
+  $('progbar').style.width=(floodState.i/floodState.total*100)+'%';
+  if(floodState.i>=floodState.total){floodState=null;setTimeout(function(){$('progbar').style.width='0%';},700);}
 }
 function coverage(g){
-  if(!heat||heatMax<=0)return null;
+  if(!heat||heatMax<=0||!g.maskN)return null;
   var lit=0;
-  for(var i=0;i<HG*HG;i++) if(g.mask[i]&&heat[i]>heatMax*0.004) lit++;
+  for(var i=0;i<HG*HG;i++)if(g.mask[i]&&heat[i]>heatMax*0.004)lit++;
   return {cov:lit/g.maskN,dark:1-lit/g.maskN};
 }
+/* демо-пучок: фокус -> своя дуга -> параллельно оси -> противоположная дуга -> её фокус */
+function beamPath(g,fi,spread){
+  var F=g.foci[fi],L=Math.hypot(F[0],F[1]);
+  var ox=F[0]/L,oy=F[1]/L;                 /* НАРУЖУ, к своей вершине */
+  var a0=Math.atan2(oy,ox)+spread;
+  var d=[Math.cos(a0),Math.sin(a0)],p=[F[0],F[1]],out=[[F[0],F[1]]];
+  for(var k=0;k<3;k++){
+    var h=hit(g,p[0],p[1],d[0],d[1]);if(!h)return null;
+    var q=[p[0]+d[0]*h.t,p[1]+d[1]*h.t];out.push(q);
+    var n=g.norm[h.i],dot=d[0]*n[0]+d[1]*n[1];
+    d=[d[0]-2*dot*n[0],d[1]-2*dot*n[1]];
+    p=[q[0]+d[0]*1e-7,q[1]+d[1]*1e-7];
+  }
+  return {pts:out,lastDir:d,lastPt:out[out.length-2]};
+}
+function focusMiss(g){
+  if(g.foci.length!==4)return null;
+  var T=g.foci[2],worst=0;
+  for(var s=-2;s<=2;s++){
+    var bp=beamPath(g,0,s*0.13);if(!bp)return null;
+    var P=bp.lastPt,d=bp.lastDir;
+    var cr=Math.abs((P[0]-T[0])*d[1]-(P[1]-T[1])*d[0]);
+    worst=Math.max(worst,cr);
+  }
+  return worst;
+}
 
-/* ============ рендер ============ */
+/* ================= рендер ================= */
 var st=$('stage'),sx=st.getContext('2d'),pl=$('plot'),px=pl.getContext('2d');
-heatCv=document.createElement('canvas');heatCv.width=HG;heatCv.height=HG;
-var hctx=heatCv.getContext('2d');
 function resize(){
-  var box=st.parentNode.getBoundingClientRect();
-  W=Math.max(280,Math.round(box.width));
+  W=Math.max(280,Math.round(st.parentNode.getBoundingClientRect().width));
   H=Math.max(320,Math.round(Math.min(620,W*0.78)));
   dpr=Math.min(S.q,window.devicePixelRatio||1);
   st.width=Math.round(W*dpr);st.height=Math.round(H*dpr);st.style.height=H+'px';
   sx.setTransform(dpr,0,0,dpr,0,0);
-  var pb=pl.parentNode.getBoundingClientRect();
-  PW=Math.max(280,Math.round(pb.width-28));PH=Math.max(230,Math.round(Math.min(340,PW*0.34)));
+  PW=Math.max(280,Math.round(pl.parentNode.getBoundingClientRect().width-28));
+  PH=Math.max(230,Math.round(Math.min(340,PW*0.34)));
   pl.width=Math.round(PW*dpr);pl.height=Math.round(PH*dpr);pl.style.height=PH+'px';
   px.setTransform(dpr,0,0,dpr,0,0);
 }
 function view(g){
-  var b=g.bbox,w=b[2]-b[0],h=b[3]-b[1];
-  var k=Math.min((W-70)/w,(H-70)/h);
+  var b=g.bbox,k=Math.min((W-70)/(b[2]-b[0]),(H-70)/(b[3]-b[1]));
   return {k:k,ox:W/2-(b[0]+b[2])/2*k,oy:H/2+(b[1]+b[3])/2*k,
     X:function(x){return this.ox+x*this.k;},Y:function(y){return this.oy-y*this.k;},
     ix:function(X){return (X-this.ox)/this.k;},iy:function(Y){return (this.oy-Y)/this.k;}};
@@ -645,122 +665,96 @@ function view(g){
 function heatImage(){
   var img=hctx.createImageData(HG,HG),d=img.data;
   var stops=[[10,20,23],[24,74,72],[47,158,150],[79,216,196],[217,185,140],[233,244,241]];
+  var dark=$('c_dark').checked;
   for(var y=0;y<HG;y++)for(var x=0;x<HG;x++){
     var k=y*HG+x,o=((HG-1-y)*HG+x)*4;
     if(!geo.mask[k]){d[o+3]=0;continue;}
-    var v=heatMax>0?Math.pow(Math.min(1,heat[k]/heatMax),0.42):0;
+    if(dark&&heat[k]<=heatMax*0.004){d[o]=214;d[o+1]=159;d[o+2]=169;d[o+3]=150;continue;}
+    var v=Math.pow(Math.min(1,heat[k]/heatMax),0.42);
     var f=v*(stops.length-1),i0=Math.floor(f),i1=Math.min(stops.length-1,i0+1),t=f-i0;
     d[o]=stops[i0][0]+(stops[i1][0]-stops[i0][0])*t;
     d[o+1]=stops[i0][1]+(stops[i1][1]-stops[i0][1])*t;
     d[o+2]=stops[i0][2]+(stops[i1][2]-stops[i0][2])*t;
-    d[o+3]=210;
+    d[o+3]=215;
   }
   hctx.putImageData(img,0,0);
 }
+function rampColor(t){
+  var s=[[79,216,196],[159,232,220],[217,185,140],[201,169,110],[171,166,220],[214,159,169]];
+  var f=t*(s.length-1),i=Math.floor(f),j=Math.min(s.length-1,i+1),u=f-i;
+  return 'rgb('+Math.round(s[i][0]+(s[j][0]-s[i][0])*u)+','+Math.round(s[i][1]+(s[j][1]-s[i][1])*u)+','+
+    Math.round(s[i][2]+(s[j][2]-s[i][2])*u)+')';
+}
 function drawStage(){
-  var g=geo,v=view(g),b=g.bbox;
+  var g=geo,v=view(g),b=g.bbox,glow=$('c_glow').checked,lab=$('c_lab').checked;
   sx.clearRect(0,0,W,H);
   var bg=sx.createLinearGradient(0,0,W,H);
   bg.addColorStop(0,'#08161A');bg.addColorStop(.55,PAL.canvas);bg.addColorStop(1,'#06100F');
   sx.fillStyle=bg;sx.fillRect(0,0,W,H);
   if($('c_grid').checked){
-    sx.strokeStyle=PAL.line;sx.lineWidth=1;
+    sx.strokeStyle='rgba(126,214,199,.16)';sx.lineWidth=1;
     for(var t=-4;t<=4;t+=0.5){
       sx.beginPath();sx.moveTo(v.X(t),0);sx.lineTo(v.X(t),H);sx.stroke();
-      sx.beginPath();sx.moveTo(0,v.Y(t));sx.lineTo(W,v.Y(t));sx.stroke();
-    }
-    sx.strokeStyle=PAL.line2;sx.beginPath();sx.moveTo(0,v.Y(0));sx.lineTo(W,v.Y(0));
-    sx.moveTo(v.X(0),0);sx.lineTo(v.X(0),H);sx.stroke();
+      sx.beginPath();sx.moveTo(0,v.Y(t));sx.lineTo(W,v.Y(t));sx.stroke();}
+    sx.strokeStyle='rgba(126,214,199,.30)';
+    sx.beginPath();sx.moveTo(0,v.Y(0));sx.lineTo(W,v.Y(0));sx.moveTo(v.X(0),0);sx.lineTo(v.X(0),H);sx.stroke();
   }
   if($('c_heat').checked&&heatMax>0){
-    heatImage();
-    sx.save();sx.imageSmoothingEnabled=true;
+    heatImage();sx.imageSmoothingEnabled=true;
     sx.drawImage(heatCv,v.X(b[0]),v.Y(b[3]),(b[2]-b[0])*v.k,(b[3]-b[1])*v.k);
-    sx.restore();
-    if($('c_dark').checked){
-      sx.fillStyle='rgba(214,159,169,.30)';
-      var cw=(b[2]-b[0])/HG*v.k,chh=(b[3]-b[1])/HG*v.k;
-      for(var y=0;y<HG;y+=1)for(var x=0;x<HG;x+=1){
-        var k=y*HG+x;
-        if(g.mask[k]&&heat[k]<=heatMax*0.004) sx.fillRect(v.X(b[0]+x/HG*(b[2]-b[0])),v.Y(b[3]-y/HG*(b[3]-b[1])),cw+0.6,chh+0.6);
-      }
-    }
   }
-  // стенки
-  var glow=$('c_glow').checked;
   for(var i=0;i<g.segs.length;i++){
     var s=g.segs[i],ty=g.types[i],col=PAL[SURF[ty].c];
     sx.strokeStyle=col;sx.lineWidth=ty===4?3.4:2.4;
-    if(ty===4)sx.setLineDash([7,5]);else sx.setLineDash([]);
+    sx.setLineDash(ty===4?[7,5]:[]);
     if(glow&&ty!==4){sx.shadowColor=col;sx.shadowBlur=9;}
     sx.beginPath();sx.moveTo(v.X(s[0]),v.Y(s[1]));sx.lineTo(v.X(s[2]),v.Y(s[3]));sx.stroke();
     sx.shadowBlur=0;
   }
   sx.setLineDash([]);
-  // фокусы и квадрат
   if($('c_foci').checked&&g.foci.length){
     if(g.foci.length===4){
+      var fs=g.foci.slice().sort(function(a,c){return Math.atan2(a[1],a[0])-Math.atan2(c[1],c[0]);});
       sx.strokeStyle=PAL.ice;sx.lineWidth=1.7;sx.setLineDash([6,5]);sx.beginPath();
-      var order=[0,1,2,3];
-      var fs=g.foci.slice().sort(function(a,b){return Math.atan2(a[1],a[0])-Math.atan2(b[1],b[0]);});
-      fs.forEach(function(f,i2){var X=v.X(f[0]),Y=v.Y(f[1]);i2?sx.lineTo(X,Y):sx.moveTo(X,Y);});
+      fs.forEach(function(f,j){var X=v.X(f[0]),Y=v.Y(f[1]);j?sx.lineTo(X,Y):sx.moveTo(X,Y);});
       sx.closePath();sx.stroke();sx.setLineDash([]);
     }
-    g.foci.forEach(function(f,i3){
+    g.foci.forEach(function(f,j){
       var X=v.X(f[0]),Y=v.Y(f[1]);
       if(glow){sx.shadowColor=PAL.sand;sx.shadowBlur=13;}
       sx.fillStyle=PAL.sand;sx.beginPath();sx.arc(X,Y,5.2,0,TAU);sx.fill();sx.shadowBlur=0;
       sx.strokeStyle=PAL.canvas;sx.lineWidth=1.6;sx.stroke();
-      if($('c_lab').checked){sx.fillStyle=PAL.sand;sx.font='11px JetBrains Mono, monospace';sx.textAlign='left';
-        sx.fillText('F'+(i3+1),X+8,Y-7);}
+      if(lab){sx.fillStyle=PAL.sand;sx.font='11px JetBrains Mono, monospace';sx.textAlign='left';
+        sx.fillText('F'+(j+1),X+8,Y-7);}
     });
   }
-  // демонстрационный пучок
   if($('c_beam').checked&&S.shape==='penrose4'&&g.foci.length===4){
-    var F=g.foci[2],Fo=g.foci[0];
-    var ux=-F[0]/Math.hypot(F[0],F[1]),uy=-F[1]/Math.hypot(F[0],F[1]);
     for(var q=-2;q<=2;q++){
-      var a0=Math.atan2(uy,ux)+q*0.16;
-      var rr={x:F[0],y:F[1],dx:Math.cos(a0),dy:Math.sin(a0)};
-      var h1=hit(g,rr.x,rr.y,rr.dx,rr.dy);if(!h1)continue;
-      var p1=[rr.x+rr.dx*h1.t,rr.y+rr.dy*h1.t];
-      var n1=g.norm[h1.i],d1=rr.dx*n1[0]+rr.dy*n1[1];
-      var e1=[rr.dx-2*d1*n1[0],rr.dy-2*d1*n1[1]];
-      var h2=hit(g,p1[0]+e1[0]*1e-7,p1[1]+e1[1]*1e-7,e1[0],e1[1]);if(!h2)continue;
-      var p2=[p1[0]+e1[0]*h2.t,p1[1]+e1[1]*h2.t];
-      var n2=g.norm[h2.i],d2=e1[0]*n2[0]+e1[1]*n2[1];
-      var e2=[e1[0]-2*d2*n2[0],e1[1]-2*d2*n2[1]];
-      var h3=hit(g,p2[0]+e2[0]*1e-7,p2[1]+e2[1]*1e-7,e2[0],e2[1]);
-      var p3=h3?[p2[0]+e2[0]*h3.t,p2[1]+e2[1]*h3.t]:[p2[0]+e2[0]*0.6,p2[1]+e2[1]*0.6];
-      sx.strokeStyle='rgba(159,232,220,.85)';sx.lineWidth=1.6;
+      var bp=beamPath(g,0,q*0.13);if(!bp)continue;
+      sx.strokeStyle='rgba(159,232,220,.9)';sx.lineWidth=1.7;
       if(glow){sx.shadowColor=PAL.ice;sx.shadowBlur=8;}
-      sx.beginPath();sx.moveTo(v.X(F[0]),v.Y(F[1]));sx.lineTo(v.X(p1[0]),v.Y(p1[1]));
-      sx.lineTo(v.X(p2[0]),v.Y(p2[1]));sx.lineTo(v.X(p3[0]),v.Y(p3[1]));sx.stroke();sx.shadowBlur=0;
+      sx.beginPath();
+      bp.pts.forEach(function(P,j){var X=v.X(P[0]),Y=v.Y(P[1]);j?sx.lineTo(X,Y):sx.moveTo(X,Y);});
+      sx.stroke();sx.shadowBlur=0;
     }
   }
-  // следы
   if($('c_trail').checked){
     var arr=(S.mode==='twin'&&twin)?twin:rays;
-    arr.forEach(function(r,ri){
-      var base=(S.mode==='twin')?(ri===0?PAL.aqua:PAL.rose):null;
+    for(var ri=0;ri<arr.length;ri++){
+      var r=arr[ri],base=(S.mode==='twin')?(ri===0?PAL.aqua:PAL.rose):rampColor(r.hue);
       for(var k2=0;k2<r.path.length;k2++){
-        var seg=r.path[k2];
-        var age=(k2+1)/r.path.length;
-        var al=Math.pow(age,1+S.fade*4)*0.9*seg[4];
-        if(al<0.012)continue;
-        var col=base||rampColor(r.hue);
-        sx.strokeStyle=col;sx.globalAlpha=al;sx.lineWidth=1.25;
-        sx.beginPath();sx.moveTo(v.X(seg[0]),v.Y(seg[1]));sx.lineTo(v.X(seg[2]),v.Y(seg[3]));sx.stroke();
+        var sg=r.path[k2],al=Math.pow((k2+1)/r.path.length,1+S.fade*4)*0.9*sg[4];
+        if(al<0.015)continue;
+        sx.strokeStyle=base;sx.globalAlpha=al;sx.lineWidth=1.25;
+        sx.beginPath();sx.moveTo(v.X(sg[0]),v.Y(sg[1]));sx.lineTo(v.X(sg[2]),v.Y(sg[3]));sx.stroke();
       }
       sx.globalAlpha=1;
       if(r.alive){
-        var X=v.X(r.x),Y=v.Y(r.y);
-        if(glow){sx.shadowColor=base||PAL.ice;sx.shadowBlur=11;}
-        sx.fillStyle=base||PAL.ice;sx.beginPath();sx.arc(X,Y,3.1,0,TAU);sx.fill();sx.shadowBlur=0;
+        if(glow){sx.shadowColor=base;sx.shadowBlur=11;}
+        sx.fillStyle=base;sx.beginPath();sx.arc(v.X(r.x),v.Y(r.y),3.1,0,TAU);sx.fill();sx.shadowBlur=0;
       }
-    });
+    }
   }
-  // источник и прицел
   var SX=v.X(src.x),SY=v.Y(src.y),AX=v.X(aim.x),AY=v.Y(aim.y);
   sx.strokeStyle=PAL.sand;sx.lineWidth=1.5;sx.setLineDash([4,4]);
   sx.beginPath();sx.moveTo(SX,SY);sx.lineTo(AX,AY);sx.stroke();sx.setLineDash([]);
@@ -771,60 +765,49 @@ function drawStage(){
   if(glow){sx.shadowColor=PAL.aqua;sx.shadowBlur=16;}
   sx.strokeStyle=PAL.aqua;sx.lineWidth=2.6;sx.beginPath();sx.arc(SX,SY,9,0,TAU);sx.stroke();
   sx.fillStyle=PAL.aqua;sx.beginPath();sx.arc(SX,SY,3.4,0,TAU);sx.fill();sx.shadowBlur=0;
-  if($('c_lab').checked){
+  if(lab){
     sx.fillStyle=PAL.muted;sx.font='11px JetBrains Mono, monospace';sx.textAlign='left';
     sx.fillText('источник ('+src.x.toFixed(3)+', '+src.y.toFixed(3)+')',12,H-14);
     sx.textAlign='right';sx.fillText(S.n+' луч · '+S.bounces+' отраж · '+SURF[S.surf].n,W-12,H-14);
   }
 }
-function rampColor(t){
-  var stops=[[79,216,196],[159,232,220],[217,185,140],[201,169,110],[171,166,220],[214,159,169]];
-  var f=t*(stops.length-1),i=Math.floor(f),j=Math.min(stops.length-1,i+1),u=f-i;
-  return 'rgb('+Math.round(stops[i][0]+(stops[j][0]-stops[i][0])*u)+','+
-    Math.round(stops[i][1]+(stops[j][1]-stops[i][1])*u)+','+
-    Math.round(stops[i][2]+(stops[j][2]-stops[i][2])*u)+')';
-}
 function drawPlot(){
   px.clearRect(0,0,PW,PH);px.fillStyle=PAL.canvas;px.fillRect(0,0,PW,PH);
-  var L=54,R=16,T=16,B=30;
-  px.strokeStyle=PAL.line;px.lineWidth=1;
-  for(var i=0;i<=8;i++){var X=L+(PW-L-R)*i/8;px.beginPath();px.moveTo(X,T);px.lineTo(X,PH-B);px.stroke();}
-  for(var j=0;j<=6;j++){var Y=T+(PH-T-B)*j/6;px.beginPath();px.moveTo(L,Y);px.lineTo(PW-R,Y);px.stroke();}
+  var L=54,R=16,T=16,B=30,i;
+  px.strokeStyle='rgba(126,214,199,.16)';px.lineWidth=1;
+  for(i=0;i<=8;i++){var X=L+(PW-L-R)*i/8;px.beginPath();px.moveTo(X,T);px.lineTo(X,PH-B);px.stroke();}
+  for(i=0;i<=6;i++){var Y=T+(PH-T-B)*i/6;px.beginPath();px.moveTo(L,Y);px.lineTo(PW-R,Y);px.stroke();}
   px.font='10px JetBrains Mono, monospace';
   if(plotMode==='poin'){
-    px.fillStyle=PAL.aqua;
-    poin.forEach(function(p){
-      var X=L+p[0]*(PW-L-R),Y=T+(1-(p[1]+1)/2)*(PH-T-B);
-      px.globalAlpha=.55;px.fillRect(X-1,Y-1,2.2,2.2);
-    });
+    px.fillStyle=PAL.aqua;px.globalAlpha=.55;
+    for(i=0;i<poin.length;i++){
+      px.fillRect(L+poin[i][0]*(PW-L-R)-1,T+(1-(poin[i][1]+1)/2)*(PH-T-B)-1,2.2,2.2);}
     px.globalAlpha=1;
     px.fillStyle=PAL.muted;px.textAlign='left';px.fillText('sin θ = +1',L+4,T+11);
     px.fillText('sin θ = −1',L+4,PH-B-4);
     px.textAlign='right';px.fillText('s / L: 0 → 1',PW-R,PH-9);
     px.textAlign='left';px.fillStyle=PAL.sand;px.fillText('точек: '+poin.length,L,PH-9);
-  } else if(plotMode==='div'){
+  }else if(plotMode==='div'){
     if(divLog.length<2){px.fillStyle=PAL.muted;px.textAlign='left';
       px.fillText('Режим «Близнецы»: запустите, чтобы увидеть расхождение',L+6,PH/2);return;}
-    var mx=Math.max.apply(null,divLog.map(function(d){return d[1];}));
-    var mn=Math.min.apply(null,divLog.map(function(d){return d[1];}));
+    var mx=-1e9,mn=1e9;
+    divLog.forEach(function(d){mx=Math.max(mx,d[1]);mn=Math.min(mn,d[1]);});
     var nb=Math.max(1,divLog[divLog.length-1][0]);
     px.strokeStyle=PAL.rose;px.lineWidth=2.2;px.beginPath();
-    divLog.forEach(function(d,k){var X=L+d[0]/nb*(PW-L-R),Y=T+(1-(d[1]-mn)/((mx-mn)||1))*(PH-T-B);
-      k?px.lineTo(X,Y):px.moveTo(X,Y);});px.stroke();
+    divLog.forEach(function(d,k){var X2=L+d[0]/nb*(PW-L-R),Y2=T+(1-(d[1]-mn)/((mx-mn)||1))*(PH-T-B);
+      k?px.lineTo(X2,Y2):px.moveTo(X2,Y2);});px.stroke();
     px.fillStyle=PAL.rose;px.textAlign='left';px.fillText('ln|Δ| от '+mn.toFixed(1)+' до '+mx.toFixed(1),L+4,T+11);
     px.fillStyle=PAL.muted;px.textAlign='right';px.fillText('отражений: '+nb,PW-R,PH-9);
     px.textAlign='left';px.fillText('наклон ≈ λ на отражение',L,PH-9);
-  } else if(plotMode==='hist'){
-    var mx2=Math.max(1,Math.max.apply(null,hist));
-    for(var k2=0;k2<36;k2++){
-      var w=(PW-L-R)/36,h=hist[k2]/mx2*(PH-T-B);
-      px.fillStyle=rampColor(k2/35);px.globalAlpha=.85;
-      px.fillRect(L+k2*w+1,PH-B-h,w-2,h);
-    }
+  }else if(plotMode==='hist'){
+    var mx2=1;for(i=0;i<36;i++)mx2=Math.max(mx2,hist[i]);
+    var w=(PW-L-R)/36;
+    for(i=0;i<36;i++){var h=hist[i]/mx2*(PH-T-B);
+      px.fillStyle=rampColor(i/35);px.globalAlpha=.85;px.fillRect(L+i*w+1,PH-B-h,w-2,h);}
     px.globalAlpha=1;px.fillStyle=PAL.muted;px.textAlign='left';
     px.fillText('|sin θ| от 0 (касательная) до 1 (нормаль)',L+4,T+11);
     px.textAlign='right';px.fillText('макс '+mx2,PW-R,PH-9);
-  } else {
+  }else{
     if(heatMax<=0){px.fillStyle=PAL.muted;px.textAlign='left';
       px.fillText('Нажмите «Залить светом» — карта появится здесь',L+6,PH/2);return;}
     heatImage();
@@ -834,62 +817,65 @@ function drawPlot(){
   }
 }
 
-/* ============ показания ============ */
+/* ================= показания ================= */
 function readouts(){
-  var g=geo;
+  var g=geo,arr=(S.mode==='twin'&&twin)?twin:rays;
   $('d_bounce').textContent=bounceTotal;
   $('d_escape').textContent=escapeTotal;
   $('d_abs').textContent=absTotal;
-  var arr=(S.mode==='twin'&&twin)?twin:rays;
-  $('d_alive').textContent=arr.filter(function(r){return r.alive;}).length;
+  var alive=0;for(var i=0;i<arr.length;i++)if(arr[i].alive)alive++;
+  $('d_alive').textContent=alive;
   var cv=coverage(g);
   $('d_cov').textContent=cv?(cv.cov*100).toFixed(2)+' %':'—';
   $('d_dark').textContent=cv?(cv.dark*100).toFixed(2)+' %':'—';
-  $('d_gap').textContent=S.shape==='penrose4'?g.gap.toExponential(2):'—';
-  if(S.shape==='penrose4'&&g.foci.length===4){
-    var fs=g.foci.slice().sort(function(a,b){return Math.atan2(a[1],a[0])-Math.atan2(b[1],b[0]);});
-    var sides=[];for(var i=0;i<4;i++)sides.push(Math.hypot(fs[i][0]-fs[(i+1)%4][0],fs[i][1]-fs[(i+1)%4][1]));
-    var mean=sides.reduce(function(a,b){return a+b;},0)/4;
-    var spread=Math.max.apply(null,sides)-Math.min.apply(null,sides);
-    $('d_sq').textContent=mean.toFixed(6);
-    $('d_sqe').textContent=spread.toExponential(2);
-  } else {$('d_sq').textContent='—';$('d_sqe').textContent='—';}
-  $('d_sin').textContent=sinN?(sinSum/sinN).toFixed(4):'—';
+  $('d_gap').textContent=g.gap!==undefined?g.gap.toExponential(2):'—';
   $('d_seg').textContent=g.segs.length;
+  $('d_segexp').textContent=g.meta.segExp!==null&&g.meta.segExp!==undefined?g.meta.segExp:'—';
+  if(S.shape==='penrose4'&&g.foci.length===4){
+    var fs=g.foci.slice().sort(function(a,c){return Math.atan2(a[1],a[0])-Math.atan2(c[1],c[0]);});
+    var sd=[];for(i=0;i<4;i++)sd.push(Math.hypot(fs[i][0]-fs[(i+1)%4][0],fs[i][1]-fs[(i+1)%4][1]));
+    var mean=(sd[0]+sd[1]+sd[2]+sd[3])/4;
+    $('d_sq').textContent=mean.toFixed(6);
+    $('d_sqe').textContent=(Math.max.apply(null,sd)-Math.min.apply(null,sd)).toExponential(2);
+    missVal=focusMiss(g);
+    $('d_miss').textContent=missVal===null?'—':missVal.toExponential(2);
+  }else{$('d_sq').textContent='—';$('d_sqe').textContent='—';$('d_miss').textContent='—';}
+  $('d_sin').textContent=sinN?(sinSum/sinN).toFixed(4):'—';
   var ly=null;
   if(divLog.length>8){
-    var a=divLog[Math.floor(divLog.length*0.15)],b2=divLog[divLog.length-1];
-    if(b2[0]>a[0])ly=(b2[1]-a[1])/(b2[0]-a[0]);
+    var a2=divLog[Math.floor(divLog.length*0.15)],b2=divLog[divLog.length-1];
+    if(b2[0]>a2[0])ly=(b2[1]-a2[1])/(b2[0]-a2[0]);
   }
   $('d_lyap').textContent=ly===null?'—':(ly>=0?'+':'')+ly.toFixed(4);
-  var hud=[];
-  hud.push({t:SURF[S.surf].n+' → '+g.groups[S.group]});
+  var hud=[{t:SURF[S.surf].n+' → '+g.groups[S.group]}];
+  if(g.meta.segExp&&g.segs.length!==g.meta.segExp)hud.push({t:'контур разорван: '+g.segs.length+' ≠ '+g.meta.segExp,c:'bad'});
   if(cv&&cv.dark>0.02)hud.push({t:'тёмная площадь '+(cv.dark*100).toFixed(1)+'%',c:'warn'});
-  if(ly!==null&&ly>0.02)hud.push({t:'хаос: λ ≈ '+ly.toFixed(3),c:'bad'});
-  if(ly!==null&&Math.abs(ly)<=0.02)hud.push({t:'регулярно: λ ≈ 0'});
-  if(S.shape==='penrose4')hud.push({t:'квадрат фокусов '+(2*(1-geo.meta.p/Math.SQRT2)).toFixed(4)});
+  if(ly!==null)hud.push({t:(ly>0.02?'хаос: λ ≈ ':'регулярно: λ ≈ ')+ly.toFixed(3),c:ly>0.02?'bad':''});
+  if(S.shape==='penrose4')hud.push({t:'квадрат фокусов '+(2*(1-g.meta.p/Math.SQRT2)).toFixed(4)});
   $('hud').innerHTML=hud.map(function(o){return '<span class="'+(o.c||'')+'">'+o.t+'</span>';}).join('');
-  var rows='<thead><tr><th>Группа стенок</th><th>Тип</th><th class="num">Сегментов</th></tr></thead><tbody>';
-  g.groups.forEach(function(name,i){
-    var cnt=0,ty=-1,mixed=false;
-    g.segs.forEach(function(s,k){if(s[4]===i){cnt++;if(ty<0)ty=g.types[k];else if(g.types[k]!==ty)mixed=true;}});
-    rows+='<tr><td>'+name+'</td><td><span class="sw" style="background:'+PAL[SURF[Math.max(0,ty)].c]+'"></span>'+
-      (mixed?'смешанный':SURF[Math.max(0,ty)].n)+'</td><td class="num">'+cnt+'</td></tr>';
-  });
-  $('tbl').innerHTML=rows+'</tbody>';
+  if(lastTblVer!==typesVer){
+    lastTblVer=typesVer;
+    var rows='<thead><tr><th>Группа стенок</th><th>Тип</th><th class="num">Сегментов</th></tr></thead><tbody>';
+    g.groups.forEach(function(name,gi){
+      var cnt=0,ty=-1,mixed=false;
+      g.segs.forEach(function(s,k){if(s[4]===gi){cnt++;if(ty<0)ty=g.types[k];else if(g.types[k]!==ty)mixed=true;}});
+      rows+='<tr><td>'+name+'</td><td><span class="sw" style="background:'+PAL[SURF[Math.max(0,ty)].c]+'"></span>'+
+        (mixed?'смешанный':SURF[Math.max(0,ty)].n)+'</td><td class="num">'+cnt+'</td></tr>';
+    });
+    $('tbl').innerHTML=rows+'</tbody>';
+  }
   $('shapeNote').textContent=g.meta.note;
   $('shapeEq').textContent=g.meta.eq;
   $('plotNote').textContent={
-    poin:'Сечение Биркгофа: по горизонтали нормированная длина дуги до точки удара, по вертикали синус угла к нормали со знаком. Гладкие кривые — инвариантные торы (интегрируемость), сплошное облако — хаос, остров среди облака — смешанный фазовый объём.',
-    div:'Логарифм расстояния между двумя лучами, начавшимися с разницей 10⁻⁷ радиан. Наклон прямой — показатель Ляпунова на отражение. У круга и эллипса он около нуля, у стадиона и Синая положителен.',
-    hist:'Распределение |sin θ| по всем ударам. Круг даёт узкий пик (угол сохраняется), хаотические бильярды — широкий профиль, близкий к ламбертовскому.',
-    cov:'Карта числа проходов луча по ячейкам полости. Тёмные ячейки при сплошном заливе — кандидаты в неосвещаемые области; их доля выводится выше.'
-  }[plotMode];
+    poin:'Сечение Биркгофа: по горизонтали нормированная длина дуги до удара, по вертикали синус угла к нормали со знаком. Гладкие кривые — инвариантные торы, сплошное облако — хаос, остров в облаке — смешанный фазовый объём.',
+    div:'Логарифм расстояния между лучами с разницей 10⁻⁷ радиан. Наклон — показатель Ляпунова на отражение: у круга и эллипса около нуля, у стадиона и Синая положителен.',
+    hist:'Распределение |sin θ| по ударам. Круг даёт узкий пик, хаотические бильярды — широкий профиль.',
+    cov:'Число проходов луча по ячейкам. Тёмные ячейки при сплошном заливе — кандидаты в неосвещаемые области.'}[plotMode];
 }
 function syncGroups(){
-  var g=geo,sel=$('p_group');sel.innerHTML='';
-  g.groups.forEach(function(n,i){sel.insertAdjacentHTML('beforeend','<option value="'+i+'">'+n+'</option>');});
-  S.group=Math.min(S.group,g.groups.length-1);sel.value=S.group;
+  var sel=$('p_group');sel.innerHTML='';
+  geo.groups.forEach(function(n,i){sel.insertAdjacentHTML('beforeend','<option value="'+i+'">'+n+'</option>');});
+  S.group=Math.min(S.group,geo.groups.length-1);sel.value=S.group;
 }
 function sync(){
   $('p_shape').value=S.shape;$('p_par').value=S.par;$('o_par').textContent=S.par.toFixed(3);
@@ -905,70 +891,115 @@ function sync(){
   $('p_surf').value=S.surf;$('p_mode').value=S.mode;$('p_q').value=S.q;
 }
 function rebuild(keepTypes){
-  var old=geo;
-  geo=makeGeo();
-  if(keepTypes&&old&&old.types.length===geo.types.length) geo.types=old.types.slice();
-  hist=new Array(36).fill(0);poin=[];divLog=[];clearHeat();
+  var old=geo;geo=makeGeo(false);
+  if(keepTypes&&old&&old.types.length===geo.types.length)geo.types=old.types.slice();
+  typesVer++;hist=new Array(36).fill(0);poin=[];divLog=[];clearHeat();
   if(!inside(src.x,src.y,geo)){src.x=0;src.y=S.shape==='sinai'?0.75:0;}
   syncGroups();newRays();
 }
-function setRun(){running=!running;$('run').textContent=running?'❚❚ Пауза':'▶ Пуск';$('run').classList.toggle('pri',!running);}
-
-/* ============ цикл ============ */
-var acc=0,last=0,loopId=null;
-function frame(ts){
-  loopId=requestAnimationFrame(frame);
-  var dt=Math.min(.05,(ts-last)/1000||0);last=ts;
-  if(floodState)floodBatch(geo);
-  if(running){
-    acc+=dt*S.sp*7;
-    var steps=Math.min(14,Math.floor(acc));acc-=steps;
-    var arr=(S.mode==='twin'&&twin)?twin:rays;
-    for(var s=0;s<steps;s++){
-      arr.forEach(function(r){advanceRay(geo,r);});
-      if(S.mode==='twin'&&twin&&twin[0].alive&&twin[1].alive){
-        var d=Math.hypot(twin[0].x-twin[1].x,twin[0].y-twin[1].y);
-        var ang=Math.atan2(twin[0].dy,twin[0].dx)-Math.atan2(twin[1].dy,twin[1].dx);
-        var dd=Math.hypot(d,ang);
-        if(dd>1e-16)divLog.push([twin[0].b,Math.log(dd)]);
-      }
-      if(arr.every(function(r){return !r.alive;})){
-        if(S.mode==='twin'){running=false;$('run').textContent='▶ Пуск';$('run').classList.add('pri');}
-        else newRays();
-      }
-    }
+function setRun(v){running=v;$('run').textContent=v?'❚❚ Пауза':'▶ Пуск';$('run').classList.toggle('pri',!v);}
+function atFocus(){
+  if(geo.foci.length===4){
+    var F=geo.foci[0],T=geo.foci[2];
+    src.x=F[0];src.y=F[1];aim.x=T[0];aim.y=T[1];
+    S.ang=(Math.atan2(T[1]-F[1],T[0]-F[0])*180/Math.PI+360)%360;
+  }else if(geo.foci.length){
+    src.x=geo.foci[0][0];src.y=geo.foci[0][1]+0.001;
   }
-  drawStage();drawPlot();readouts();
+  newRays();sync();
 }
 
-/* ============ ввод ============ */
+/* ================= самотест ================= */
+function selfTest(){
+  var save=JSON.parse(JSON.stringify(S)),rows=[];
+  function row(name,got,exp,ok){rows.push([name,got,exp,ok]);}
+  S.shape='penrose4';S.par=0.35;S.res=150;
+  var g1=makeGeo(true);
+  row('Отрезков контура = 4n',g1.segs.length,'600',g1.segs.length===600);
+  row('Зазор стыков дуг',g1.gap.toExponential(2),'< 1e-9',g1.gap<1e-9);
+  var fs=g1.foci.slice().sort(function(a,c){return Math.atan2(a[1],a[0])-Math.atan2(c[1],c[0]);});
+  var sd=[];for(var i=0;i<4;i++)sd.push(Math.hypot(fs[i][0]-fs[(i+1)%4][0],fs[i][1]-fs[(i+1)%4][1]));
+  var spread=Math.max.apply(null,sd)-Math.min.apply(null,sd);
+  row('Разброс сторон квадрата',spread.toExponential(2),'< 1e-12',spread<1e-12);
+  var side=(sd[0]+sd[1]+sd[2]+sd[3])/4,exp=2*(1-g1.meta.p/Math.SQRT2);
+  row('Сторона квадрата',side.toFixed(6),exp.toFixed(6),Math.abs(side-exp)<1e-9);
+  var m1=focusMiss(g1);
+  S.res=300;var g2=makeGeo(true);var m2=focusMiss(g2);
+  row('Промах мимо фокуса, n=150',m1===null?'—':m1.toExponential(2),'конечный',m1!==null&&isFinite(m1));
+  row('Промах мимо фокуса, n=300',m2===null?'—':m2.toExponential(2),'меньше прежнего',m1!==null&&m2!==null&&m2<m1*0.8);
+  row('Сходимость к свойству параболы',m1&&m2?(m1/m2).toFixed(2)+'×':'—','> 1.25×',m1&&m2&&m1/m2>1.25);
+  /* круг: инвариант угла падения */
+  S.shape='circle';S.res=180;var gc=makeGeo(true);
+  var r={x:0.55,y:0,dx:Math.cos(0.32),dy:Math.sin(0.32),alive:true,b:0,energy:1,path:[],cap:8,hue:0};
+  var sns=[];
+  for(var k=0;k<60&&r.alive;k++){
+    var h=hit(gc,r.x,r.y,r.dx,r.dy);if(!h)break;
+    var tn=gc.tans[h.i];sns.push(Math.abs(r.dx*tn[0]+r.dy*tn[1]));
+    var q=[r.x+r.dx*h.t,r.y+r.dy*h.t],n=gc.norm[h.i],d=r.dx*n[0]+r.dy*n[1];
+    var nd=[r.dx-2*d*n[0],r.dy-2*d*n[1]];
+    r.dx=nd[0];r.dy=nd[1];r.x=q[0]+nd[0]*1e-7;r.y=q[1]+nd[1]*1e-7;r.b++;
+  }
+  var sp2=sns.length?Math.max.apply(null,sns)-Math.min.apply(null,sns):1;
+  row('Круг: разброс |sin θ|',sp2.toExponential(2),'< 5e-3',sns.length>20&&sp2<5e-3);
+  /* стадион: положительный Ляпунов */
+  S.shape='stadium';S.par=0.5;S.res=180;var gs2=makeGeo(true);
+  function trace(x,y,a,nb){
+    var p={x:x,y:y,dx:Math.cos(a),dy:Math.sin(a)},out=[];
+    for(var j=0;j<nb;j++){
+      var hh=hit(gs2,p.x,p.y,p.dx,p.dy);if(!hh)break;
+      var qq=[p.x+p.dx*hh.t,p.y+p.dy*hh.t],nn=gs2.norm[hh.i],dd=p.dx*nn[0]+p.dy*nn[1];
+      var nd2=[p.dx-2*dd*nn[0],p.dy-2*dd*nn[1]];
+      p.dx=nd2[0];p.dy=nd2[1];p.x=qq[0]+nd2[0]*1e-7;p.y=qq[1]+nd2[1]*1e-7;
+      out.push([p.x,p.y,Math.atan2(p.dy,p.dx)]);
+    }
+    return out;
+  }
+  var t1=trace(0,0.2,0.7,90),t2=trace(0,0.2,0.7+1e-7,90);
+  var nn2=Math.min(t1.length,t2.length),l0=null,l1=null;
+  for(var j2=0;j2<nn2;j2++){
+    var da=Math.abs(t1[j2][2]-t2[j2][2]);if(da>Math.PI)da=TAU-da;
+    var dd2=Math.hypot(t1[j2][0]-t2[j2][0],t1[j2][1]-t2[j2][1],da);
+    if(dd2>1e-16){if(l0===null&&j2>8)l0=[j2,Math.log(dd2)];l1=[j2,Math.log(dd2)];}
+  }
+  var lam=(l0&&l1&&l1[0]>l0[0])?(l1[1]-l0[1])/(l1[0]-l0[0]):null;
+  row('Стадион: λ на отражение',lam===null?'—':lam.toFixed(4),'> 0.02',lam!==null&&lam>0.02);
+  S=save;rebuild();sync();
+  var ok=rows.filter(function(r2){return r2[3];}).length;
+  $('testTbl').innerHTML='<thead><tr><th>Проверка</th><th>Модель</th><th>Ожидание</th><th>Итог</th></tr></thead><tbody>'+
+    rows.map(function(r2){return '<tr><td>'+r2[0]+'</td><td>'+r2[1]+'</td><td>'+r2[2]+
+      '</td><td class="'+(r2[3]?'pass':'fail')+'">'+(r2[3]?'✓':'✗')+'</td></tr>';}).join('')+
+    '</tbody><tfoot><tr><td colspan="4" class="'+(ok===rows.length?'pass':'fail')+'">Пройдено '+ok+' из '+rows.length+'</td></tr></tfoot>';
+}
+$('doTest').addEventListener('click',function(){try{selfTest();}catch(e){fatal('самотест: '+e.message);}});
+
+/* ================= пресеты ================= */
 var SHAPES=[['penrose4','Четыре параболы (Пенроуз)'],['penroseRoom','Комната пенрозовского типа'],
   ['mushroom','Гриб Бунимовича'],['ellipse','Эллипс'],['circle','Круг'],
   ['stadium','Стадион Бунимовича'],['sinai','Бильярд Синая'],['square','Квадрат']];
 SHAPES.forEach(function(s){$('p_shape').insertAdjacentHTML('beforeend','<option value="'+s[0]+'">'+s[1]+'</option>');});
 var PRE=[
  ['Квадрат фокусов',function(){S.shape='penrose4';S.par=0.32;S.n=1;S.spr=0;S.bounces=8;S.dif=0;S.mode='ray';rebuild();atFocus();}],
- ['Пучок из фокуса',function(){S.shape='penrose4';S.par=0.32;S.n=14;S.spr=52;S.bounces=6;rebuild();atFocus();}],
+ ['Пучок из фокуса',function(){S.shape='penrose4';S.par=0.32;S.n=14;S.spr=52;S.bounces=6;S.dif=0;rebuild();atFocus();}],
  ['Заполнить параболы',function(){S.shape='penrose4';S.n=260;S.spr=360;S.bounces=90;rebuild();startFlood();}],
  ['Диффузные стенки',function(){S.shape='penrose4';S.dif=0.55;S.n=90;S.spr=360;rebuild();}],
- ['Ретроотражатели',function(){S.shape='penrose4';rebuild();geo.types.fill(2);S.n=24;S.spr=200;}],
- ['Отверстие в дуге',function(){S.shape='penrose4';rebuild();geo.segs.forEach(function(s,i){if(s[4]===0)geo.types[i]=4;});S.n=120;S.spr=360;}],
- ['Каустика круга',function(){S.shape='circle';S.n=1;S.spr=0;S.ang=18;S.bounces=220;src.x=0.55;src.y=0;rebuild();}],
- ['Фокусы эллипса',function(){S.shape='ellipse';S.n=18;S.spr=300;S.bounces=40;rebuild();src.x=geo.foci[0][0];src.y=0.001;newRays();}],
+ ['Ретроотражатели',function(){S.shape='penrose4';S.n=24;S.spr=200;rebuild();geo.types.fill(2);typesVer++;newRays();}],
+ ['Отверстие в дуге',function(){S.shape='penrose4';S.n=120;S.spr=360;rebuild();
+   geo.segs.forEach(function(s,i){if(s[4]===0)geo.types[i]=4;});typesVer++;newRays();}],
+ ['Каустика круга',function(){S.shape='circle';S.n=1;S.spr=0;S.ang=18;S.bounces=220;rebuild();src.x=0.55;src.y=0;newRays();}],
+ ['Фокусы эллипса',function(){S.shape='ellipse';S.n=18;S.spr=300;S.bounces=40;rebuild();
+   src.x=geo.foci[0][0];src.y=0.001;newRays();}],
  ['Хаос стадиона',function(){S.shape='stadium';S.par=0.5;S.mode='twin';S.bounces=150;rebuild();src.x=0;src.y=0.2;newRays();}],
  ['Смесь гриба',function(){S.shape='mushroom';S.par=0.28;S.n=150;S.spr=360;S.bounces=150;rebuild();src.x=0;src.y=-0.4;newRays();}],
  ['Синай',function(){S.shape='sinai';S.par=0.45;S.mode='twin';S.bounces=150;rebuild();src.x=0.6;src.y=0.6;newRays();}],
  ['Тёмные зоны',function(){S.shape='penroseRoom';S.par=0.5;S.n=400;S.bounces=140;rebuild();src.x=0;src.y=0.55;newRays();startFlood();}]
 ];
-PRE.forEach(function(p){var b=document.createElement('button');b.textContent=p[0];
-  b.addEventListener('click',function(){p[1]();sync();running=!reduce;if(!running){$('run').textContent='▶ Пуск';$('run').classList.add('pri');}else{$('run').textContent='❚❚ Пауза';$('run').classList.remove('pri');}});
-  $('presets').appendChild(b);});
-function atFocus(){
-  if(geo.foci.length){var f=geo.foci[geo.foci.length-1];src.x=f[0];src.y=f[1];
-    var o=geo.foci[0];aim.x=o[0];aim.y=o[1];
-    S.ang=(Math.atan2(aim.y-src.y,aim.x-src.x)*180/Math.PI+360)%360;}
-  newRays();sync();
-}
+PRE.forEach(function(p){
+  var b=document.createElement('button');b.textContent=p[0];
+  b.addEventListener('click',function(){p[1]();sync();setRun(!reduce);});
+  $('presets').appendChild(b);
+});
+
+/* ================= обработчики ================= */
 $('p_shape').addEventListener('change',function(e){S.shape=e.target.value;S.group=0;rebuild();sync();});
 $('p_par').addEventListener('input',function(e){S.par=+e.target.value;rebuild(true);sync();});
 $('p_res').addEventListener('input',function(e){S.res=+e.target.value;rebuild(true);sync();});
@@ -985,12 +1016,13 @@ $('p_surf').addEventListener('change',function(e){S.surf=+e.target.value;});
 $('p_group').addEventListener('change',function(e){S.group=+e.target.value;});
 $('p_mode').addEventListener('change',function(e){S.mode=e.target.value;newRays();});
 $('p_q').addEventListener('change',function(e){S.q=+e.target.value;resize();});
-$('applyAll').addEventListener('click',function(){geo.segs.forEach(function(s,i){if(s[4]===S.group)geo.types[i]=S.surf;});});
-$('allMirror').addEventListener('click',function(){geo.types.fill(0);});
-$('run').addEventListener('click',setRun);
-$('step').addEventListener('click',function(){running=false;$('run').textContent='▶ Пуск';$('run').classList.add('pri');
-  var arr=(S.mode==='twin'&&twin)?twin:rays;arr.forEach(function(r){advanceRay(geo,r);});});
-$('reset').addEventListener('click',function(){poin=[];divLog=[];clearHeat();hist=new Array(36).fill(0);newRays();});
+$('applyAll').addEventListener('click',function(){
+  geo.segs.forEach(function(s,i){if(s[4]===S.group)geo.types[i]=S.surf;});typesVer++;});
+$('allMirror').addEventListener('click',function(){geo.types.fill(0);typesVer++;});
+$('run').addEventListener('click',function(){setRun(!running);});
+$('step').addEventListener('click',function(){setRun(false);
+  var arr=(S.mode==='twin'&&twin)?twin:rays;arr.forEach(function(r){advanceRay(geo,r);});readouts();});
+$('reset').addEventListener('click',function(){poin=[];divLog=[];hist=new Array(36).fill(0);clearHeat();newRays();readouts();});
 $('flood').addEventListener('click',startFlood);
 $('clearHeat').addEventListener('click',clearHeat);
 $('rand').addEventListener('click',function(){
@@ -1003,8 +1035,7 @@ $('clearDiag').addEventListener('click',function(){poin=[];divLog=[];hist=new Ar
 $('export').addEventListener('click',function(){
   var out=document.createElement('canvas');out.width=st.width;out.height=st.height+Math.round(56*dpr);
   var c=out.getContext('2d');c.fillStyle=PAL.canvas;c.fillRect(0,0,out.width,out.height);
-  c.drawImage(st,0,0);
-  c.setTransform(dpr,0,0,dpr,0,0);
+  c.drawImage(st,0,0);c.setTransform(dpr,0,0,dpr,0,0);
   c.fillStyle=PAL.sand;c.font='600 14px JetBrains Mono, monospace';
   c.fillText('LibLabTab · бильярд Пенроуза · '+$('p_shape').selectedOptions[0].text,14,H+24);
   c.fillStyle=PAL.muted;c.font='12px JetBrains Mono, monospace';
@@ -1014,25 +1045,24 @@ $('export').addEventListener('click',function(){
   $(p[0]).addEventListener('click',function(){plotMode=p[1];
     [['m_poin','poin'],['m_div','div'],['m_hist','hist'],['m_cov','cov']].forEach(function(q){
       $(q[0]).setAttribute('aria-pressed',String(plotMode===q[1]));});});});
-['c_foci','c_beam','c_heat','c_dark','c_trail','c_grid','c_lab','c_glow'].forEach(function(id){
-  $(id).addEventListener('change',function(){});});
 
 function ptr(ev){var b=st.getBoundingClientRect();
   return {X:(ev.clientX-b.left)*(W/b.width),Y:(ev.clientY-b.top)*(H/b.height)};}
 st.addEventListener('pointerdown',function(ev){
   var p=ptr(ev),v=view(geo);
   var SX=v.X(src.x),SY=v.Y(src.y),AX=v.X(aim.x),AY=v.Y(aim.y);
-  if(Math.hypot(p.X-AX,p.Y-AY)<26){drag='aim';}
-  else if(Math.hypot(p.X-SX,p.Y-SY)<26){drag='src';}
+  if(Math.hypot(p.X-AX,p.Y-AY)<26)drag='aim';
+  else if(Math.hypot(p.X-SX,p.Y-SY)<26)drag='src';
   else{
     var wx=v.ix(p.X),wy=v.iy(p.Y),best=-1,bd=1e9;
     geo.segs.forEach(function(s,i){var d=distPtSeg(wx,wy,s);if(d<bd){bd=d;best=i;}});
-    if(bd<0.06&&best>=0){S.group=geo.segs[best][4];geo.types[best]=S.surf;
+    if(bd<0.06&&best>=0){S.group=geo.segs[best][4];geo.types[best]=S.surf;typesVer++;
       $('p_group').value=S.group;drag=null;}
     else if(inside(wx,wy,geo)){src.x=wx;src.y=wy;drag='src';newRays();}
     else return;
   }
-  ev.preventDefault();st.setPointerCapture&&st.setPointerCapture(ev.pointerId);
+  ev.preventDefault();
+  try{st.setPointerCapture(ev.pointerId);}catch(e){}
 });
 st.addEventListener('pointermove',function(ev){
   if(!drag)return;
@@ -1046,29 +1076,58 @@ window.addEventListener('pointerup',endDrag);
 st.addEventListener('touchmove',function(ev){if(drag)ev.preventDefault();},{passive:false});
 window.addEventListener('keydown',function(ev){
   var t=ev.target.tagName;if(t==='INPUT'||t==='SELECT'||t==='TEXTAREA')return;
-  if(ev.code==='Space'){ev.preventDefault();setRun();}
+  if(ev.code==='Space'){ev.preventDefault();setRun(!running);}
   else if(ev.key==='s'||ev.key==='S'||ev.key==='ы')$('step').click();
   else if(ev.key==='f'||ev.key==='F'||ev.key==='а')startFlood();
   else if(ev.key==='r'||ev.key==='R'||ev.key==='к')$('reset').click();
 });
 var nav=$('nav').querySelectorAll('a');
 function onScroll(){
-  var y=window.scrollY+130,cur='lab';
-  ['lab','ctrl','diag','phys'].forEach(function(id){var el=$(id);if(el&&el.offsetTop<=y)cur=id;});
+  var cur='lab';
+  ['lab','ctrl','diag','test','phys'].forEach(function(id){
+    var el=$(id);if(el&&el.getBoundingClientRect().top<=140)cur=id;});
   nav.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+cur);});
 }
 window.addEventListener('scroll',onScroll,{passive:true});
 nav.forEach(function(a){a.addEventListener('click',function(ev){
   ev.preventDefault();var el=$(a.getAttribute('href').slice(1));
-  if(el)window.scrollTo({top:el.offsetTop-96,behavior:'smooth'});});});
+  if(el)window.scrollTo({top:window.scrollY+el.getBoundingClientRect().top-96,behavior:'smooth'});});});
 var rt=null;
 window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){readPal();resize();},140);});
 
-rebuild();sync();resize();onScroll();
-running=!reduce;
-$('run').textContent=running?'❚❚ Пауза':'▶ Пуск';
-$('run').classList.toggle('pri',!running);
-last=performance.now();loopId=requestAnimationFrame(frame);
+/* ================= цикл ================= */
+var acc=0,last=0;
+function frame(ts){
+  requestAnimationFrame(frame);
+  var dt=Math.min(.05,(ts-last)/1000||0);last=ts;
+  try{
+    if(floodState)floodBatch(geo);
+    if(running){
+      acc+=dt*S.sp*7;
+      var steps=Math.min(14,Math.floor(acc));acc-=steps;
+      var arr=(S.mode==='twin'&&twin)?twin:rays;
+      for(var s=0;s<steps;s++){
+        for(var i=0;i<arr.length;i++)advanceRay(geo,arr[i]);
+        if(S.mode==='twin'&&twin&&twin[0].alive&&twin[1].alive){
+          var da=Math.abs(Math.atan2(twin[0].dy,twin[0].dx)-Math.atan2(twin[1].dy,twin[1].dx));
+          if(da>Math.PI)da=TAU-da;
+          var dd=Math.hypot(twin[0].x-twin[1].x,twin[0].y-twin[1].y,da);
+          if(dd>1e-16)divLog.push([twin[0].b,Math.log(dd)]);
+        }
+        var any=false;for(var j=0;j<arr.length;j++)if(arr[j].alive){any=true;break;}
+        if(!any){if(S.mode==='twin')setRun(false);else newRays();}
+      }
+    }
+    drawStage();drawPlot();
+    if(ts-lastUI>120){lastUI=ts;readouts();}
+  }catch(e){if(!errOnce){errOnce=true;fatal(e.message);}}
+}
+rebuild();sync();resize();onScroll();readouts();
+setRun(!reduce);
+try{selfTest();}catch(e){}
+last=performance.now();requestAnimationFrame(frame);
+
+}catch(e){fatal(e.message);}
 })();
 </script>
 </body>
