@@ -144,6 +144,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
   <div class="row">
     <button class="pri" id="rec">Записать опыт</button>
     <button id="taskBtn">Задача на равновесие</button>
+    <button id="reset">Сброс</button>
   </div>
 
   <div id="task" class="task">
@@ -432,7 +433,14 @@ button:disabled{opacity:.45;cursor:not-allowed}
       (S3.active ? ' (третий груз включён, сторона: ' + (S3.side==='L'?'слева':'справа') + ')' : '');
     syncInputs(); update();
   });
-
+  $('reset').addEventListener('click',function(){
+    if(S.task){ S.task=null; lockLeft(false); $('task').className='task'; $('taskBtn').textContent='Задача на равновесие'; }
+    S.m1=200; S.d1=30; S.m2=300; S.d2=30; S.g=10;
+    S3.active=false; S3.m3=150; S3.d3=20; S3.side='L';
+    R.length=0; ang=0; vel=0; target=0;
+    $('g').value='10';
+    syncInputs(); renderLog(); update();
+  });
   syncInputs(); renderLog(); update();
 })();
 </script>

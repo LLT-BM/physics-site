@@ -74,6 +74,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       <button id="stepBtn">Шаг</button>
       <button id="rnd">Случайное поле</button>
       <button id="clr">Очистить</button>
+      <button id="reset">Сброс</button>
       <span style="flex:1"></span>
       <button id="mDraw" aria-pressed="true">Рисовать</button>
       <button id="mErase" aria-pressed="false">Стереть</button>
@@ -451,6 +452,17 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   $('play').addEventListener('click',function(){ setRunning(!running); });
   $('stepBtn').addEventListener('click',function(){ setRunning(false); step(); render(); });
   $('clr').addEventListener('click',function(){ setRunning(false); clearField(); });
+  $('reset').addEventListener('click',function(){
+    setRunning(false);
+    cs=8; speed=12; dens=22; wrap=true; ageCol=true; trails=true; gridOn=true;
+    $('cs').value=8; $('speed').value=12; $('dens').value=22;
+    $('wrap').checked=true; $('ageCol').checked=true; $('trails').checked=true; $('gridOn').checked=true;
+    $('o_cs').textContent='8 px'; $('o_speed').textContent='12 покол/с'; $('o_dens').textContent='22 %';
+    setRules([3],[2,3]); $('preset').value='0';
+    stamp=null; mode='draw'; $('pat').value=''; syncMode();
+    resize(); clearField(); randomField();
+    if(!reduce) setRunning(true);
+  });
   $('rnd').addEventListener('click',function(){ randomField(); });
   $('mDraw').addEventListener('click',function(){ mode='draw'; stamp=null; $('pat').value=''; syncMode(); });
   $('mErase').addEventListener('click',function(){ mode='erase'; stamp=null; $('pat').value=''; syncMode(); });

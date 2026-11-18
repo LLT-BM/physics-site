@@ -159,6 +159,7 @@
     <button id="btnAuto" class="tgl main">▶ автоколебания</button>
     <div class="spd"><span class="lbl">частота</span><input id="freq" type="range" min="20" max="140" value="50"><b id="freqVal">0.50 Гц</b></div>
     <button id="btnFlip" class="tgl">⇄ полюса</button>
+    <button id="reset" class="tgl">⟲ сброс</button>
     <div class="spd"><span class="lbl">витки</span><input id="turns" type="range" min="1" max="8" value="4"><b id="turnsVal">N = 4</b></div>
     <button class="tgl on" id="tgF">поле</button>
     <button class="tgl on" id="tgC">ток</button>
@@ -568,6 +569,31 @@ resize();
 geo=layout();
 S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;
 requestAnimationFrame(frame);
+</script>
+<script>
+/* LibLabTab · сброс Ленца */
+(function(){
+  var b=document.getElementById("reset");
+  if(!b||b.__lenzWired)return; b.__lenzWired=true;
+  b.addEventListener("click",function(){
+    try{
+      setAuto(false);
+      var f=$("freq"), t=$("turns");
+      f.value=f.defaultValue; S.freq=(+f.value)/100;
+      $("freqVal").textContent=S.freq.toFixed(2)+" Гц";
+      t.value=t.defaultValue; S.turns=+t.value;
+      $("turnsVal").textContent="N = "+S.turns;
+      S.s=1; S.phase=0; S.emf=0; S.dAbsS=0; S.needle=0; S.vS=0;
+      S.phiPrev=null; S.absPrev=null; S.prevMx=null;
+      S.drag=false; S.hover=false;
+      geo=layout();
+      S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;
+    }catch(e){
+      if(window.__simFail) window.__simFail("сброс: "+e.message);
+      else location.reload();
+    }
+  });
+})();
 </script>
 </body>
 </html>

@@ -59,6 +59,7 @@ canvas:active{cursor:grabbing}
 <div class="row">
 <div class="legend" id="legend"></div>
 <label><input type="checkbox" id="auto" checked> автовращение</label>
+<button id="reset" type="button">Сброс</button>
 </div>
 
 <div class="info" id="info"></div>
@@ -215,6 +216,11 @@ Object.keys(ORB).forEach(k=>{const b=document.createElement('button');b.textCont
  b.onclick=()=>{orb=k;build(k);render()};ob.appendChild(b)});
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;render()});
 document.getElementById('auto').onchange=e=>auto=e.target.checked;
+document.getElementById('reset').onclick=()=>{
+  mode='atom'; orb='1s'; yaw=.6; pitch=.4; auto=true;
+  document.getElementById('auto').checked=true;
+  build(orb); render();
+};
 cv.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;cv.setPointerCapture(e.pointerId)});
 cv.addEventListener('pointermove',e=>{if(!drag)return;yaw+=(e.clientX-lx)*.008;pitch=Math.max(-1.4,Math.min(1.4,pitch+(e.clientY-ly)*.008));lx=e.clientX;ly=e.clientY});
 cv.addEventListener('pointerup',()=>drag=false);

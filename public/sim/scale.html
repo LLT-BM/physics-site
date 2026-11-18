@@ -77,6 +77,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <button id="next" class="sm">объект →</button>
       <button id="tour" class="pri">▶ Экскурсия</button>
       <button id="toHuman" class="sm">К человеку</button>
+      <button id="reset" class="sm">Сброс</button>
       <button id="pin" class="sm">Закрепить для сравнения</button>
     </div>
     <div id="pinBox"></div>
@@ -663,6 +664,19 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
   }
   $('tour').addEventListener('click',function(){ touring=!touring; if(touring&&logT>=HI-0.1) logT=LO; setTour(); });
   $('toHuman').addEventListener('click',function(){ jump(byId.human); });
+  $('reset').addEventListener('click',function(){
+    touring=false; setTour();
+    pinned=null; $('pinBox').textContent='';
+    marks=[]; $('q').value='';
+    Object.keys(CATS).forEach(function(k){ filt[k]=true; });
+    Array.prototype.forEach.call($('cats').querySelectorAll('button'),function(b){
+      b.setAttribute('aria-pressed','true'); b.style.opacity='1'; });
+    $('bhM').value='1'; $('bhU').value='1.98847e30';
+    $('bhOut').textContent='r_s = 2GM/c². Для Солнца это 2,95 км, для Земли — 8,87 мм.';
+    $('dbM').value='9.109e-31'; $('dbV').value='1000000';
+    $('dbOut').textContent='λ = h/(mv). Именно поэтому квантовые эффекты заметны у электрона и незаметны у мяча.';
+    found(); jump(byId.human); logW=logT;
+  });
   $('pin').addEventListener('click',function(){ pinned=sel; $('pinBox').textContent=pinned?('Закреплено: '+pinned.n+' · '+len(pinned.d)):''; info(); });
 
   st.addEventListener('wheel',function(e){ e.preventDefault(); touring=false; setTour();
