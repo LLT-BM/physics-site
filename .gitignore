@@ -27,3 +27,4 @@ pnpm-debug.log*
 deploy.bat
 deploy.log
 site.zip
+public/api/data/

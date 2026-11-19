@@ -1,70 +1,306 @@
 ---
-/** Провайдер комментариев. PUBLIC_COMMENTS = 'giscus' | 'none'.
-    Для giscus нужны PUBLIC_GISCUS_REPO, PUBLIC_GISCUS_REPO_ID,
-    PUBLIC_GISCUS_CATEGORY, PUBLIC_GISCUS_CATEGORY_ID. */
-const env = (import.meta as any).env ?? {};
-const provider = env.PUBLIC_COMMENTS ?? 'none';
-const ready = provider === 'giscus' && env.PUBLIC_GISCUS_REPO && env.PUBLIC_GISCUS_REPO_ID
-  && env.PUBLIC_GISCUS_CATEGORY && env.PUBLIC_GISCUS_CATEGORY_ID;
-interface Props { term: string }
+/** Комментарии на странице. Боевой сайт: /api/comments.php (PHP + SQLite).
+    localhost: хранение в браузере, чтобы разрабатывать без PHP. */
+interface Props { term?: string; page?: string }
 const { term } = Astro.props;
+const page = Astro.props.page ?? Astro.url.pathname;
+const title = term ?? 'модели';
 ---
-<section class="comments" id="comments">
-  <h2>Комментарии</h2>
-  {ready ? (
-    <div class="giscus-wrap" data-term={term}></div>
-  ) : (
-    <p class="note">
-      Обсуждение этой модели — в
-      <a href={`https://github.com/LLT-BM/physics-site/discussions/new?category=general&title=${encodeURIComponent(term)}`}>
-        GitHub Discussions
-      </a>. Вход через GitHub, регистрация отдельная не нужна.
-    </p>
-  )}
+<section class="cmt" id="comments" data-page={page}>
+  <h2>Комментарии <span class="cmt-count" data-count>0</span></h2>
+  <p class="cmt-mode" data-mode-note></p>
+
+  <form class="cmt-form" data-form autocomplete="off">
+    <div class="cmt-row">
+      <label class="sr" for="cmtName">Имя</label>
+      <input id="cmtName" data-name type="text" maxlength="40" placeholder="Как вас подписать" />
+      <span class="cmt-hp" aria-hidden="true">
+        <label for="cmtWeb">Сайт</label>
+        <input id="cmtWeb" data-hp type="text" tabindex="-1" autocomplete="off" />
+      </span>
+    </div>
+    <label class="sr" for="cmtBody">Текст комментария</label>
+    <textarea id="cmtBody" data-body rows="3" maxlength="2000"
+              placeholder={`Вопрос или замечание по модели «${title}»`}></textarea>
+    <div class="cmt-actions">
+      <span class="cmt-counter" data-counter>0 / 2000</span>
+      <button type="button" class="cmt-cancel hide" data-cancel>Отменить ответ</button>
+      <button type="submit" class="cmt-send" data-send>Отправить</button>
+    </div>
+    <p class="cmt-status" data-status role="status" aria-live="polite"></p>
+  </form>
+
+  <div class="cmt-sort" role="group" aria-label="Сортировка">
+    <button type="button" class="on" data-sort="new">Сначала новые</button>
+    <button type="button" data-sort="old">Сначала старые</button>
+    <button type="button" data-sort="top">По лайкам</button>
+  </div>
+
+  <ol class="cmt-list" data-list></ol>
+  <p class="cmt-empty" data-empty>Пока никто не написал. Будьте первым.</p>
 </section>
 
 <style>
-  .comments{margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
-  h2{font:600 1.05rem var(--disp);margin:0 0 12px;padding-left:11px;border-left:4px solid var(--lilac)}
-  .note{color:var(--muted);font-size:.9rem}
-  .note a{color:var(--aqua)}
+  .cmt{margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
+  .cmt h2{font:600 1.05rem var(--disp);margin:0 0 8px;padding-left:11px;border-left:4px solid var(--lilac)}
+  .cmt-count{font:600 .78rem var(--mono);color:var(--muted);margin-left:6px}
+  .cmt-mode{margin:0 0 12px;font-size:.84rem;color:var(--muted)}
+  .cmt-form{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;position:relative}
+  .cmt-row{display:flex;gap:8px;margin-bottom:8px}
+  .cmt input,.cmt textarea{font:inherit;font-size:16px;width:100%;padding:11px 12px;border-radius:9px;
+    border:1px solid var(--line2);background:var(--canvas);color:var(--ink);resize:vertical}
+  .cmt input:focus,.cmt textarea:focus{outline:3px solid var(--aqua);outline-offset:2px}
+  .cmt-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .cmt-actions{display:flex;align-items:center;gap:10px;margin-top:9px;flex-wrap:wrap}
+  .cmt-counter{font:600 .76rem var(--mono);color:var(--muted);margin-right:auto}
+  .cmt-send{font:inherit;font-size:16px;font-weight:600;min-height:44px;padding:10px 18px;border-radius:10px;
+    border:1px solid var(--aqua);background:var(--aqua);color:var(--on);cursor:pointer;touch-action:manipulation}
+  .cmt-send[disabled]{opacity:.5;cursor:not-allowed}
+  .cmt-cancel{font:inherit;font-size:15px;min-height:44px;padding:10px 14px;border-radius:10px;
+    border:1px solid var(--line2);background:transparent;color:var(--muted);cursor:pointer}
+  .cmt-status{margin:9px 0 0;font:600 .82rem var(--mono);color:var(--aqua);min-height:1.2em}
+  .cmt-status.bad{color:var(--rose)}
+  .cmt-sort{display:flex;gap:6px;margin:14px 0 10px;flex-wrap:wrap}
+  .cmt-sort button{font:600 .78rem var(--mono);min-height:40px;padding:6px 12px;border-radius:999px;
+    border:1px solid var(--line2);background:var(--overlay);color:var(--muted);cursor:pointer}
+  .cmt-sort button.on{background:var(--aqua);color:var(--on);border-color:var(--aqua)}
+  .cmt-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .cmt-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+  .cmt-item.child{margin-left:26px;border-left:3px solid var(--lilac)}
+  .cmt-head{display:flex;align-items:center;gap:9px;margin-bottom:6px;flex-wrap:wrap}
+  .cmt-ava{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;
+    font:700 .8rem var(--mono);background:var(--overlay);color:var(--aqua);border:1px solid var(--line2)}
+  .cmt-who{font:600 .92rem var(--sans);color:var(--ink)}
+  .cmt-when{font:400 .74rem var(--mono);color:var(--muted)}
+  .cmt-body{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.94rem;line-height:1.6}
+  .cmt-tools{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .cmt-tools button{font:600 .78rem var(--mono);min-height:40px;padding:5px 12px;border-radius:999px;
+    border:1px solid var(--line2);background:transparent;color:var(--muted);cursor:pointer}
+  .cmt-tools button:hover:not([disabled]){color:var(--aqua);border-color:var(--aqua)}
+  .cmt-tools button[disabled]{opacity:.65;cursor:default}
+  .cmt-empty{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+  .hide{display:none}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  @media (max-width:640px){ .cmt-item.child{margin-left:14px} }
 </style>
 
-{ready && (
-<script is:inline define:vars={{
-  repo: env.PUBLIC_GISCUS_REPO, repoId: env.PUBLIC_GISCUS_REPO_ID,
-  cat: env.PUBLIC_GISCUS_CATEGORY, catId: env.PUBLIC_GISCUS_CATEGORY_ID
-}}>
-(function(){
-  function mount(){
-    var wrap=document.querySelector('.giscus-wrap'); if(!wrap||wrap.dataset.done) return;
-    wrap.dataset.done='1';
-    var t=document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
-    var s=document.createElement('script');
-    s.src='https://giscus.app/client.js';
-    s.async=true; s.crossOrigin='anonymous';
-    s.setAttribute('data-repo',repo);
-    s.setAttribute('data-repo-id',repoId);
-    s.setAttribute('data-category',cat);
-    s.setAttribute('data-category-id',catId);
-    s.setAttribute('data-mapping','specific');
-    s.setAttribute('data-term',wrap.dataset.term);
-    s.setAttribute('data-strict','1');
-    s.setAttribute('data-reactions-enabled','1');
-    s.setAttribute('data-emit-metadata','0');
-    s.setAttribute('data-input-position','top');
-    s.setAttribute('data-theme',t);
-    s.setAttribute('data-lang','ru');
-    wrap.appendChild(s);
+<script>
+  type Row = { id: string; parent: string | null; author: string; body: string; likes: number; created_at: string };
+  type Backend = {
+    list(): Promise<Row[]>;
+    add(author: string, body: string, parent: string | null, trap: string): Promise<{ id: string; token: string }>;
+    like(id: string): Promise<void>;
+    del(id: string, token: string): Promise<void>;
+  };
+
+  const root = document.querySelector<HTMLElement>('.cmt');
+  if (root) {
+    const page = root.dataset.page!;
+    const isDev = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+    const API = '/api/comments.php';
+    const K = { name: 'llt-c-name', own: 'llt-c-own', likes: 'llt-c-likes', local: 'llt-c-local:' + page };
+
+    const store = {
+      get(k: string) { try { return localStorage.getItem(k); } catch { return null; } },
+      set(k: string, v: string) { try { localStorage.setItem(k, v); } catch { /* приватный режим */ } }
+    };
+    const readJson = <T,>(k: string, d: T): T => { try { return JSON.parse(store.get(k) ?? '') as T; } catch { return d; } };
+
+    const q = <T extends HTMLElement>(s: string) => root.querySelector(s) as T;
+    const form = q<HTMLFormElement>('[data-form]');
+    const nameEl = q<HTMLInputElement>('[data-name]');
+    const bodyEl = q<HTMLTextAreaElement>('[data-body]');
+    const hpEl = q<HTMLInputElement>('[data-hp]');
+    const statusEl = q<HTMLElement>('[data-status]');
+    const counterEl = q<HTMLElement>('[data-counter]');
+    const listEl = q<HTMLElement>('[data-list]');
+    const emptyEl = q<HTMLElement>('[data-empty]');
+    const countEl = q<HTMLElement>('[data-count]');
+    const cancelEl = q<HTMLButtonElement>('[data-cancel]');
+    const sendEl = q<HTMLButtonElement>('[data-send]');
+    const noteEl = q<HTMLElement>('[data-mode-note]');
+
+    const own: Record<string, string> = readJson(K.own, {});
+    const liked = new Set<string>(readJson<string[]>(K.likes, []));
+    let rows: Row[] = [];
+    let sort: 'new' | 'old' | 'top' = 'new';
+    let parent: string | null = null;
+    let timer = 0;
+
+    /* ---------- бэкенды ---------- */
+    const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+
+    const apiBackend: Backend = {
+      async list() {
+        const r = await fetch(`${API}?page=${encodeURIComponent(page)}`, { headers: { Accept: 'application/json' } });
+        if (!r.ok) throw new Error('сервер ответил ' + r.status);
+        const j = await r.json();
+        if (!Array.isArray(j)) throw new Error('неверный ответ сервера');
+        return j;
+      },
+      async add(author, body, par, trap) {
+        const r = await fetch(API, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'add', page, parent: par, author, body, website: trap })
+        });
+        const j = await r.json().catch(() => ({}));
+        if (r.status === 429) throw new Error('слишком часто, подождите немного');
+        if (j.error === 'links') throw new Error('слишком много ссылок: допустимо не больше двух');
+        if (!r.ok || !j.ok) throw new Error('не удалось сохранить (' + r.status + ')');
+        return { id: String(j.id), token: String(j.token) };
+      },
+      async like(id) {
+        await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'like', id }) });
+      },
+      async del(id, token) {
+        const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'delete', id, token }) });
+        if (!r.ok) throw new Error('не удалось удалить');
+      }
+    };
+
+    const localBackend: Backend = {
+      async list() { return readJson<Row[]>(K.local, []); },
+      async add(author, body, par) {
+        const all = readJson<Row[]>(K.local, []);
+        const id = uid();
+        all.push({ id, parent: par, author, body, likes: 0, created_at: new Date().toISOString() });
+        store.set(K.local, JSON.stringify(all));
+        return { id, token: 'local' };
+      },
+      async like(id) {
+        const all = readJson<Row[]>(K.local, []);
+        const it = all.find(r => r.id === id); if (it) it.likes++;
+        store.set(K.local, JSON.stringify(all));
+      },
+      async del(id) {
+        const all = readJson<Row[]>(K.local, []).filter(r => r.id !== id && r.parent !== id);
+        store.set(K.local, JSON.stringify(all));
+      }
+    };
+
+    const be: Backend = isDev ? localBackend : apiBackend;
+    noteEl.textContent = isDev
+      ? 'Режим разработки: комментарии хранятся только в этом браузере.'
+      : 'Без регистрации: подпишитесь любым именем. Не публикуйте личные данные.';
+
+    /* ---------- утилиты ---------- */
+    nameEl.value = store.get(K.name) ?? '';
+    const say = (t: string, bad = false) => {
+      statusEl.textContent = t; statusEl.classList.toggle('bad', bad);
+      clearTimeout(timer);
+      if (t) timer = window.setTimeout(() => { statusEl.textContent = ''; }, 6000);
+    };
+    const esc = (s: string) => s.replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+    const when = (iso: string) => {
+      const t = new Date(iso).getTime();
+      if (!isFinite(t)) return '';
+      const d = (Date.now() - t) / 1000;
+      if (d < 60) return 'только что';
+      if (d < 3600) return Math.floor(d / 60) + ' мин назад';
+      if (d < 86400) return Math.floor(d / 3600) + ' ч назад';
+      if (d < 2592000) return Math.floor(d / 86400) + ' дн назад';
+      return new Date(t).toLocaleDateString('ru-RU');
+    };
+    const time = (r: Row) => new Date(r.created_at).getTime() || 0;
+
+    /* ---------- отрисовка ---------- */
+    function render() {
+      const tops = rows.filter(r => !r.parent);
+      tops.sort((a, b) =>
+        sort === 'top' ? (b.likes - a.likes) || (time(b) - time(a))
+        : sort === 'old' ? time(a) - time(b) : time(b) - time(a));
+      const out: string[] = [];
+      const item = (r: Row, child: boolean) => {
+        const mine = !!own[r.id];
+        out.push(
+          `<li class="cmt-item${child ? ' child' : ''}" data-id="${esc(r.id)}">` +
+          `<div class="cmt-head"><span class="cmt-ava" aria-hidden="true">${esc((r.author.trim()[0] ?? '?').toUpperCase())}</span>` +
+          `<span class="cmt-who">${esc(r.author)}</span><span class="cmt-when">${esc(when(r.created_at))}</span></div>` +
+          `<p class="cmt-body">${esc(r.body)}</p>` +
+          `<div class="cmt-tools">` +
+          `<button type="button" data-act="like"${liked.has(r.id) ? ' disabled' : ''} aria-label="Нравится">♥ ${r.likes}</button>` +
+          (child ? '' : `<button type="button" data-act="reply">Ответить</button>`) +
+          (mine ? `<button type="button" data-act="del">Удалить</button>` : '') +
+          `</div></li>`);
+      };
+      for (const t of tops) {
+        item(t, false);
+        rows.filter(r => r.parent === t.id).sort((a, b) => time(a) - time(b)).forEach(c => item(c, true));
+      }
+      listEl.innerHTML = out.join('');
+      countEl.textContent = String(rows.length);
+      emptyEl.classList.toggle('hide', rows.length > 0);
+    }
+    async function refresh() { rows = await be.list(); render(); }
+
+    function resetReply() {
+      parent = null; cancelEl.classList.add('hide');
+      bodyEl.placeholder = bodyEl.dataset.ph ?? '';
+    }
+    bodyEl.dataset.ph = bodyEl.placeholder;
+
+    /* ---------- события ---------- */
+    bodyEl.addEventListener('input', () => { counterEl.textContent = `${bodyEl.value.length} / 2000`; });
+    cancelEl.addEventListener('click', resetReply);
+
+    listEl.addEventListener('click', async e => {
+      const btn = (e.target as HTMLElement).closest('button[data-act]') as HTMLButtonElement | null;
+      const li = btn?.closest('li[data-id]') as HTMLElement | null;
+      if (!btn || !li) return;
+      const id = li.dataset.id!;
+      try {
+        if (btn.dataset.act === 'like') {
+          if (liked.has(id)) return;
+          liked.add(id); store.set(K.likes, JSON.stringify([...liked]));
+          const it = rows.find(r => r.id === id); if (it) it.likes++;
+          render();
+          await be.like(id);
+        } else if (btn.dataset.act === 'del') {
+          if (!confirm('Удалить комментарий вместе с ответами?')) return;
+          await be.del(id, own[id]);
+          delete own[id]; store.set(K.own, JSON.stringify(own));
+          await refresh(); say('Удалено.');
+        } else if (btn.dataset.act === 'reply') {
+          parent = id;
+          const who = rows.find(r => r.id === id)?.author ?? '';
+          cancelEl.classList.remove('hide');
+          bodyEl.placeholder = `Ответ для ${who}…`;
+          bodyEl.focus();
+          form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } catch (err: any) { say(err?.message ?? 'ошибка', true); }
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-sort]').forEach(b => {
+      b.addEventListener('click', () => {
+        sort = b.dataset.sort as typeof sort;
+        root.querySelectorAll('[data-sort]').forEach(x => x.classList.toggle('on', x === b));
+        render();
+      });
+    });
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const body = bodyEl.value.trim();
+      const author = (nameEl.value.trim().replace(/\s+/g, ' ') || 'Гость').slice(0, 40);
+      if (body.length < 2) { say('Напишите хотя бы пару слов.', true); return; }
+      sendEl.disabled = true;
+      try {
+        const res = await be.add(author, body, parent, hpEl.value);
+        if (res.token) { own[res.id] = res.token; store.set(K.own, JSON.stringify(own)); }
+        store.set(K.name, author);
+        bodyEl.value = ''; counterEl.textContent = '0 / 2000';
+        resetReply();
+        await refresh();
+        say('Отправлено. Спасибо!');
+      } catch (err: any) {
+        say('Не получилось: ' + (err?.message ?? err), true);
+      } finally { sendEl.disabled = false; }
+    });
+
+    refresh().catch(err => say('Не удалось загрузить комментарии: ' + err.message, true));
   }
-  function sync(){
-    var t=document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
-    var f=document.querySelector('iframe.giscus-frame');
-    if(f) f.contentWindow.postMessage({giscus:{setConfig:{theme:t}}},'https://giscus.app');
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount); else mount();
-  window.addEventListener('llt:theme',sync);
-  new MutationObserver(sync).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
-})();
 </script>
-)}
