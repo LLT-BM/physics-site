@@ -28,3 +28,7 @@ deploy.bat
 deploy.log
 site.zip
 public/api/data/
+
+site.zip
+tree.txt
+deploy.log
