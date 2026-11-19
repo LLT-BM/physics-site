@@ -2,19 +2,16 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Закон Ленца — интерактивная модель</title>
 <link rel="canonical" href="https://liblabtab.ru/models/lenz-law/">
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
-  :root{
-    --ink:#E9F4F1; --mut:#8FA8A6; --line:rgba(126,214,199,.16);
-    --cyan:#54e8ff; --warm:#D9B98C; --npole:#D9B98C; --spole:#ABA6DC;
-    --mono:'JetBrains Mono',monospace; --disp:'Unbounded',sans-serif;
-  }
+  
+:root
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;overflow:hidden}
+  html,body{height:100%;overflow:visible}
   body{font-family:'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);
     background:#060b13;user-select:none;-webkit-user-select:none}
   .bg{position:fixed;inset:0;z-index:0;
@@ -122,10 +119,19 @@
     .corner,.note{display:none}
   }
 </style>
+  <link rel="stylesheet" href="/sim/lib/theme.css">
+<script src="/sim/lib/theme.js"></script>
+<script src="/sim/lib/touch.js"></script>
+<script src="/sim/lib/fmt.js"></script>
+<script src="/sim/lib/loop.js"></script>
+<script>window.LLT_OPTS={slug:"lenz-law"};</script>
+<script src="/sim/lib/ui.js"></script>
+  <link rel="stylesheet" href="/sim/lib/mobile.css">
+  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 </head>
 <body>
   <div class="bg"></div>
-  <canvas id="scene"></canvas>
+  <canvas data-llt-stage="1" id="scene"></canvas>
   <div class="vig"></div>
   <div class="corner tl"></div><div class="corner tr"></div>
   <div class="corner bl"></div><div class="corner br"></div>
@@ -159,7 +165,7 @@
     <button id="btnAuto" class="tgl main">▶ автоколебания</button>
     <div class="spd"><span class="lbl">частота</span><input id="freq" type="range" min="20" max="140" value="50"><b id="freqVal">0.50 Гц</b></div>
     <button id="btnFlip" class="tgl">⇄ полюса</button>
-    <button id="reset" class="tgl">⟲ сброс</button>
+    <button id="reset" class="tgl">⟲ Сброс</button>
     <div class="spd"><span class="lbl">витки</span><input id="turns" type="range" min="1" max="8" value="4"><b id="turnsVal">N = 4</b></div>
     <button class="tgl on" id="tgF">поле</button>
     <button class="tgl on" id="tgC">ток</button>
@@ -270,7 +276,7 @@ function drawCoil(g,In,dirB){
     ctx.strokeStyle='rgba(150,96,48,.5)';
     ctx.beginPath();ctx.ellipse(x,g.axisY,g.rx,g.ry,0,Math.PI/2,Math.PI*1.5);ctx.stroke();
     const grd=ctx.createLinearGradient(0,g.axisY-g.ry,0,g.axisY+g.ry);
-    grd.addColorStop(0,'#D8B98C');grd.addColorStop(.5,'#B08A5C');grd.addColorStop(1,'#6E5636');
+    grd.addColorStop(0,PAL.sand);grd.addColorStop(.5,PAL.brass);grd.addColorStop(1,'#6E5636');
     ctx.strokeStyle=grd;
     ctx.beginPath();ctx.ellipse(x,g.axisY,g.rx,g.ry,0,Math.PI*1.5,Math.PI*2.5);ctx.stroke();
   }
@@ -323,7 +329,7 @@ function drawMagnet(g,now){
   ctx.save();
   ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=18;ctx.shadowOffsetY=10;
   rr(x0,y0,g.LW,g.LH,9);ctx.clip();
-  const blue=['#8ab6ff','#2f5cc4'], red=['#ff8a6e','#D9B98C'];
+  const blue=['#8ab6ff','#2f5cc4'], red=['#ff8a6e',PAL.sand];
   const lc=nRight?blue:red, rc=nRight?red:blue;
   let grd=ctx.createLinearGradient(0,y0,0,y0+g.LH);
   grd.addColorStop(0,lc[0]);grd.addColorStop(1,lc[1]);
@@ -401,7 +407,7 @@ function drawMeter(g){
   ctx.font='600 '+Math.round(mw*0.062)+'px "JetBrains Mono",monospace';
   ctx.fillText('мкА',pivX,pivY-R*0.42);
   const ang=(clamp(S.needle,-1.15,1.15)*55-90)*Math.PI/180;
-  ctx.strokeStyle='#B08A5C';ctx.lineWidth=2.5;
+  ctx.strokeStyle=PAL.brass;ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(pivX-10*Math.cos(ang),pivY-10*Math.sin(ang));
   ctx.lineTo(pivX+R*0.92*Math.cos(ang),pivY+R*0.92*Math.sin(ang));ctx.stroke();
   ctx.beginPath();ctx.arc(pivX,pivY,4.5,0,TAU);ctx.fillStyle='#232E2C';ctx.fill();
@@ -435,8 +441,8 @@ function updatePanel(phi,In,now){
   $('st4b').textContent=moving>0?'катушка отталкивает магнит':moving<0?'катушка притягивает магнит':'нет взаимодействия';
   $('fluxFill').style.width=(clamp(Math.abs(phi)/S.turns,0,1)*100).toFixed(1)+'%';
   $('fluxDir').textContent=Math.abs(phi)<0.02?'·':phi>0?'→':'←';
-  $('emfVal').textContent=(S.emf>=0?'+':'−')+Math.abs(S.emf).toFixed(1);
-  $('iVal').textContent=(In>=0?'+':'−')+Math.abs(In).toFixed(2);
+  $('emfVal').textContent=LLTsigned(S.emf, 1);
+  $('iVal').textContent=LLTsigned(In, 2);
 }
 
 /* ---------- управление ---------- */
@@ -557,8 +563,8 @@ function frame(now){
   if(S.show.force&&Math.abs(In)>0.06&&Math.abs(S.vS)>14){
     const len=clamp(30+70*Math.abs(In),30,100)*-Math.sign(S.vS);
     const y=geo.axisY-geo.LH/2-18;
-    arrow(S.mx-geo.LW/2,y,S.mx-geo.LW/2+len,y,'#D9B98C',2.5,10);
-    ctx.font='600 11px "JetBrains Mono",monospace';ctx.fillStyle='#D9B98C';
+    arrow(S.mx-geo.LW/2,y,S.mx-geo.LW/2+len,y,PAL.sand,2.5,10);
+    ctx.font='600 11px "JetBrains Mono",monospace';ctx.fillStyle=PAL.sand;
     ctx.fillText('F',S.mx-geo.LW/2+len/2-4,y-9);
   }
   drawMeter(geo);
@@ -573,7 +579,11 @@ requestAnimationFrame(frame);
 <script>
 /* LibLabTab · сброс Ленца */
 (function(){
-  var b=document.getElementById("reset");
+  
+/* LibLabTab · палитра до первого использования */
+var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
+window.PAL = PAL;
+var b=document.getElementById("reset");
   if(!b||b.__lenzWired)return; b.__lenzWired=true;
   b.addEventListener("click",function(){
     try{
@@ -595,5 +605,20 @@ requestAnimationFrame(frame);
   });
 })();
 </script>
+<script>
+/* LibLabTab · перекраска при смене темы */
+(function(){
+  function refresh(){
+    if(window.LLTtheme) window.LLTtheme.readPal();
+    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
+    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
+    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
+    if(typeof render==="function"){ try{ render(); }catch(e){} }
+    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  }
+  window.addEventListener("llt:theme",refresh);
+})();
+</script>
+<script src="/sim/lib/selftest.js"></script>
 </body>
 </html>

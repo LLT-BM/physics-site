@@ -1,0 +1,45 @@
+/* LibLabTab · токены для автономных симуляций + алиасы старых имён. */
+:root{
+  color-scheme:dark;
+  --bg:#0A1417; --surface:#102024; --overlay:#14262A; --canvas:#071012;
+  --ink:#E9F4F1; --muted:#8FA8A6;
+  --line:rgba(126,214,199,.16); --line2:rgba(126,214,199,.30);
+  --aqua:#4FD8C4; --sand:#D9B98C; --lilac:#ABA6DC; --rose:#D69FA9;
+  --ok:#3FC9AE; --deep:#2E9E96; --brass:#C9A96E; --ice:#9FE8DC; --on:#06110F;
+  --scrim:rgba(6,17,15,.72);
+  --disp:'Unbounded',system-ui,sans-serif;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F2F6F5; --surface:#FFFFFF; --overlay:#E8EFED; --canvas:#FBFDFC;
+  --ink:#11201E; --muted:#5A6B68;
+  --line:rgba(24,86,80,.16); --line2:rgba(24,86,80,.30);
+  --aqua:#0E8578; --sand:#8A6733; --lilac:#57509F; --rose:#A55262;
+  --ok:#0E8578; --deep:#0B6B60; --brass:#8A6733; --ice:#2C7F74; --on:#FFFFFF;
+  --scrim:rgba(255,255,255,.82);
+}
+/* Алиасы: старые имена продолжают работать и переключаются вместе с темой */
+:root{
+  --panel:var(--surface); --grid:var(--line); --mut:var(--muted);
+  --cyan:var(--aqua); --amber:var(--sand); --pink:var(--lilac); --warn:var(--rose);
+  --acc:var(--aqua); --fg:var(--ink); --card:var(--surface); --bd:var(--line2);
+  --obj:var(--aqua); --img:var(--sand);
+  --r1:var(--aqua); --r2:var(--sand); --r3:var(--lilac);
+  --left:var(--aqua); --right:var(--sand); --third:var(--lilac);
+  --npole:var(--sand); --spole:var(--lilac); --warm:var(--sand);
+  --beam:var(--muted); --edge:var(--muted); --stand:var(--muted);
+  --glass:var(--line); --glassEdge:var(--aqua); --axis:var(--muted); --screen:var(--muted);
+}
+/* Мягкая адаптация типографики под светлую тему */
+:root[data-theme="light"] body{background-image:
+  linear-gradient(var(--line) 1px,transparent 1px),
+  linear-gradient(90deg,var(--line) 1px,transparent 1px)}
+.llt-theme-btn{
+  position:fixed;right:12px;top:12px;z-index:70;min-height:36px;padding:6px 11px;
+  border-radius:999px;border:1px solid var(--line2);background:var(--scrim);
+  color:var(--ink);font:600 12px var(--mono);cursor:pointer;backdrop-filter:blur(6px)
+}
+.llt-theme-btn:hover{border-color:var(--aqua);color:var(--aqua)}
+.llt-theme-btn:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}

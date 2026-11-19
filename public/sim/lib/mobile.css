@@ -1,0 +1,95 @@
+/* LibLabTab · смартфоны и планшеты. Подключается последним в <head>. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;max-width:100%}
+body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;
+  overflow-x:clip;max-width:100vw;font-size:16px}
+canvas,svg{max-width:100%;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
+
+/* Ни один контейнер не имеет права распирать экран */
+.wrap,main,.card,.grp,.ctl,.grid2,.rd,.bar,.chips,.stats,.rrow,.legend,.tw,.holder,
+.stagebox,.controls,.chain,.info,.tabs,.orbs,.row,.rules,.blk,.brw,.br{min-width:0;max-width:100%}
+.ctl>*,.grid2>*,.cards>*,.rd>*,.bar>*,.chips>*,.stats>*,.rrow>*,.legend>*,
+.info>*,.tabs>*,.orbs>*,.row>*,.br>*,.brw>*{min-width:0}
+label{flex-wrap:wrap;gap:6px}
+label>select,label>input,label>output{min-width:0}
+label>select{flex:1 1 130px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+.tw table{min-width:520px}
+table{max-width:100%}
+.hud{max-width:calc(100% - 24px)}
+.hud span{white-space:normal;word-break:break-word}
+
+/* Тач-таргеты не меньше 44 px, поля не зумят iOS */
+button,.tgl,.pbtn,.preset,.chip,.fchip,.pri,.sm,summary{min-height:44px !important;touch-action:manipulation}
+input,select,textarea{font-size:16px !important;max-width:100%}
+input[type=checkbox],.chk input,.rrow input{width:22px !important;height:22px !important;flex:none}
+.chk{min-height:44px;align-items:center}
+input[type=range]{height:44px;margin:0;min-width:0;width:100%}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:4px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+  width:26px;height:26px;margin-top:-10px;border-radius:50%;
+  background:var(--sand);border:2px solid var(--canvas);cursor:pointer}
+input[type=range]::-moz-range-track{height:6px;border-radius:4px}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;
+  background:var(--sand);border:2px solid var(--canvas)}
+
+@media (max-width:900px){
+  .wrap{padding-left:10px;padding-right:10px}
+  .ctl,.grid2{grid-template-columns:1fr !important}
+  .rd{grid-template-columns:repeat(auto-fit,minmax(132px,1fr))}
+  h1{font-size:clamp(1.3rem,5.4vw,1.7rem)}
+  .card{padding:12px;border-radius:12px}
+  .corner,.vig{display:none}
+
+  /* Мелкие подписи ранних версий поднимаем до читаемых */
+  .lead,.sub,.note,.info p,.task p,#concl,.hint,.scale{font-size:.92rem !important;line-height:1.55}
+  .tag,.stat,.u,.mchip,.legend,.legend span,.hud span,.eyebrow,.fnote,.mlab,
+  .steps i,.steps small,.tgl,.spd .lbl,.spd b,.tl,.ftxt,.chip,.fchip,
+  .meta,.grade,.lvl,.sec,.found,.flab,.crumbs,.mnum,.tstate{font-size:.8rem !important}
+  .steps b,.mrow2 b,.readout .value,.rd b,.stat b,output{font-size:1rem !important}
+  .rrow span{min-width:0 !important}
+  .rrow{gap:8px}
+  .rrow label{gap:5px;padding:4px 2px}
+  .legend{gap:10px}
+  .chain{position:static !important;width:auto !important;right:auto !important;top:auto !important;
+    margin:12px 10px;clip-path:none !important}
+  .controls{position:static !important;transform:none !important;left:auto !important;
+    right:auto !important;bottom:auto !important;margin:12px 10px;clip-path:none !important;
+    display:flex;flex-wrap:wrap;overflow:visible !important}
+  header{position:static !important}
+  .note2{display:block !important}
+  .llt-theme-btn,#lltBack{min-height:40px !important;font-size:.8rem !important}
+}
+@media (max-width:420px){
+  .rd{grid-template-columns:1fr 1fr}
+  .bar{gap:6px}
+  .bar button{flex:1 1 auto}
+  .chips button,.tgl{font-size:.8rem !important;padding:8px 10px}
+  .readouts{grid-template-columns:1fr 1fr !important}
+}
+@media (hover:none) and (pointer:coarse){ button:hover{transform:none;filter:none} }
+@media (prefers-reduced-motion:reduce){ *{animation-duration:.001ms !important;transition-duration:.001ms !important} }
+
+/* Док-панель под большим пальцем */
+#lltDock{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));
+  z-index:65;display:none;gap:8px;padding:8px;border-radius:14px;
+  border:1px solid var(--line2);background:var(--scrim);backdrop-filter:blur(10px);
+  box-shadow:0 -8px 30px rgba(0,0,0,.35)}
+#lltDock.on{display:flex}
+#lltDock button{flex:1;min-width:0;min-height:48px !important;padding:8px 6px;border-radius:10px;
+  border:1px solid var(--line2);background:var(--overlay);color:var(--ink);
+  font:600 .84rem var(--sans);cursor:pointer}
+#lltDock button.main{background:var(--aqua);color:var(--on);border-color:var(--aqua)}
+body.llt-docked{padding-bottom:86px}
+
+/* Полоса прокрутки в палитре проекта */
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--canvas);border-radius:8px}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--deep),var(--aqua));border-radius:8px;border:2px solid var(--canvas)}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(var(--aqua),var(--ice))}
+*{scrollbar-color:var(--aqua) var(--canvas);scrollbar-width:thin}
+/* Док заменяет эти кнопки на узком экране — оригиналы не дублируются и не перекрываются */
+@media (max-width:900px){
+  body.llt-docked [data-llt-proxied]{display:none !important}
+}
+button,.tgl,.pbtn,.preset{scroll-margin-bottom:104px;scroll-margin-top:88px}

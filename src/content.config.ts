@@ -1,5 +1,18 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
+
+export const SECTIONS = [
+  'механика','электричество','оптика','молекулярная-физика',
+  'квантовая-физика','нелинейная-динамика','гидродинамика','астрономия'
+] as const;
+export const LEVELS = ['базовый','продвинутый'] as const;
+export const GRADES = ['7-9','10-11','вуз'] as const;
+export const TAGS = [
+  'школьный-курс','хаос','колебания','статика','геометрическая-оптика',
+  'постоянный-ток','переменный-ток','ван-дер-ваальс','клеточные-автоматы',
+  'масштабы','численные-методы','3d'
+] as const;
 
 const models = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/models' }),
@@ -7,10 +20,21 @@ const models = defineCollection({
     title: z.string(),
     date: z.coerce.date(),
     description: z.string(),
-    tags: z.array(z.string()).default([]),
+    tags: z.array(z.enum(TAGS)).default([]),
     model: z.string(),
-    cover: z.string().optional(),
-  }),
+    cover: z.string(),
+    section: z.enum(SECTIONS),
+    level: z.enum(LEVELS).default('базовый'),
+    grade: z.enum(GRADES).optional(),
+    order: z.number().int().positive(),
+    coreVersion: z.string().default('1'),
+    draft: z.boolean().default(false),
+    answers: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
+    checkpoints: z.array(z.object({
+      name: z.string(), setup: z.string(), expected: z.string()
+    })).default([]),
+    aliases: z.array(z.string()).default([])
+  })
 });
 
 export const collections = { models };

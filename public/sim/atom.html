@@ -8,9 +8,9 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
-:root{--bg:#f7f6f2;--fg:#1d1d1a;--mut:#65645c;--card:#ecebe4;--bd:#d2d0c6;--acc:#2f6fb5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101216;--fg:#e8e7e1;--mut:#9a9a92;--card:#1a1d23;--bd:#2c3038;--acc:#6aa8ee;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#101216;--fg:#e8e7e1;--mut:#9a9a92;--card:#1a1d23;--bd:#2c3038;--acc:#6aa8ee;color-scheme:dark}
+
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -37,6 +37,15 @@ canvas:active{cursor:grabbing}
 .note{color:var(--mut);font-size:13px;margin-top:16px}
 @media (prefers-reduced-motion:reduce){canvas{cursor:default}}
 </style>
+  <link rel="stylesheet" href="/sim/lib/theme.css">
+<script src="/sim/lib/theme.js"></script>
+<script src="/sim/lib/touch.js"></script>
+<script src="/sim/lib/fmt.js"></script>
+<script src="/sim/lib/loop.js"></script>
+<script>window.LLT_OPTS={slug:"atom-model"};</script>
+<script src="/sim/lib/ui.js"></script>
+  <link rel="stylesheet" href="/sim/lib/mobile.css">
+  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 </head>
 <body>
 <main>
@@ -51,7 +60,7 @@ canvas:active{cursor:grabbing}
 <div class="orbs" id="orbs" role="group" aria-label="Орбиталь"></div>
 
 <div class="stage">
-<canvas id="cv" aria-label="Интерактивная модель атома"></canvas>
+<canvas data-llt-stage="1" id="cv" aria-label="Интерактивная модель атома"></canvas>
 <div class="scale" id="scale"></div>
 <div class="hint">перетащите, чтобы повернуть</div>
 </div>
@@ -69,7 +78,7 @@ canvas:active{cursor:grabbing}
 <script>
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 let W=0,H=0,mode='atom',orb='1s',yaw=.6,pitch=.4,auto=true,drag=false,lx=0,ly=0,ext=10,pts=null;
-const POS='#3b8be0',NEG='#e8643a';
+const POS=PAL.aqua,NEG=PAL.sand;
 
 function fit(){const d=Math.min(devicePixelRatio||1,2),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0)}
 addEventListener('resize',fit);
@@ -119,14 +128,18 @@ function drawAtom(){
   }
  }
  ctx.globalAlpha=1;
- ctx.fillStyle='#e24b4a';ctx.shadowColor='#e24b4a';ctx.shadowBlur=12;
+ ctx.fillStyle=PAL.rose;ctx.shadowColor=PAL.rose;ctx.shadowBlur=12;
  ctx.beginPath();ctx.arc(cx,cy,3,0,6.283);ctx.fill();ctx.shadowBlur=0;
 }
 
 /* Ядро: углерод‑12 (6 p + 6 n) */
 const NU=[];
 (function(){
- for(let i=0;i<12;i++){let v;do{v=[Math.random()*2-1,Math.random()*2-1,Math.random()*2-1]}while(v[0]**2+v[1]**2+v[2]**2>1);
+ 
+/* LibLabTab · палитра до первого использования */
+var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
+window.PAL = PAL;
+for(let i=0;i<12;i++){let v;do{v=[Math.random()*2-1,Math.random()*2-1,Math.random()*2-1]}while(v[0]**2+v[1]**2+v[2]**2>1);
   NU.push({p:v.map(a=>a*.62),z:i%2,ph:Math.random()*6.28})}
  for(let it=0;it<300;it++)for(const a of NU){
   for(const b of NU){if(a===b)continue;const d=[0,1,2].map(k=>a.p[k]-b.p[k]),l=Math.hypot(...d)||.01;
@@ -143,13 +156,13 @@ function drawNuc(t){
  const L=NU.map(n=>{const q=rot(n.p[0]+.03*Math.sin(t*3+n.ph),n.p[1]+.03*Math.cos(t*2.6+n.ph),n.p[2]+.03*Math.sin(t*3.3+n.ph*2));return{q,z:n.z}});
  L.sort((a,b)=>b.q[2]-a.q[2]);
  for(const n of L){const r=sc*.3*(1-n.q[2]*.08);
-  n.z?ball(cx+n.q[0]*sc,cy+n.q[1]*sc,r,'#f5a98d','#c4491f',.93):ball(cx+n.q[0]*sc,cy+n.q[1]*sc,r,'#d9d8d0','#76756d',.93)}
+  n.z?ball(cx+n.q[0]*sc,cy+n.q[1]*sc,r,PAL.sand,PAL.brass,.93):ball(cx+n.q[0]*sc,cy+n.q[1]*sc,r,PAL.ink,PAL.muted,.93)}
 }
 
 /* Протон: uud, глюоны, «море» виртуальных пар */
 const hs=n=>{const s=Math.sin(n*12.9898)*43758.5453;return s-Math.floor(s)};
 const QK=[{l:'u',f:[1.1,1.7,1.3],p:[0,1,2]},{l:'u',f:[1.4,.9,1.9],p:[2,4,1]},{l:'d',f:[.8,1.5,1.2],p:[4,0,3]}];
-const CC=['#e24b4a','#1d9e75','#378add'];
+const CC=[PAL.rose,PAL.ok,PAL.lilac];
 function drawNct(t){
  const sc=Math.min(W,H)*.4,cx=W/2,cy=H/2;
  const g=ctx.createRadialGradient(cx,cy,sc*.2,cx,cy,sc*1.1);
@@ -161,7 +174,7 @@ function drawNct(t){
   const v=[hs(i*3+cyc*17)*2-1,hs(i*5+cyc*13)*2-1,hs(i*11+cyc*19)*2-1];if(Math.hypot(...v)>1)continue;
   const q=rot(v[0]*.9,v[1]*.9,v[2]*.9),d=.04+.05*a;
   ctx.globalAlpha=a*.7;ctx.fillStyle=CC[i%3];ctx.fillRect(cx+q[0]*sc-1.5,cy+q[1]*sc-1.5,3,3);
-  ctx.fillStyle='#9a9a92';ctx.fillRect(cx+(q[0]+d)*sc-1.5,cy+q[1]*sc-1.5,3,3);ctx.globalAlpha=1;
+  ctx.fillStyle=PAL.muted;ctx.fillRect(cx+(q[0]+d)*sc-1.5,cy+q[1]*sc-1.5,3,3);ctx.globalAlpha=1;
  }
  const Q=QK.map((k,i)=>{const p=k.f.map((f,j)=>.5*Math.sin(f*t+k.p[j]));return{k,i,q:rot(p[0],p[1],p[2])}});
  const S=Q.map(o=>[cx+o.q[0]*sc,cy+o.q[1]*sc]);
@@ -185,17 +198,17 @@ function drawNct(t){
 /* Текст и интерфейс */
 const INFO={
 atom:{scale:'≈ 10⁻¹⁰ м (1 Å). Ядро здесь в 100 000 раз меньше — красная точка не в масштабе.',
- leg:`<span><i style="background:${POS}"></i>фаза +</span><span><i style="background:${NEG}"></i>фаза −</span><span><i style="background:#e24b4a"></i>ядро</span>`,
+ leg:`<span><i style="background:${POS}"></i>фаза +</span><span><i style="background:${NEG}"></i>фаза −</span><span><i style="background:var(--rose)"></i>ядро</span>`,
  cards:[['Нет орбит, есть облака','Электрон не летает по траектории. Его состояние задаёт волновая функция ψ, а плотность точек показывает вероятность |ψ|² обнаружить электрон в данном месте.'],
  ['Цвет — знак фазы','Узловые поверхности, где ψ меняет знак, — прямое следствие волновой природы электрона. Именно фазы определяют, как атомы образуют химические связи.'],
  ['Электрон — точка','Структуры у электрона не нашли вплоть до масштаба порядка 10⁻¹⁹ м. Он считается элементарной частицей, в отличие от ядра.']]},
 nuc:{scale:'≈ 10⁻¹⁵–10⁻¹⁴ м (1–10 фм). Показан углерод‑12: 6 протонов и 6 нейтронов.',
- leg:'<span><i style="background:#d9582b"></i>протон</span><span><i style="background:#8d8c84"></i>нейтрон</span>',
+ leg:'<span><i style="background:var(--sand)"></i>протон</span><span><i style="background:var(--muted)"></i>нейтрон</span>',
  cards:[['Остаточная сила','Нуклоны держит остаточное сильное взаимодействие — «хвост» связи между кварками, подобно тому как молекулы притягиваются остатком электрических сил атомов.'],
  ['Не твёрдые шарики','Нуклоны в ядре перекрываются и непрерывно движутся. Ядро имеет оболочечную структуру, а в лёгких ядрах возможны α‑кластеры — как в состоянии Хойла углерода‑12.'],
  ['Почти вся масса атома','В ядре сосредоточено более 99,9 % массы атома при объёме порядка 10⁻¹⁵ от атомного.']]},
 nct:{scale:'≈ 10⁻¹⁵ м: радиус протона около 0,84 фм. Кварки точечны (< 10⁻¹⁸ м).',
- leg:'<span><i style="background:#e24b4a"></i><i style="background:#1d9e75"></i><i style="background:#378add"></i>цветовой заряд</span><span><i style="background:#ef9f27"></i>глюоны</span>',
+ leg:'<span><i style="background:var(--rose)"></i><i style="background:var(--ok)"></i><i style="background:var(--lilac)"></i>цветовой заряд</span><span><i style="background:var(--sand)"></i>глюоны</span>',
  cards:[['Состав uud','Три валентных кварка: два u (заряд +⅔) и один d (−⅓) дают заряд +1. Цвета — не оттенки, а три вида заряда сильного взаимодействия; кварки обмениваются ими через глюоны.'],
  ['Конфайнмент','Кварк нельзя извлечь из протона: при растяжении глюонной «струны» энергия рождает новые пары кварк—антикварк. Глюоны сами несут цвет и взаимодействуют друг с другом.'],
  ['Откуда масса','Массы трёх кварков (даёт механизм Хиггса) — лишь около 1 % массы протона. Остальное — энергия движения кварков и глюонного поля, E = mc². Внутри ещё и «море» виртуальных пар.']]}
@@ -236,5 +249,20 @@ function frame(ms){
 }
 fit();build(orb);render();requestAnimationFrame(frame);
 </script>
+<script>
+/* LibLabTab · перекраска при смене темы */
+(function(){
+  function refresh(){
+    if(window.LLTtheme) window.LLTtheme.readPal();
+    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
+    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
+    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
+    if(typeof render==="function"){ try{ render(); }catch(e){} }
+    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  }
+  window.addEventListener("llt:theme",refresh);
+})();
+</script>
+<script src="/sim/lib/selftest.js"></script>
 </body>
 </html>

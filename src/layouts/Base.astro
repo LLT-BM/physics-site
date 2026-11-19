@@ -1,41 +1,50 @@
 ---
+import '../styles/tokens.css';
 import '../styles/global.css';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import '../styles/mobile.css';
+import FrameBridge from '../components/FrameBridge.astro';
 
 interface Props {
   title: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
+  jsonLd?: Record<string, unknown>;
 }
-
 const {
   title,
-  description = 'Интерактивные физические модели в браузере: механика, электродинамика, оптика, квантовая физика. Запускаются без установки.',
+  description = 'Интерактивные физические модели в браузере: механика, электродинамика, оптика, квантовая физика.',
   image = '/covers/atom.svg',
+  imageAlt,
+  jsonLd
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
-
-// На сайте обложки — лёгкие SVG. Telegram/VK/Facebook SVG не показывают,
-// поэтому для Open Graph подставляем одноимённый PNG.
-const ogImageUrl = image.replace('.svg', '.png');
-const ogImage = new URL(ogImageUrl, Astro.site);
+const ogImage = new URL(image.replace('.svg', '.png'), Astro.site);
 ---
 <!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#070c15" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>{title}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
 
-  <!-- Иконки: монограмма LLT -->
+  {/* Тема ставится ДО первой отрисовки — без вспышки */}
+  <script is:inline>
+  (function(){try{var t=localStorage.getItem('llt-theme');
+    if(!t)t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';
+    document.documentElement.setAttribute('data-theme',t);}catch(e){
+    document.documentElement.setAttribute('data-theme','dark');}})();
+  </script>
+
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0A1417" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#F2F6F5" media="(prefers-color-scheme: light)" />
 
-  <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="ru_RU" />
   <meta property="og:site_name" content="LibLabTab — интерактивная физика" />
@@ -45,24 +54,28 @@ const ogImage = new URL(ogImageUrl, Astro.site);
   <meta property="og:image" content={ogImage} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="LibLabTab — интерактивные модели физики" />
+  <meta property="og:image:alt" content={imageAlt ?? title} />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content={ogImage} />
 
   <link rel="alternate" type="application/rss+xml" title="LibLabTab RSS" href="/rss.xml" />
   <link rel="stylesheet" href="/fonts/fonts.css" />
+  {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
 </head>
 <body>
   <header class="site-head">
     <a class="logo" href="/">LibLabTab</a>
-    <span class="motto">одна модель в день</span>
+    <span class="motto">новые модели каждую неделю</span>
+    <ThemeToggle />
   </header>
 
   <main><slot /></main>
 
   <footer class="site-foot">
     © {new Date().getFullYear()} · LibLabTab · сделано на Astro · модели работают прямо в браузере ·
+    <a href="/account/">Вход</a> ·
     <a href="https://github.com/LLT-BM/physics-site">исходники</a>
   </footer>
+  <FrameBridge />
 </body>
 </html>

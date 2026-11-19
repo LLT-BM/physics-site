@@ -8,14 +8,8 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
-:root{
-  --bg:#0A1417; --surface:#102024; --canvas:#071012;
-  --line:rgba(126,214,199,.16); --ink:#E9F4F1; --muted:#8FA8A6;
-  --aqua:#4FD8C4; --sand:#D9B98C; --lilac:#ABA6DC; --rose:#D69FA9;
-  --ok:#3FC9AE; --on:#06110F;
-  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
-  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
+
+:root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
 *{box-sizing:border-box}
 body{margin:0;background-color:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
@@ -66,6 +60,15 @@ th{color:var(--muted);font-weight:600}
 .pass{color:var(--ok)} .fail{color:var(--rose)}
 kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
 </style>
+  <link rel="stylesheet" href="/sim/lib/theme.css">
+<script src="/sim/lib/theme.js"></script>
+<script src="/sim/lib/touch.js"></script>
+<script src="/sim/lib/fmt.js"></script>
+<script src="/sim/lib/loop.js"></script>
+<script>window.LLT_OPTS={slug:"bernoulli"};</script>
+<script src="/sim/lib/ui.js"></script>
+  <link rel="stylesheet" href="/sim/lib/mobile.css">
+  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 </head>
 <body>
 <main class="wrap">
@@ -82,7 +85,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <button class="pri" id="run">▶ Пуск</button>
       <button id="reset">Сброс</button>
     </div>
-    <canvas id="scene" aria-label="Течение жидкости: труба Вентури или истечение из бака"></canvas>
+    <canvas data-llt-stage="1" id="scene" aria-label="Течение жидкости: труба Вентури или истечение из бака"></canvas>
     <div class="chips" id="quick"></div>
     <div class="rd" id="rdv">
       <div><span>расход Q</span><b class="a" id="v_Q">—</b></div>
@@ -207,6 +210,10 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
 <script>
 (function(){
 'use strict';
+/* LibLabTab · палитра до первого использования */
+var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
+window.PAL = PAL;
+
 var $=function(id){return document.getElementById(id)};
 
 /* ---- перехват ошибок: поломка больше не будет молчаливой ---- */
@@ -215,8 +222,8 @@ function fatal(msg){
   if(box){box.style.display='block';box.textContent='Ошибка модели: '+msg+'\nСообщите этот текст — по нему место поломки находится сразу.';}
   try{
     var c=$('scene'),x=c.getContext('2d');
-    x.setTransform(1,0,0,1,0,0);x.fillStyle='#071012';x.fillRect(0,0,c.width,c.height);
-    x.fillStyle='#D69FA9';x.font='16px monospace';x.fillText('Ошибка: '+msg,20,40);
+    x.setTransform(1,0,0,1,0,0);x.fillStyle=PAL.canvas;x.fillRect(0,0,c.width,c.height);
+    x.fillStyle=PAL.rose;x.font='16px monospace';x.fillText('Ошибка: '+msg,20,40);
   }catch(e){}
 }
 window.addEventListener('error',function(e){fatal(e.message||'неизвестно');});
@@ -248,7 +255,7 @@ function kRef(){return P.rho/rr();}
 function hUnit(){return isGas()?' мм в.ст.':' м';}
 function hMul(){return isGas()?1000:1;}
 function area(D){return Math.PI*D*D/4;}
-function nf(x,n){if(!isFinite(x))return '—';return x.toFixed(n).replace('.',',');}
+function nf(x,n){ return window.LLTfmt?LLTfmt.nf(x,n):(isFinite(x)?LLTfix(x, n):"—"); }
 function press(x){
   if(!isFinite(x))return '—';
   if(isGas())return nf(x,1)+' Па';
@@ -286,8 +293,8 @@ function dat(gp,x){
   }
   return P.D1;
 }
-function compute(){
-  var gp=geomPipe(),N=320,dx=gp.L/N;
+function compute(NN){
+  var gp=geomPipe(),N=NN||320,dx=gp.L/N;
   var Q=P.v1*area(P.D1), v2=Q/area(P.D2), v3=Q/area(P.D1);
   var events=[];
   gp.segs.forEach(function(s){
@@ -354,7 +361,7 @@ function pipeGeom(){
 }
 function drawVenturi(){
   var g=pipeGeom(),fl=FL[P.fl];
-  sx.clearRect(0,0,W,HS);sx.fillStyle='#071012';sx.fillRect(0,0,W,HS);
+  sx.clearRect(0,0,W,HS);sx.fillStyle=PAL.canvas;sx.fillRect(0,0,W,HS);
   sx.beginPath();
   var i;
   for(i=0;i<=prof.N;i++)sx[i?'lineTo':'moveTo'](g.X(prof.xs[i]),g.cy-g.r(prof.Ds[i])-hZ(prof.zs[i])*g.kH);
@@ -362,7 +369,7 @@ function drawVenturi(){
   sx.closePath();
   var grd=sx.createLinearGradient(0,g.cy-HS*0.1,0,g.cy+HS*0.1);
   grd.addColorStop(0,'rgba(79,216,196,.18)');grd.addColorStop(.5,'rgba(79,216,196,.07)');grd.addColorStop(1,'rgba(79,216,196,.18)');
-  sx.fillStyle=grd;sx.fill();sx.strokeStyle='#4FD8C4';sx.lineWidth=2.2;sx.stroke();
+  sx.fillStyle=grd;sx.fill();sx.strokeStyle=PAL.aqua;sx.lineWidth=2.2;sx.stroke();
 
   if(fl.pv<1e8){
     sx.fillStyle='rgba(214,159,169,.24)';
@@ -374,7 +381,7 @@ function drawVenturi(){
     }
   }
   if($('c_part').checked){
-    sx.fillStyle='#E9F4F1';sx.globalAlpha=.6;
+    sx.fillStyle=PAL.ink;sx.globalAlpha=.6;
     parts.forEach(function(p){
       var D=dat(prof.gp,p.s),X=g.X(p.s),z=hZ(P.dz*p.s/prof.gp.L)*g.kH;
       sx.beginPath();sx.arc(X,g.cy+p.o*g.r(D)*0.76-z,2.1,0,6.2832);sx.fill();
@@ -390,48 +397,48 @@ function drawVenturi(){
       sx.moveTo(X+w/2,top);sx.lineTo(X+w/2,Math.min(Y,y0)-3);sx.stroke();
       if(hp>=0){sx.fillStyle='rgba(217,185,140,.55)';sx.fillRect(X-w/2+1,Y,w-2,y0-Y);}
       else{sx.fillStyle='rgba(214,159,169,.5)';sx.fillRect(X-w/2+1,y0,w-2,Y-y0);}
-      sx.strokeStyle=hp>=0?'#D9B98C':'#D69FA9';sx.lineWidth=2;
+      sx.strokeStyle=hp>=0?PAL.sand:PAL.rose;sx.lineWidth=2;
       sx.beginPath();sx.moveTo(X-w/2-3,Y);sx.lineTo(X+w/2+3,Y);sx.stroke();
-      if($('c_lab').checked){sx.fillStyle=hp>=0?'#D9B98C':'#D69FA9';sx.font='10px JetBrains Mono, monospace';
+      if($('c_lab').checked){sx.fillStyle=hp>=0?PAL.sand:PAL.rose;sx.font='10px JetBrains Mono, monospace';
         sx.textAlign='center';sx.fillText(press(s.p),X,Y-6);}
     }
     if($('c_pitot').checked){
       var Y0=g.Y(hP(s.p)+hV(s.v))-z;
-      sx.strokeStyle='#ABA6DC';sx.lineWidth=2;sx.setLineDash([4,3]);
+      sx.strokeStyle=PAL.lilac;sx.lineWidth=2;sx.setLineDash([4,3]);
       sx.beginPath();sx.moveTo(X+22,y0);sx.lineTo(X+22,Y0);sx.stroke();sx.setLineDash([]);
       sx.beginPath();sx.moveTo(X+16,Y0);sx.lineTo(X+28,Y0);sx.stroke();
-      if($('c_lab').checked){sx.fillStyle='#ABA6DC';sx.font='10px JetBrains Mono, monospace';
+      if($('c_lab').checked){sx.fillStyle=PAL.lilac;sx.font='10px JetBrains Mono, monospace';
         sx.textAlign='left';sx.fillText('Пито',X+31,Y0+3);}
     }
     if($('c_lab').checked){
-      sx.fillStyle='#4FD8C4';sx.font='11px JetBrains Mono, monospace';sx.textAlign='center';
+      sx.fillStyle=PAL.aqua;sx.font='11px JetBrains Mono, monospace';sx.textAlign='center';
       sx.fillText('v'+(i2+1)+' = '+nf(s.v,2)+' м/с',X,g.cy+g.r(s.D)-z+18);
-      sx.fillStyle='#8FA8A6';sx.font='10px JetBrains Mono, monospace';
+      sx.fillStyle=PAL.muted;sx.font='10px JetBrains Mono, monospace';
       sx.fillText('D = '+nf(s.D*1000,0)+' мм',X,g.cy+g.r(s.D)-z+31);
     }
   });
   if($('c_lines').checked){
-    sx.strokeStyle='#ABA6DC';sx.lineWidth=2;sx.beginPath();
+    sx.strokeStyle=PAL.lilac;sx.lineWidth=2;sx.beginPath();
     for(i=0;i<=prof.N;i++){var Y=g.Y(hH(prof.Hs[i]));sx[i?'lineTo':'moveTo'](g.X(prof.xs[i]),Y);}
     sx.stroke();
-    sx.strokeStyle='#D9B98C';sx.lineWidth=1.8;sx.setLineDash([6,4]);sx.beginPath();
+    sx.strokeStyle=PAL.sand;sx.lineWidth=1.8;sx.setLineDash([6,4]);sx.beginPath();
     for(i=0;i<=prof.N;i++){var Y2=g.Y(hP(prof.ps[i])+hZ(prof.zs[i]));sx[i?'lineTo':'moveTo'](g.X(prof.xs[i]),Y2);}
     sx.stroke();sx.setLineDash([]);
     if($('c_lab').checked){
       sx.font='10px JetBrains Mono, monospace';sx.textAlign='left';
-      sx.fillStyle='#ABA6DC';sx.fillText('EGL — полный напор',g.pad+4,g.Y(hH(prof.Hs[0]))-6);
-      sx.fillStyle='#D9B98C';sx.fillText('HGL — пьезометрическая линия',g.pad+4,g.Y(hP(prof.ps[0]))-6);
+      sx.fillStyle=PAL.lilac;sx.fillText('EGL — полный напор',g.pad+4,g.Y(hH(prof.Hs[0]))-6);
+      sx.fillStyle=PAL.sand;sx.fillText('HGL — пьезометрическая линия',g.pad+4,g.Y(hP(prof.ps[0]))-6);
     }
   }
   if($('c_lab').checked){
-    sx.fillStyle='#8FA8A6';sx.font='11px JetBrains Mono, monospace';sx.textAlign='left';
+    sx.fillStyle=PAL.muted;sx.font='11px JetBrains Mono, monospace';sx.textAlign='left';
     sx.fillText(fl.n+' · ρ = '+nf(P.rho,1)+' кг/м³ · Q = '+nf(prof.Q*1000,2)+' л/с',8,16);
     sx.textAlign='right';sx.fillText(P.real?'реальная жидкость':'идеальная жидкость',W-8,16);
   }
 }
 function drawTor(){
   var t=tor();
-  sx.clearRect(0,0,W,HS);sx.fillStyle='#071012';sx.fillRect(0,0,W,HS);
+  sx.clearRect(0,0,W,HS);sx.fillStyle=PAL.canvas;sx.fillRect(0,0,W,HS);
   var pad=54,ground=HS-42;
   var k=Math.min((HS-96)/Math.max(P.H,0.3),(W*0.40)/Math.max(t.Rmax,0.3));
   var tx=pad,tw=Math.min(W*0.26,180),tH=P.H*k,lvlH=lvl*k,holeY=ground-t.y*k;
@@ -440,62 +447,62 @@ function drawTor(){
   var grd=sx.createLinearGradient(0,ground-lvlH,0,ground);
   grd.addColorStop(0,'rgba(79,216,196,.30)');grd.addColorStop(1,'rgba(79,216,196,.12)');
   sx.fillStyle=grd;sx.fillRect(tx+1,ground-lvlH,tw-2,lvlH);
-  sx.strokeStyle='#4FD8C4';sx.lineWidth=2;
+  sx.strokeStyle=PAL.aqua;sx.lineWidth=2;
   sx.beginPath();sx.moveTo(tx+1,ground-lvlH);sx.lineTo(tx+tw-1,ground-lvlH);sx.stroke();
-  sx.strokeStyle='#8FA8A6';sx.lineWidth=1;
+  sx.strokeStyle=PAL.muted;sx.lineWidth=1;
   sx.beginPath();sx.moveTo(tx-16,ground);sx.lineTo(W-16,ground);sx.stroke();
   for(var i=0;i<Math.floor((W-tx)/16);i++){sx.beginPath();sx.moveTo(tx+i*16,ground);sx.lineTo(tx+i*16-7,ground+8);sx.stroke();}
-  sx.fillStyle='#071012';sx.fillRect(tx+tw-3,holeY-Math.max(3,P.d*k/2),6,Math.max(6,P.d*k));
+  sx.fillStyle=PAL.canvas;sx.fillRect(tx+tw-3,holeY-Math.max(3,P.d*k/2),6,Math.max(6,P.d*k));
   var x0=tx+tw,y0=holeY,tEnd=t.v>1e-6?Math.sqrt(2*Math.max(t.y,0)/G):0;
-  sx.strokeStyle='#4FD8C4';sx.lineWidth=3;sx.beginPath();
+  sx.strokeStyle=PAL.aqua;sx.lineWidth=3;sx.beginPath();
   for(var q=0;q<=60;q++){var tt=tEnd*q/60;q?sx.lineTo(x0+t.v*tt*k,y0+0.5*G*tt*tt*k):sx.moveTo(x0,y0);}
   sx.stroke();
   if($('c_part').checked&&tEnd>0){
-    sx.fillStyle='#E9F4F1';sx.globalAlpha=.75;
+    sx.fillStyle=PAL.ink;sx.globalAlpha=.75;
     drops.forEach(function(dd){var tt=(dd%1)*tEnd;
       sx.beginPath();sx.arc(x0+t.v*tt*k,y0+0.5*G*tt*tt*k,2.4,0,6.2832);sx.fill();});
     sx.globalAlpha=1;
   }
   var XR=x0+t.R*k;
-  sx.strokeStyle='#D9B98C';sx.lineWidth=1.6;sx.setLineDash([5,4]);
+  sx.strokeStyle=PAL.sand;sx.lineWidth=1.6;sx.setLineDash([5,4]);
   sx.beginPath();sx.moveTo(XR,ground);sx.lineTo(XR,ground-26);sx.stroke();sx.setLineDash([]);
   sx.beginPath();sx.moveTo(x0,ground-14);sx.lineTo(XR,ground-14);sx.stroke();
-  sx.fillStyle='#D9B98C';sx.font='11px JetBrains Mono, monospace';sx.textAlign='center';
+  sx.fillStyle=PAL.sand;sx.font='11px JetBrains Mono, monospace';sx.textAlign='center';
   sx.fillText('дальность '+nf(t.R,3)+' м',(x0+XR)/2,ground-20);
-  sx.strokeStyle='#ABA6DC';sx.lineWidth=1.4;
+  sx.strokeStyle=PAL.lilac;sx.lineWidth=1.4;
   sx.beginPath();sx.moveTo(tx-24,ground-lvlH);sx.lineTo(tx-24,holeY);sx.stroke();
-  sx.fillStyle='#ABA6DC';sx.textAlign='right';sx.fillText('h = '+nf(t.h,2)+' м',tx-28,(ground-lvlH+holeY)/2);
-  sx.strokeStyle='#D69FA9';
+  sx.fillStyle=PAL.lilac;sx.textAlign='right';sx.fillText('h = '+nf(t.h,2)+' м',tx-28,(ground-lvlH+holeY)/2);
+  sx.strokeStyle=PAL.rose;
   sx.beginPath();sx.moveTo(tx-24,holeY);sx.lineTo(tx-24,ground);sx.stroke();
-  sx.fillStyle='#D69FA9';sx.fillText('y = '+nf(t.y,2)+' м',tx-28,(holeY+ground)/2);
+  sx.fillStyle=PAL.rose;sx.fillText('y = '+nf(t.y,2)+' м',tx-28,(holeY+ground)/2);
   if($('c_lab').checked){
-    sx.fillStyle='#4FD8C4';sx.font='12px JetBrains Mono, monospace';sx.textAlign='left';
+    sx.fillStyle=PAL.aqua;sx.font='12px JetBrains Mono, monospace';sx.textAlign='left';
     sx.fillText('v = √(2gh) = '+nf(t.v,4)+' м/с',x0+8,y0-14);
-    sx.fillStyle='#8FA8A6';sx.font='11px JetBrains Mono, monospace';
+    sx.fillStyle=PAL.muted;sx.font='11px JetBrains Mono, monospace';
     sx.fillText('максимум дальности = H = '+nf(t.Rmax,3)+' м при h = H/2',8,16);
     sx.textAlign='right';sx.fillText(P.drain?'бак опорожняется':'уровень постоянный',W-8,16);
   }
 }
 function drawPlot(){
-  px.clearRect(0,0,W,HP);px.fillStyle='#071012';px.fillRect(0,0,W,HP);
+  px.clearRect(0,0,W,HP);px.fillStyle=PAL.canvas;px.fillRect(0,0,W,HP);
   var L=60,R=16,T=16,B=28,i;
   px.strokeStyle='rgba(126,214,199,.16)';px.lineWidth=1;
-  for(i=0;i<=8;i++){var X=L+(W-L-R)*i/8;px.beginPath();px.moveTo(X,T);px.lineTo(X,HP-B);px.stroke();}
-  for(i=0;i<=6;i++){var Y=T+(HP-T-B)*i/6;px.beginPath();px.moveTo(L,Y);px.lineTo(W-R,Y);px.stroke();}
+  for(i=0;i<=8;i++){var gx=L+(W-L-R)*i/8;px.beginPath();px.moveTo(gx,T);px.lineTo(gx,HP-B);px.stroke();}
+  for(i=0;i<=6;i++){var gy=T+(HP-T-B)*i/6;px.beginPath();px.moveTo(L,gy);px.lineTo(W-R,gy);px.stroke();}
   px.font='10px JetBrains Mono, monospace';
   if(scene==='tor'){
     var mx=Math.max(P.H,0.1),N=140;
-    px.strokeStyle='#D9B98C';px.lineWidth=2.4;px.beginPath();
+    px.strokeStyle=PAL.sand;px.lineWidth=2.4;px.beginPath();
     for(i=0;i<=N;i++){var h=mx*i/N,Rr=2*Math.sqrt(h*Math.max(0,mx-h));
       var X2=L+i/N*(W-L-R),Y2=HP-B-(Rr/mx)*(HP-T-B)*0.94;
       i?px.lineTo(X2,Y2):px.moveTo(X2,Y2);}
     px.stroke();
     var t=tor(),Xc=L+(t.h/mx)*(W-L-R),Yc=HP-B-(t.R/mx)*(HP-T-B)*0.94;
-    px.strokeStyle='#D69FA9';px.lineWidth=1.6;px.setLineDash([5,4]);
+    px.strokeStyle=PAL.rose;px.lineWidth=1.6;px.setLineDash([5,4]);
     px.beginPath();px.moveTo(Xc,T);px.lineTo(Xc,HP-B);px.stroke();px.setLineDash([]);
-    px.fillStyle='#D69FA9';px.beginPath();px.arc(Xc,Yc,5,0,6.2832);px.fill();
-    px.fillStyle='#D9B98C';px.textAlign='left';px.fillText('R(h) = 2√(h(H−h))',L+4,T+12);
-    px.fillStyle='#8FA8A6';px.textAlign='right';px.fillText('h: 0…'+nf(mx,2)+' м',W-R,HP-8);
+    px.fillStyle=PAL.rose;px.beginPath();px.arc(Xc,Yc,5,0,6.2832);px.fill();
+    px.fillStyle=PAL.sand;px.textAlign='left';px.fillText('R(h) = 2√(h(H−h))',L+4,T+12);
+    px.fillStyle=PAL.muted;px.textAlign='right';px.fillText('h: 0…'+nf(mx,2)+' м',W-R,HP-8);
     px.textAlign='left';px.fillText('пик при h = H/2 = '+nf(mx/2,2)+' м, R = H',L,HP-8);
     return;
   }
@@ -507,13 +514,13 @@ function drawPlot(){
     var pd=(pmax-pmin)*0.12+1;
     function Yp(p){return T+(HP-T-B)*(1-(p-(pmin-pd))/((pmax+pd)-(pmin-pd)));}
     function Yv(v){return T+(HP-T-B)*(1-(v-vmin*0.8)/((vmax*1.1)-vmin*0.8||1));}
-    px.strokeStyle='#D9B98C';px.lineWidth=2.4;px.beginPath();
+    px.strokeStyle=PAL.sand;px.lineWidth=2.4;px.beginPath();
     prof.ps.forEach(function(p,k){var xx=X(prof.xs[k]),yy=Yp(p);k?px.lineTo(xx,yy):px.moveTo(xx,yy);});px.stroke();
-    px.strokeStyle='#4FD8C4';px.lineWidth=2.2;px.beginPath();
+    px.strokeStyle=PAL.aqua;px.lineWidth=2.2;px.beginPath();
     prof.vs.forEach(function(v,k){var xx=X(prof.xs[k]),yy=Yv(v);k?px.lineTo(xx,yy):px.moveTo(xx,yy);});px.stroke();
-    px.fillStyle='#D9B98C';px.textAlign='left';px.fillText('p: '+press(pmin)+' … '+press(pmax),L+4,T+12);
-    px.fillStyle='#4FD8C4';px.fillText('v: '+nf(vmin,2)+' … '+nf(vmax,2)+' м/с',L+4,T+25);
-    px.fillStyle='#8FA8A6';px.textAlign='right';px.fillText('x: 0…'+nf(gp.L,2)+' м',W-R,HP-8);
+    px.fillStyle=PAL.sand;px.textAlign='left';px.fillText('p: '+press(pmin)+' … '+press(pmax),L+4,T+12);
+    px.fillStyle=PAL.aqua;px.fillText('v: '+nf(vmin,2)+' … '+nf(vmax,2)+' м/с',L+4,T+25);
+    px.fillStyle=PAL.muted;px.textAlign='right';px.fillText('x: 0…'+nf(gp.L,2)+' м',W-R,HP-8);
   }else if(plotMode==='head'){
     var mx2=-1e9,mn2=1e9;
     for(i=0;i<=prof.N;i++){
@@ -522,35 +529,35 @@ function drawPlot(){
     }
     var pd2=(mx2-mn2)*0.15+0.02;
     function Yh(h){return T+(HP-T-B)*(1-(h-(mn2-pd2))/((mx2+pd2)-(mn2-pd2)));}
-    px.strokeStyle='#D69FA9';px.lineWidth=1.8;px.beginPath();
+    px.strokeStyle=PAL.rose;px.lineWidth=1.8;px.beginPath();
     for(i=0;i<=prof.N;i++){var y3=Yh(hZ(prof.zs[i]));i?px.lineTo(X(prof.xs[i]),y3):px.moveTo(X(prof.xs[i]),y3);}px.stroke();
-    px.strokeStyle='#D9B98C';px.lineWidth=2.2;px.setLineDash([6,4]);px.beginPath();
+    px.strokeStyle=PAL.sand;px.lineWidth=2.2;px.setLineDash([6,4]);px.beginPath();
     for(i=0;i<=prof.N;i++){var y4=Yh(hP(prof.ps[i])+hZ(prof.zs[i]));i?px.lineTo(X(prof.xs[i]),y4):px.moveTo(X(prof.xs[i]),y4);}px.stroke();px.setLineDash([]);
-    px.strokeStyle='#ABA6DC';px.lineWidth=2.4;px.beginPath();
+    px.strokeStyle=PAL.lilac;px.lineWidth=2.4;px.beginPath();
     for(i=0;i<=prof.N;i++){var y5=Yh(hH(prof.Hs[i]));i?px.lineTo(X(prof.xs[i]),y5):px.moveTo(X(prof.xs[i]),y5);}px.stroke();
-    px.textAlign='left';px.fillStyle='#ABA6DC';px.fillText('EGL',L+4,T+12);
-    px.fillStyle='#D9B98C';px.fillText('HGL',L+44,T+12);
-    px.fillStyle='#D69FA9';px.fillText('z',L+86,T+12);
-    px.fillStyle='#8FA8A6';px.textAlign='right';px.fillText(head(mx2),W-R,HP-8);
+    px.textAlign='left';px.fillStyle=PAL.lilac;px.fillText('EGL',L+4,T+12);
+    px.fillStyle=PAL.sand;px.fillText('HGL',L+44,T+12);
+    px.fillStyle=PAL.rose;px.fillText('z',L+86,T+12);
+    px.fillStyle=PAL.muted;px.textAlign='right';px.fillText(head(mx2),W-R,HP-8);
   }else{
     var st=prof.st,bw=(W-L-R)/5,mx3=0.1;
     st.forEach(function(s){mx3=Math.max(mx3,hP(s.p)+hV(s.v)+hZ(s.z));});
     mx3*=1.18;
     st.forEach(function(s,i2){
       var xc=L+bw*(i2+0.9),w=bw*0.55,y=HP-B;
-      [['z',hZ(s.z),'#D69FA9'],['p',hP(s.p),'#D9B98C'],['v',hV(s.v),'#4FD8C4']].forEach(function(it){
+      [['z',hZ(s.z),PAL.rose],['p',hP(s.p),PAL.sand],['v',hV(s.v),PAL.aqua]].forEach(function(it){
         if(Math.abs(it[1])<1e-9)return;
         var y2=y-it[1]/mx3*(HP-T-B);
         px.fillStyle=it[2];px.globalAlpha=.78;
         px.fillRect(xc-w/2,Math.min(y,y2),w,Math.abs(y2-y));px.globalAlpha=1;y=y2;
       });
-      px.strokeStyle='#ABA6DC';px.lineWidth=2;
+      px.strokeStyle=PAL.lilac;px.lineWidth=2;
       px.beginPath();px.moveTo(xc-w/2-4,y);px.lineTo(xc+w/2+4,y);px.stroke();
-      px.fillStyle='#8FA8A6';px.textAlign='center';px.font='10px JetBrains Mono, monospace';
+      px.fillStyle=PAL.muted;px.textAlign='center';px.font='10px JetBrains Mono, monospace';
       px.fillText('сечение '+(i2+1),xc,HP-8);
-      px.fillStyle='#ABA6DC';px.fillText(head(hP(s.p)+hV(s.v)+hZ(s.z)),xc,y-6);
+      px.fillStyle=PAL.lilac;px.fillText(head(hP(s.p)+hV(s.v)+hZ(s.z)),xc,y-6);
     });
-    px.fillStyle='#8FA8A6';px.textAlign='left';
+    px.fillStyle=PAL.muted;px.textAlign='left';
     px.fillText('снизу вверх: z, p/ρg, v²/2g; черта — полный напор',L+4,T+12);
   }
 }
@@ -737,10 +744,10 @@ function selfTest(){
   chk('Борда–Карно (внезапное)',bc*P.rho*G,17964,1e-3,'Па');
   var vcav=Math.sqrt(2*(30000+PATM-2340)/(998*(16-1)));
   chk('Порог кавитации v₁',vcav,4.1512,1e-3,'м/с');
-  setAll({real:true,diff:true});var l1=compute().loss*P.rho*G;
-  chk('Потеря с диффузором ≈',l1,7170.7,0.10,'Па');
-  setAll({real:true,diff:false});var l2=compute().loss*P.rho*G;
-  chk('Потеря без диффузора ≈',l2,22440.1,0.10,'Па');
+  setAll({real:true,diff:true});var l1=compute().loss*P.rho*G,r1=compute(4000).loss*P.rho*G;
+  chk('Потеря с диффузором: сходимость сетки',l1,r1,0.01,'Па');
+  setAll({real:true,diff:false});var l2=compute().loss*P.rho*G,r2=compute(4000).loss*P.rho*G;
+  chk('Потеря без диффузора: сходимость сетки',l2,r2,0.01,'Па');
   P.H=1;P.hh=1;lvl=1;
   chk('Торричелли v при h=1',tor().v,4.42945,1e-5,'м/с');
   P.hh=0.5;lvl=1;
@@ -789,5 +796,21 @@ last=performance.now();requestAnimationFrame(frame);
 }catch(e){fatal(e.message);}
 })();
 </script>
+<script>
+/* LibLabTab · перекраска при смене темы */
+(function(){
+  function refresh(){
+    if(window.LLTtheme) window.LLTtheme.readPal();
+    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
+    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
+    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
+    if(typeof render==="function"){ try{ render(); }catch(e){} }
+    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  }
+  window.addEventListener("llt:theme",refresh);
+try{ window.__selfTest = selfTest; }catch(e){}
+})();
+</script>
+<script src="/sim/lib/selftest.js"></script>
 </body>
 </html>

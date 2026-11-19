@@ -8,12 +8,8 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
-:root{
-  --bg:#0A1417; --grid:rgba(126,214,199,.05); --surface:#102024; --ink:#E9F4F1; --muted:#8FA8A6; --line:rgba(126,214,199,.16);
-  --cyan:#4FD8C4; --amber:#D9B98C; --pink:#ABA6DC; --ok:#3FC9AE; --warn:#D69FA9; --on:#06110F;
-  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
-  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
+
+:root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background-color:var(--bg);color:var(--ink);
@@ -59,6 +55,15 @@ select{font:inherit;font-family:var(--mono);font-size:.88rem;padding:7px 9px;bor
 .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
 kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink)}
 </style>
+  <link rel="stylesheet" href="/sim/lib/theme.css">
+<script src="/sim/lib/theme.js"></script>
+<script src="/sim/lib/touch.js"></script>
+<script src="/sim/lib/fmt.js"></script>
+<script src="/sim/lib/loop.js"></script>
+<script>window.LLT_OPTS={slug:"life-game"};</script>
+<script src="/sim/lib/ui.js"></script>
+  <link rel="stylesheet" href="/sim/lib/mobile.css">
+  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 </head>
 <body>
 <main class="wrap">
@@ -67,7 +72,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
 
   <section class="card">
     <div class="holder" id="holder">
-      <canvas id="field" aria-label="Поле клеточного автомата"></canvas>
+      <canvas data-llt-stage="1" id="field" aria-label="Поле клеточного автомата"></canvas>
     </div>
     <div class="bar">
       <button class="pri" id="play">▶ Пуск</button>
@@ -137,7 +142,11 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
 
 <script>
 (function(){
-  var $=function(id){return document.getElementById(id)};
+  
+/* LibLabTab · палитра до первого использования */
+var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
+window.PAL = PAL;
+var $=function(id){return document.getElementById(id)};
   var cv=$('field'), ctx=cv.getContext('2d'), gcv=$('graph'), gctx=gcv.getContext('2d');
   var holder=$('holder');
   var W=900,H=520,dpr=1,cs=8,cols=0,rows=0,ox=0,oy=0;
@@ -246,7 +255,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
     gridCv.width=Math.max(1,W*dpr); gridCv.height=Math.max(1,H*dpr);
     gxx.setTransform(dpr,0,0,dpr,0,0);
     gxx.clearRect(0,0,W,H);
-    gxx.fillStyle='#071012'; gxx.fillRect(0,0,W,H);
+    gxx.fillStyle=PAL.canvas; gxx.fillRect(0,0,W,H);
     if(gridOn&&cs>=6){
       gxx.strokeStyle='rgba(126,214,199,.07)'; gxx.lineWidth=1; gxx.beginPath();
       for(var x=0;x<=cols;x++){ var px=ox+x*cs+.5; gxx.moveTo(px,oy); gxx.lineTo(px,oy+rows*cs); }
@@ -346,7 +355,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
     for(var y=0;y<rows;y++) for(var x=0;x<cols;x++){
       var i=y*cols+x;
       if(cur[i]){
-        ctx.fillStyle = ageCol ? palette[Math.min(63,age[i])] : '#4FD8C4';
+        ctx.fillStyle = ageCol ? palette[Math.min(63,age[i])] : PAL.aqua;
         ctx.fillRect(ox+x*cs,oy+y*cs,s,s);
       }
     }
@@ -378,7 +387,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       var x=i/(pops.length-1)*(w-2)+1, y=h-3-(pops[i]/mx)*(h-10);
       i?gctx.lineTo(x,y):gctx.moveTo(x,y);
     }
-    gctx.strokeStyle='#4FD8C4'; gctx.lineWidth=1.8; gctx.stroke();
+    gctx.strokeStyle=PAL.aqua; gctx.lineWidth=1.8; gctx.stroke();
     gctx.lineTo(w-1,h-2); gctx.lineTo(1,h-2); gctx.closePath();
     gctx.fillStyle='rgba(79,216,196,.14)'; gctx.fill();
     gctx.fillStyle='rgba(143,168,166,.9)'; gctx.font='11px JetBrains Mono, monospace';
@@ -510,5 +519,20 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   lastT=performance.now(); raf=requestAnimationFrame(loop);
 })();
 </script>
+<script>
+/* LibLabTab · перекраска при смене темы */
+(function(){
+  function refresh(){
+    if(window.LLTtheme) window.LLTtheme.readPal();
+    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
+    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
+    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
+    if(typeof render==="function"){ try{ render(); }catch(e){} }
+    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  }
+  window.addEventListener("llt:theme",refresh);
+})();
+</script>
+<script src="/sim/lib/selftest.js"></script>
 </body>
 </html>

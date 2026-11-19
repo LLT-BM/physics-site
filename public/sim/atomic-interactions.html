@@ -8,12 +8,8 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
-:root{
-  --bg:#0A1417; --grid:rgba(126,214,199,.05); --surface:#102024; --ink:#E9F4F1; --muted:#8FA8A6; --line:rgba(126,214,199,.16);
-  --cyan:#4FD8C4; --amber:#D9B98C; --pink:#ABA6DC; --ok:#3FC9AE; --warn:#D69FA9; --on:#06110F;
-  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
-  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
+
+:root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background-color:var(--bg);color:var(--ink);
@@ -57,6 +53,15 @@ select{font:inherit;font-family:var(--mono);font-size:.85rem;padding:7px 9px;bor
 kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink)}
 #mix{font-family:var(--mono);font-size:.8rem;color:var(--amber);margin:8px 0 0}
 </style>
+  <link rel="stylesheet" href="/sim/lib/theme.css">
+<script src="/sim/lib/theme.js"></script>
+<script src="/sim/lib/touch.js"></script>
+<script src="/sim/lib/fmt.js"></script>
+<script src="/sim/lib/loop.js"></script>
+<script>window.LLT_OPTS={slug:"atomic-interactions"};</script>
+<script src="/sim/lib/ui.js"></script>
+  <link rel="stylesheet" href="/sim/lib/mobile.css">
+  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 </head>
 <body>
 <main class="wrap">
@@ -64,7 +69,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   <p class="lead">Две частицы притягиваются на больших расстояниях и отталкиваются на малых. Причина притяжения — <b>силы Ван-дер-Ваальса</b> (флуктуации электронных облаков), отталкивания — <b>запрет Паули</b> при перекрытии облаков. Тяните частицы мышью или пальцем, отпускайте — и смотрите, как точка на графике потенциальной энергии катается по яме.</p>
 
   <section class="card">
-    <canvas id="scene" aria-label="Две взаимодействующие частицы"></canvas>
+    <canvas data-llt-stage="1" id="scene" aria-label="Две взаимодействующие частицы"></canvas>
     <div class="bar">
       <button class="pri" id="play">▶ Пуск</button>
       <button id="eq">В равновесие</button>
@@ -187,7 +192,11 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
 
 <script>
 (function(){
-  var $=function(id){return document.getElementById(id)};
+  
+/* LibLabTab · палитра до первого использования */
+var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
+window.PAL = PAL;
+var $=function(id){return document.getElementById(id)};
   var KB=0.08617333262, HBAR=2.0445, T0PS=0.3219359, KJ=0.0964853, PN=1.6022, CE=14399.6;
   var R2=Math.pow(2,1/6);
 
@@ -237,7 +246,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   var W=900,H1=230,H2=320,dpr=1;
   var sc=$('scene'), sx=sc.getContext('2d'), pl=$('plot'), px=pl.getContext('2d');
 
-  function fmt(x,n){ if(!isFinite(x)) return '∞'; return x.toFixed(n).replace('.',','); }
+  function fmt(x,n){ if(!isFinite(x)) return '∞'; return LLTfix(x, n); }
   function clamp(x,a,b){ return Math.max(a,Math.min(b,x)); }
 
   /* ---------- модель ---------- */
@@ -348,7 +357,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
     if(!M) return;
     var g=geom();
     sx.clearRect(0,0,W,H1);
-    sx.fillStyle='#071012'; sx.fillRect(0,0,W,H1);
+    sx.fillStyle=PAL.canvas; sx.fillRect(0,0,W,H1);
     sx.strokeStyle='rgba(126,214,199,.10)'; sx.lineWidth=1;
     sx.beginPath(); sx.moveTo(0,g.cy+.5); sx.lineTo(W,g.cy+.5); sx.stroke();
 
@@ -369,7 +378,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
 
     var overlap=(g.r1+g.r2)-(g.x2-g.x1);
     if($('cCloud').checked){
-      [[g.x1,g.r1,'#4FD8C4'],[g.x2,g.r2,'#D9B98C']].forEach(function(o){
+      [[g.x1,g.r1,PAL.aqua],[g.x2,g.r2,PAL.sand]].forEach(function(o){
         var gr=sx.createRadialGradient(o[0],g.cy,o[1]*0.15,o[0],g.cy,o[1]*1.5);
         gr.addColorStop(0,o[2]+'55'); gr.addColorStop(.55,o[2]+'22'); gr.addColorStop(1,o[2]+'00');
         sx.fillStyle=gr; sx.beginPath(); sx.arc(o[0],g.cy,o[1]*1.5,0,6.2832); sx.fill();
@@ -379,18 +388,18 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       sx.fillStyle='rgba(214,159,169,'+Math.min(.45,overlap/(g.r1+g.r2)*1.4).toFixed(3)+')';
       sx.beginPath(); sx.ellipse((g.x1+g.x2)/2,g.cy,overlap/2,Math.min(g.r1,g.r2)*0.8,0,0,6.2832); sx.fill();
     }
-    [[g.x1,g.r1,'#4FD8C4',M.n1],[g.x2,g.r2,'#D9B98C',M.n2]].forEach(function(o){
+    [[g.x1,g.r1,PAL.aqua,M.n1],[g.x2,g.r2,PAL.sand,M.n2]].forEach(function(o){
       var gr=sx.createRadialGradient(o[0]-o[1]*.3,g.cy-o[1]*.3,o[1]*.1,o[0],g.cy,o[1]);
       gr.addColorStop(0,'#ffffff'); gr.addColorStop(.35,o[2]); gr.addColorStop(1,'#0B1A1C');
       sx.fillStyle=gr; sx.beginPath(); sx.arc(o[0],g.cy,o[1],0,6.2832); sx.fill();
       sx.strokeStyle=o[2]; sx.lineWidth=1.6; sx.stroke();
-      sx.fillStyle='#E9F4F1'; sx.font='600 12px JetBrains Mono, monospace'; sx.textAlign='center';
+      sx.fillStyle=PAL.ink; sx.font='600 12px JetBrains Mono, monospace'; sx.textAlign='center';
       sx.fillText(o[3],o[0],g.cy-o[1]-10);
     });
 
     if($('cForce').checked){
       var F=Fof(r), mag=Math.abs(F), s=Math.min(70,16*Math.log(1+mag/(0.02*M.D+1e-9)));
-      var col=F>0?'#ABA6DC':'#3FC9AE', dir=F>0?-1:1;
+      var col=F>0?PAL.lilac:PAL.ok, dir=F>0?-1:1;
       [[g.x1,dir],[g.x2,-dir]].forEach(function(o){
         var x0=o[0], sgn=o[1];
         var xa=x0+sgn*s, xe=xa+sgn*0;
@@ -411,7 +420,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   /* ---------- график ---------- */
   function plot(){
     var w=W,h=H2,L=44,Rr=12,Tp=14,B=30;
-    px.clearRect(0,0,w,h); px.fillStyle='#071012'; px.fillRect(0,0,w,h);
+    px.clearRect(0,0,w,h); px.fillStyle=PAL.canvas; px.fillRect(0,0,w,h);
     var xLo=M.rDrag*0.92, xHi=Math.max(3.0*M.L,r*1.1);
     var E=Etot(), D=M.D;
     var yLo=-1.30*D, yHi=Math.max(1.7*D,E*1.05+0.2*D);
@@ -467,7 +476,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       px.fillStyle='rgba(217,185,140,.20)'; px.fill(); }
     px.restore();
 
-    line(pts,'#4FD8C4',[],2.4);
+    line(pts,PAL.aqua,[],2.4);
 
     if($('cQuant').checked){
       var shown=Math.min(8,M.nLev);
@@ -494,14 +503,14 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
 
     // полная энергия
     px.save(); px.beginPath(); px.rect(L,Tp,w-L-Rr,h-Tp-B); px.clip();
-    px.setLineDash([7,5]); px.strokeStyle='#D9B98C'; px.lineWidth=1.8;
+    px.setLineDash([7,5]); px.strokeStyle=PAL.sand; px.lineWidth=1.8;
     px.beginPath(); px.moveTo(L,Y(E)); px.lineTo(w-Rr,Y(E)); px.stroke(); px.setLineDash([]);
     // текущая точка
     var Vr=Vof(r);
     px.strokeStyle='rgba(217,185,140,.6)'; px.lineWidth=1.2;
     px.beginPath(); px.moveTo(X(r),Y(Vr)); px.lineTo(X(r),Y(E)); px.stroke();
     px.fillStyle='#fff'; px.beginPath(); px.arc(X(r),Y(clamp(Vr,yLo,yHi)),5,0,6.2832); px.fill();
-    px.strokeStyle='#4FD8C4'; px.lineWidth=2; px.stroke();
+    px.strokeStyle=PAL.aqua; px.lineWidth=2; px.stroke();
     // равновесие
     px.strokeStyle='rgba(79,216,196,.35)'; px.setLineDash([3,4]);
     px.beginPath(); px.moveTo(X(M.rm),Tp); px.lineTo(X(M.rm),h-B); px.stroke(); px.setLineDash([]);
@@ -517,7 +526,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
     $('v_r').textContent=fmt(r,3)+' Å';
     $('v_rr').textContent=fmt(r/M.rm,3);
     $('v_V').textContent=fmt(Vr,2)+' мэВ';
-    $('v_F').textContent=(F>0?'+':'')+fmt(F*PN,1)+' пН';
+    $('v_F').textContent=LLTsigned(F*PN, 1)+' пН';
     $('v_K').textContent=fmt(K,2)+' мэВ';
     $('v_E').textContent=fmt(E,2)+' мэВ';
     $('v_kj').textContent=fmt(Vr*KJ,2);
@@ -689,5 +698,20 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   lastT=performance.now(); raf=requestAnimationFrame(loop);
 })();
 </script>
+<script>
+/* LibLabTab · перекраска при смене темы */
+(function(){
+  function refresh(){
+    if(window.LLTtheme) window.LLTtheme.readPal();
+    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
+    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
+    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
+    if(typeof render==="function"){ try{ render(); }catch(e){} }
+    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  }
+  window.addEventListener("llt:theme",refresh);
+})();
+</script>
+<script src="/sim/lib/selftest.js"></script>
 </body>
 </html>

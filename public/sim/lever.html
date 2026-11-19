@@ -8,13 +8,8 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
-:root{
-  --bg:#0A1417; --grid:rgba(126,214,199,.05); --surface:#102024; --ink:#E9F4F1; --muted:#8FA8A6; --line:rgba(126,214,199,.16);
-  --left:#4FD8C4; --right:#D9B98C; --third:#ABA6DC; --ok:#3FC9AE; --on:#06110F;
-  --beam:#6E7C7A; --edge:#9CA8A5; --brass:#C9A96E; --stand:#6a7784;
-  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
-  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
+
+:root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{
@@ -75,6 +70,15 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .wl rect{fill:var(--left)} .wr rect{fill:var(--right)} .wt rect{fill:var(--third)}
 #armL{fill:var(--left)} #armR{fill:var(--right)} #arm3{fill:var(--third)}
 </style>
+  <link rel="stylesheet" href="/sim/lib/theme.css">
+<script src="/sim/lib/theme.js"></script>
+<script src="/sim/lib/touch.js"></script>
+<script src="/sim/lib/fmt.js"></script>
+<script src="/sim/lib/loop.js"></script>
+<script>window.LLT_OPTS={slug:"lever-moments"};</script>
+<script src="/sim/lib/ui.js"></script>
+  <link rel="stylesheet" href="/sim/lib/mobile.css">
+  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 </head>
 <body>
 <main class="wrap">
@@ -82,7 +86,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
   <p class="lead">Рычаг в равновесии, когда сумма моментов, вращающих его по часовой стрелке, равна сумме моментов против часовой: <b>ΣMслева = ΣMсправа</b>. Для двух грузов это даёт <b>F₁·l₁ = F₂·l₂</b>. Меняйте грузы и плечи ползунками, перетаскивайте грузы по рычагу и включайте третий груз.</p>
 
   <section class="card">
-    <svg id="svg" viewBox="0 0 700 400" role="img" aria-label="Рычаг с грузами на оси">
+    <svg data-llt-stage="1" id="svg" viewBox="0 0 700 400" role="img" aria-label="Рычаг с грузами на оси">
       <polygon class="stand" points="350,214 318,372 382,372"/>
       <rect class="stand" x="290" y="372" width="120" height="12" rx="3"/>
       <g id="beam">
@@ -137,7 +141,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
         <option value="9.8">g = 9,8 Н/кг</option>
       </select>
     </div>
-    <table id="rd"></table>
+    <div class="tw"><table id="rd"></table></div>
     <p id="ratio"></p>
   </section>
 
@@ -174,7 +178,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
   var ang = 0, vel = 0, target = 0, raf = null, last = 0, drag = null, task = null;
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function fmt(x, n){ return x.toFixed(n).replace('.', ','); }
+  function fmt(x, n){ return LLTfix(x, n); }
   function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
 
   // шкала
@@ -444,5 +448,20 @@ button:disabled{opacity:.45;cursor:not-allowed}
   syncInputs(); renderLog(); update();
 })();
 </script>
+<script>
+/* LibLabTab · перекраска при смене темы */
+(function(){
+  function refresh(){
+    if(window.LLTtheme) window.LLTtheme.readPal();
+    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
+    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
+    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
+    if(typeof render==="function"){ try{ render(); }catch(e){} }
+    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  }
+  window.addEventListener("llt:theme",refresh);
+})();
+</script>
+<script src="/sim/lib/selftest.js"></script>
 </body>
 </html>

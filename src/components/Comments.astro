@@ -1,0 +1,70 @@
+---
+/** Провайдер комментариев. PUBLIC_COMMENTS = 'giscus' | 'none'.
+    Для giscus нужны PUBLIC_GISCUS_REPO, PUBLIC_GISCUS_REPO_ID,
+    PUBLIC_GISCUS_CATEGORY, PUBLIC_GISCUS_CATEGORY_ID. */
+const env = (import.meta as any).env ?? {};
+const provider = env.PUBLIC_COMMENTS ?? 'none';
+const ready = provider === 'giscus' && env.PUBLIC_GISCUS_REPO && env.PUBLIC_GISCUS_REPO_ID
+  && env.PUBLIC_GISCUS_CATEGORY && env.PUBLIC_GISCUS_CATEGORY_ID;
+interface Props { term: string }
+const { term } = Astro.props;
+---
+<section class="comments" id="comments">
+  <h2>Комментарии</h2>
+  {ready ? (
+    <div class="giscus-wrap" data-term={term}></div>
+  ) : (
+    <p class="note">
+      Обсуждение этой модели — в
+      <a href={`https://github.com/LLT-BM/physics-site/discussions/new?category=general&title=${encodeURIComponent(term)}`}>
+        GitHub Discussions
+      </a>. Вход через GitHub, регистрация отдельная не нужна.
+    </p>
+  )}
+</section>
+
+<style>
+  .comments{margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
+  h2{font:600 1.05rem var(--disp);margin:0 0 12px;padding-left:11px;border-left:4px solid var(--lilac)}
+  .note{color:var(--muted);font-size:.9rem}
+  .note a{color:var(--aqua)}
+</style>
+
+{ready && (
+<script is:inline define:vars={{
+  repo: env.PUBLIC_GISCUS_REPO, repoId: env.PUBLIC_GISCUS_REPO_ID,
+  cat: env.PUBLIC_GISCUS_CATEGORY, catId: env.PUBLIC_GISCUS_CATEGORY_ID
+}}>
+(function(){
+  function mount(){
+    var wrap=document.querySelector('.giscus-wrap'); if(!wrap||wrap.dataset.done) return;
+    wrap.dataset.done='1';
+    var t=document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
+    var s=document.createElement('script');
+    s.src='https://giscus.app/client.js';
+    s.async=true; s.crossOrigin='anonymous';
+    s.setAttribute('data-repo',repo);
+    s.setAttribute('data-repo-id',repoId);
+    s.setAttribute('data-category',cat);
+    s.setAttribute('data-category-id',catId);
+    s.setAttribute('data-mapping','specific');
+    s.setAttribute('data-term',wrap.dataset.term);
+    s.setAttribute('data-strict','1');
+    s.setAttribute('data-reactions-enabled','1');
+    s.setAttribute('data-emit-metadata','0');
+    s.setAttribute('data-input-position','top');
+    s.setAttribute('data-theme',t);
+    s.setAttribute('data-lang','ru');
+    wrap.appendChild(s);
+  }
+  function sync(){
+    var t=document.documentElement.getAttribute('data-theme')==='light'?'light':'dark';
+    var f=document.querySelector('iframe.giscus-frame');
+    if(f) f.contentWindow.postMessage({giscus:{setConfig:{theme:t}}},'https://giscus.app');
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount); else mount();
+  window.addEventListener('llt:theme',sync);
+  new MutationObserver(sync).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+})();
+</script>
+)}

@@ -8,13 +8,8 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
-:root{
-  --bg:#0A1417; --grid:rgba(126,214,199,.05); --surface:#102024; --ink:#E9F4F1; --muted:#8FA8A6; --line:rgba(126,214,199,.16);
-  --obj:#4FD8C4; --img:#D9B98C; --r1:#4FD8C4; --r2:#D9B98C; --r3:#ABA6DC; --ok:#3FC9AE; --warn:#D69FA9; --on:#06110F;
-  --glass:rgba(126,214,199,.18); --glassEdge:#7ED6C7; --axis:#3C4A4A; --screen:#9CA8A5;
-  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
-  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
+
+:root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background-color:var(--bg);color:var(--ink);
@@ -71,6 +66,15 @@ button.pri{background:var(--obj);color:var(--on);border-color:var(--obj);font-we
 .hit{fill:transparent;cursor:grab}
 .blur{fill:var(--img);opacity:.18}
 </style>
+  <link rel="stylesheet" href="/sim/lib/theme.css">
+<script src="/sim/lib/theme.js"></script>
+<script src="/sim/lib/touch.js"></script>
+<script src="/sim/lib/fmt.js"></script>
+<script src="/sim/lib/loop.js"></script>
+<script>window.LLT_OPTS={slug:"lens-image"};</script>
+<script src="/sim/lib/ui.js"></script>
+  <link rel="stylesheet" href="/sim/lib/mobile.css">
+  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 </head>
 <body>
 <main class="wrap">
@@ -78,7 +82,7 @@ button.pri{background:var(--obj);color:var(--on);border-color:var(--obj);font-we
   <p class="lead">Тонкая линза связана формулой <b>1/d + 1/f = 1/F</b>, а увеличение <b>Γ = |f/d|</b>. Двигайте предмет и экран мышью или ползунками: когда экран стоит в плоскости действительного изображения — картинка резкая; мнимое изображение на экран не проецируется.</p>
 
   <section class="card">
-    <svg class="scene" id="svg" viewBox="0 0 900 480" role="img" aria-label="Оптическая скамья с линзой, предметом и экраном">
+    <svg data-llt-stage="1" class="scene" id="svg" viewBox="0 0 900 480" role="img" aria-label="Оптическая скамья с линзой, предметом и экраном">
       <defs>
         <clipPath id="sceneClip"><rect x="0" y="0" width="900" height="480"/></clipPath>
       </defs>
@@ -133,7 +137,7 @@ button.pri{background:var(--obj);color:var(--on);border-color:var(--obj);font-we
 
   <section class="card" style="margin-top:12px">
     <div class="head"><h2>Расчёт</h2></div>
-    <table id="rd"></table>
+    <div class="tw"><table id="rd"></table></div>
     <div class="props" id="props"></div>
   </section>
 
@@ -150,7 +154,7 @@ button.pri{background:var(--obj);color:var(--on);border-color:var(--obj);font-we
   var S={d:DEF.d,h:DEF.h,F:DEF.F,type:DEF.type,scr:DEF.scr};
   var drag=null, reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function fmt(x,n){return x.toFixed(n).replace('.',',')}
+  function fmt(x,n){return LLTfix(x, n)}
   function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
   function X(cm){return CX+cm*SC}       // см от линзы -> viewBox x
   function Y(cmUp){return CY-cmUp*SC}   // см вверх от оси -> viewBox y
@@ -329,5 +333,20 @@ button.pri{background:var(--obj);color:var(--on);border-color:var(--obj);font-we
   render();
 })();
 </script>
+<script>
+/* LibLabTab · перекраска при смене темы */
+(function(){
+  function refresh(){
+    if(window.LLTtheme) window.LLTtheme.readPal();
+    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
+    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
+    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
+    if(typeof render==="function"){ try{ render(); }catch(e){} }
+    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  }
+  window.addEventListener("llt:theme",refresh);
+})();
+</script>
+<script src="/sim/lib/selftest.js"></script>
 </body>
 </html>

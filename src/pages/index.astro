@@ -1,48 +1,152 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getCollection } from 'astro:content';
-import { fmtDate } from '../lib/date';
+import { numbered, sections, tagIndex } from '../lib/models';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const models = (await getCollection('models')).sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime() || a.id.localeCompare(b.id)
-);
-const tags = [...new Set(models.flatMap(m => m.data.tags))].sort();
+const items = await numbered();
+const secs = await sections();
+const tags = await tagIndex();
+const total = items.length;
 
 const inlineCover = (file?: string) => {
   if (!file) return null;
-  try {
-    return fs.readFileSync(path.join(process.cwd(), 'public', file), 'utf-8');
-  } catch { return null; }
+  try { return fs.readFileSync(path.join(process.cwd(), 'public', file), 'utf-8'); }
+  catch { return null; }
 };
 ---
-<Base title="Интерактивные физические модели — каталог">
+<Base title="LibLabTab — интерактивные модели физики">
   <section class="hero">
     <h1>Физика, которую можно потрогать</h1>
-    <p>Интерактивные симуляции прямо в браузере: тяните магнит, крутите маятник, меняйте параметры — и смотрите, как работают законы природы.</p>
-    <p class="count">моделей в каталоге: {models.length}</p>
+    <p>Интерактивные симуляции прямо в браузере: тяните магнит, крутите маятник, собирайте цепь, меняйте параметры — и смотрите, как работают законы природы.</p>
+    <p class="count">моделей в каталоге: <b>{total}</b> · разделов: <b>{secs.length}</b></p>
   </section>
-  {tags.length > 0 && (
-    <div class="tagbar">{tags.map(t => <a class="tag" href={`/tags/${t}/`}>#{t}</a>)}</div>
-  )}
-  <div class="cards">
-    {models.map(m => {
+
+  <nav class="filters" aria-label="Разделы и свойства">
+    <div class="frow">
+      <span class="flab">Раздел</span>
+      <button class="fchip on" data-kind="section" data-val="">все</button>
+      {secs.map(([s, list]) => (
+        <button class="fchip" data-kind="section" data-val={s}>{s} <i>{list.length}</i></button>
+      ))}
+    </div>
+    <div class="frow">
+      <span class="flab">Уровень</span>
+      <button class="fchip on" data-kind="level" data-val="">любой</button>
+      <button class="fchip" data-kind="level" data-val="базовый">базовый</button>
+      <button class="fchip" data-kind="level" data-val="продвинутый">продвинутый</button>
+    </div>
+    <div class="frow">
+      <span class="flab">Свойство</span>
+      <button class="fchip on" data-kind="tag" data-val="">все</button>
+      {tags.map(([t, list]) => (
+        <a class="fchip" href={`/tags/${t}/`}>{t} <i>{list.length}</i></a>
+      ))}
+    </div>
+    <div class="frow">
+      <label class="sr" for="q">Поиск по каталогу</label>
+      <input id="q" type="search" placeholder="поиск: маятник, диод, Бернулли…" autocomplete="off" />
+      <span id="found" class="found" aria-live="polite"></span>
+    </div>
+  </nav>
+
+  <div class="cards" id="cards">
+    {items.map(({ m, num }) => {
       const svg = inlineCover(m.data.cover);
       return (
-        <a class="card" href={`/models/${m.id}/`}>
-          {svg ? <div class="cover" set:html={svg} /> : <div class="nocover"><span>{m.data.title.charAt(0)}</span></div>}
+        <a class="card" href={`/models/${m.id}/`}
+           data-section={m.data.section} data-level={m.data.level}
+           data-tags={m.data.tags.join(' ')}
+           data-text={(m.data.title + ' ' + m.data.description + ' ' + m.data.tags.join(' ')).toLowerCase()}>
+          <span class="num">{num}</span>
+          {svg ? <div class="cover" aria-hidden="true" set:html={svg} />
+               : <div class="nocover" aria-hidden="true"><span>{m.data.title.charAt(0)}</span></div>}
           <div class="card-body">
             <div class="meta">
-              <time datetime={m.data.date.toISOString()}>{fmtDate(m.data.date)}</time>
-              {m.data.tags.map(t => <span class="tag">#{t}</span>)}
+              <span class="sec">{m.data.section}</span>
+              <span class={'lvl ' + (m.data.level === 'базовый' ? 'b' : 'a')}>{m.data.level}</span>
+              {m.data.grade && <span class="grade">{m.data.grade}</span>}
             </div>
             <h2>{m.data.title}</h2>
             <p>{m.data.description}</p>
+            <div class="tagline">{m.data.tags.map(t => <span class="tag">#{t}</span>)}</div>
             <span class="open">открыть модель →</span>
           </div>
         </a>
       );
     })}
   </div>
+  <p id="empty" class="empty hide">Ничего не найдено. Сбросьте фильтры или измените запрос.</p>
 </Base>
+
+<style>
+  .hero{padding:6px 0 4px}
+  h1{font:800 clamp(1.5rem,5vw,2.1rem)/1.12 var(--disp);margin:0 0 10px}
+  .hero p{color:var(--muted);max-width:74ch;margin:0 0 6px}
+  .count{font-family:var(--mono);font-size:.86rem}
+  .count b{color:var(--aqua)}
+  .filters{margin:14px 0 4px;display:grid;gap:8px}
+  .frow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .flab{font:600 .72rem var(--mono);color:var(--muted);min-width:74px}
+  .fchip{font:600 .76rem var(--mono);padding:8px 11px;min-height:36px;border-radius:999px;
+    border:1px solid var(--line2);background:var(--overlay);color:var(--ink);cursor:pointer;text-decoration:none}
+  .fchip i{font-style:normal;color:var(--muted)}
+  .fchip.on{background:var(--aqua);color:var(--on);border-color:var(--aqua)}
+  .fchip.on i{color:var(--on)}
+  #q{flex:1;min-width:200px;font:inherit;font-size:16px;padding:10px 12px;border-radius:10px;
+    border:1px solid var(--line2);background:var(--surface);color:var(--ink)}
+  .found{font:600 .78rem var(--mono);color:var(--aqua)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:14px}
+  .card{position:relative;display:block;text-decoration:none;color:var(--ink);
+    background:var(--surface);border:1px solid var(--line);border-radius:15px;overflow:hidden;
+    box-shadow:var(--shadow);transition:.16s}
+  .card:hover{border-color:var(--aqua);transform:translateY(-2px)}
+  .num{position:absolute;left:10px;top:10px;z-index:2;font:700 .74rem var(--mono);
+    padding:4px 8px;border-radius:999px;background:var(--scrim);color:var(--sand);border:1px solid var(--line2)}
+  .cover,.nocover{aspect-ratio:1200/750;background:var(--canvas);display:block}
+  .cover :global(svg){width:100%;height:100%;display:block}
+  .nocover{display:grid;place-items:center;font:800 3rem var(--disp);color:var(--line2)}
+  .card-body{padding:12px 13px 14px}
+  .meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:7px}
+  .sec,.lvl,.grade{font:600 .7rem var(--mono);padding:4px 8px;border-radius:999px;border:1px solid var(--line2)}
+  .sec{color:var(--aqua)}
+  .lvl.b{color:var(--ok)} .lvl.a{color:var(--sand)}
+  .grade{color:var(--muted)}
+  h2{font:600 1.05rem var(--disp);margin:0 0 6px;line-height:1.25}
+  .card-body p{margin:0;color:var(--muted);font-size:.9rem}
+  .tagline{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+  .tag{font:400 .7rem var(--mono);color:var(--muted);padding:3px 7px;border:1px solid var(--line);border-radius:999px}
+  .open{display:inline-block;margin-top:10px;font:600 .8rem var(--mono);color:var(--aqua)}
+  .empty{margin-top:16px;color:var(--muted);font-family:var(--mono);font-size:.86rem}
+  .hide{display:none}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  @media (max-width:640px){ .cards{grid-template-columns:1fr} .flab{min-width:100%} }
+</style>
+
+<script is:inline>
+(function(){
+  var state={section:'',level:'',tag:''};
+  var cards=[].slice.call(document.querySelectorAll('#cards .card'));
+  var q=document.getElementById('q'), found=document.getElementById('found'), empty=document.getElementById('empty');
+  function apply(){
+    var s=(q.value||'').trim().toLowerCase(), n=0;
+    cards.forEach(function(c){
+      var ok=(!state.section||c.dataset.section===state.section)
+           &&(!state.level||c.dataset.level===state.level)
+           &&(!s||c.dataset.text.indexOf(s)>=0);
+      c.classList.toggle('hide',!ok); if(ok)n++;
+    });
+    found.textContent='найдено: '+n;
+    empty.classList.toggle('hide',n>0);
+  }
+  document.querySelectorAll('.fchip[data-kind]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var k=b.dataset.kind; state[k]=b.dataset.val;
+      document.querySelectorAll('.fchip[data-kind="'+k+'"]').forEach(function(x){ x.classList.toggle('on',x===b); });
+      apply();
+    });
+  });
+  q.addEventListener('input',apply);
+  apply();
+})();
+</script>

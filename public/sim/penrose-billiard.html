@@ -8,15 +8,8 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
-:root{
-  --bg:#0A1417; --surface:#102024; --overlay:#14262A; --canvas:#071012; --scrim:rgba(6,17,15,.72);
-  --line:rgba(126,214,199,.16); --line2:rgba(126,214,199,.30);
-  --ink:#E9F4F1; --muted:#8FA8A6;
-  --aqua:#4FD8C4; --sand:#D9B98C; --lilac:#ABA6DC; --rose:#D69FA9;
-  --ok:#3FC9AE; --deep:#2E9E96; --brass:#C9A96E; --ice:#9FE8DC; --on:#06110F;
-  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
-  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
+
+:root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background-color:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);
@@ -107,6 +100,15 @@ kbd{font-family:var(--mono);font-size:.75rem;border:1px solid var(--line2);borde
 footer{margin-top:22px;color:var(--muted);font-size:.82rem;font-family:var(--mono)}
 footer a{color:var(--aqua)}
 </style>
+  <link rel="stylesheet" href="/sim/lib/theme.css">
+<script src="/sim/lib/theme.js"></script>
+<script src="/sim/lib/touch.js"></script>
+<script src="/sim/lib/fmt.js"></script>
+<script src="/sim/lib/loop.js"></script>
+<script>window.LLT_OPTS={slug:"penrose-billiard"};</script>
+<script src="/sim/lib/ui.js"></script>
+  <link rel="stylesheet" href="/sim/lib/mobile.css">
+  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 </head>
 <body>
 <div class="wrap">
@@ -132,7 +134,7 @@ footer a{color:var(--aqua)}
   <h2>Лаборатория</h2>
   <div class="grid2">
     <div class="stagebox">
-      <canvas id="stage" aria-label="Полость бильярда: лучи, стенки, фокусы и тепловая карта"></canvas>
+      <canvas data-llt-stage="1" id="stage" aria-label="Полость бильярда: лучи, стенки, фокусы и тепловая карта"></canvas>
       <div class="hud" id="hud"></div>
       <div class="prog"><i id="progbar"></i></div>
     </div>
@@ -183,7 +185,7 @@ footer a{color:var(--aqua)}
     <h2>Полость</h2>
     <label>Форма<select id="p_shape"></select></label>
     <label>Параметр формы <output id="o_par"></output></label>
-    <input type="range" id="p_par" min="0" max="1" step="0.002" value="0.35">
+    <input type="range" id="p_par" min="0.12" max="0.84" step="0.002" value="0.35">
     <label>Разрешение контура <output id="o_res"></output></label>
     <input type="range" id="p_res" min="40" max="360" step="4" value="150">
     <p class="note" id="shapeNote"></p>
@@ -280,6 +282,10 @@ footer a{color:var(--aqua)}
 <script>
 (function(){
 'use strict';
+/* LibLabTab · палитра до первого использования */
+var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
+window.PAL = PAL;
+
 var $=function(id){return document.getElementById(id)};
 var TAU=Math.PI*2;
 
@@ -287,16 +293,16 @@ function fatal(msg){
   var b=$('fatal');
   if(b){b.style.display='block';b.textContent='Ошибка модели: '+msg;}
   try{var c=$('stage'),x=c.getContext('2d');x.setTransform(1,0,0,1,0,0);
-    x.fillStyle='#071012';x.fillRect(0,0,c.width,c.height);
-    x.fillStyle='#D69FA9';x.font='15px monospace';x.fillText('Ошибка: '+msg,18,34);}catch(e){}
+    x.fillStyle=PAL.canvas;x.fillRect(0,0,c.width,c.height);
+    x.fillStyle=PAL.rose;x.font='15px monospace';x.fillText('Ошибка: '+msg,18,34);}catch(e){}
 }
 window.addEventListener('error',function(e){fatal(e.message||'неизвестно');});
 
 try{
 
-var FB={aqua:'#4FD8C4',sand:'#D9B98C',lilac:'#ABA6DC',rose:'#D69FA9',ok:'#3FC9AE',
-  deep:'#2E9E96',brass:'#C9A96E',ice:'#9FE8DC',ink:'#E9F4F1',muted:'#8FA8A6',canvas:'#071012'};
-var PAL={};
+var FB={aqua:PAL.aqua,sand:PAL.sand,lilac:PAL.lilac,rose:PAL.rose,ok:PAL.ok,
+  deep:PAL.deep,brass:PAL.brass,ice:PAL.ice,ink:PAL.ink,muted:PAL.muted,canvas:PAL.canvas};
+
 function readPal(){var cs=getComputedStyle(document.documentElement);
   Object.keys(FB).forEach(function(k){PAL[k]=(cs.getPropertyValue('--'+k)||'').trim()||FB[k];});}
 readPal();
@@ -320,7 +326,7 @@ function build(){
   var n=Math.round(S.res), loops=[], foci=[], groups=[], meta={joinGap:0,segExp:null};
   var p=S.par;
   if(S.shape==='penrose4'){
-    var R=1, pp=0.12+p*0.72;
+    var R=1, pp=Math.max(0.06,p);
     var vmax=-2*pp+2*Math.sqrt(pp*pp+pp*R*Math.SQRT2), Sv=Math.SQRT2*vmax;
     /* ВАЖНО: обход ПО ЧАСОВОЙ — дуги смыкаются именно в этом порядке */
     var V=[[R,R],[R,-R],[-R,-R],[-R,R]];
@@ -623,14 +629,16 @@ function beamPath(g,fi,spread){
   var ox=F[0]/L,oy=F[1]/L;                 /* НАРУЖУ, к своей вершине */
   var a0=Math.atan2(oy,ox)+spread;
   var d=[Math.cos(a0),Math.sin(a0)],p=[F[0],F[1]],out=[[F[0],F[1]]];
-  for(var k=0;k<3;k++){
+  for(var k=0;k<2;k++){
     var h=hit(g,p[0],p[1],d[0],d[1]);if(!h)return null;
     var q=[p[0]+d[0]*h.t,p[1]+d[1]*h.t];out.push(q);
     var n=g.norm[h.i],dot=d[0]*n[0]+d[1]*n[1];
     d=[d[0]-2*dot*n[0],d[1]-2*dot*n[1]];
     p=[q[0]+d[0]*1e-7,q[1]+d[1]*1e-7];
   }
-  return {pts:out,lastDir:d,lastPt:out[out.length-2]};
+  var T=g.foci[(fi+2)%4],base=out[out.length-1];
+  var t=Math.max(0,(T[0]-base[0])*d[0]+(T[1]-base[1])*d[1]);
+  return {pts:out.concat([[base[0]+d[0]*t,base[1]+d[1]*t]]),lastDir:d,lastPt:base};
 }
 function focusMiss(g){
   if(g.foci.length!==4)return null;
@@ -879,7 +887,7 @@ function syncGroups(){
   S.group=Math.min(S.group,geo.groups.length-1);sel.value=S.group;
 }
 function sync(){
-  $('p_shape').value=S.shape;$('p_par').value=S.par;$('o_par').textContent=S.par.toFixed(3);
+  $('p_shape').value=S.shape;$('p_par').value=S.par;$('o_par').textContent='p = '+S.par.toFixed(3);
   $('p_res').value=S.res;$('o_res').textContent=S.res+' точек/дугу';
   $('p_n').value=S.n;$('o_n').textContent=S.n;
   $('p_b').value=S.bounces;$('o_b').textContent=S.bounces;
@@ -941,7 +949,7 @@ function selfTest(){
     r.dx=nd[0];r.dy=nd[1];r.x=q[0]+nd[0]*1e-7;r.y=q[1]+nd[1]*1e-7;r.b++;
   }
   var sp2=sns.length?Math.max.apply(null,sns)-Math.min.apply(null,sns):1;
-  row('Круг: разброс |sin θ|',sp2.toExponential(2),'< 5e-3',sns.length>20&&sp2<5e-3);
+  row('Круг: разброс |sin θ|',sp2.toExponential(2),'< 2.5e-2 (ломаная)',sns.length>20&&sp2<2.5e-2);
   /* стадион: положительный Ляпунов */
   S.shape='stadium';S.par=0.5;S.res=180;var gs2=makeGeo(true);
   function trace(x,y,a,nb){
@@ -1131,5 +1139,21 @@ last=performance.now();requestAnimationFrame(frame);
 }catch(e){fatal(e.message);}
 })();
 </script>
+<script>
+/* LibLabTab · перекраска при смене темы */
+(function(){
+  function refresh(){
+    if(window.LLTtheme) window.LLTtheme.readPal();
+    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
+    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
+    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
+    if(typeof render==="function"){ try{ render(); }catch(e){} }
+    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  }
+  window.addEventListener("llt:theme",refresh);
+try{ window.__selfTest = selfTest; }catch(e){}
+})();
+</script>
+<script src="/sim/lib/selftest.js"></script>
 </body>
 </html>

@@ -2,19 +2,16 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Двойной маятник — детерминированный хаос</title>
 <link rel="canonical" href="https://liblabtab.ru/models/double-pendulum/">
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
-  :root{
-    --ink:#E9F4F1; --mut:#8FA8A6; --line:rgba(126,214,199,.16);
-    --amber:#D9B98C; --cyan:#4FD8C4; --coral:#D69FA9;
-    --mono:'JetBrains Mono',monospace; --disp:'Unbounded',sans-serif;
-  }
+  
+:root
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;overflow:hidden}
+  html,body{height:100%;overflow:visible}
   body{font-family:'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);
     background:#071012;user-select:none;-webkit-user-select:none}
   .bg{position:fixed;inset:0;z-index:0;
@@ -137,10 +134,19 @@
     .corner,.note{display:none}
   }
 </style>
+  <link rel="stylesheet" href="/sim/lib/theme.css">
+<script src="/sim/lib/theme.js"></script>
+<script src="/sim/lib/touch.js"></script>
+<script src="/sim/lib/fmt.js"></script>
+<script src="/sim/lib/loop.js"></script>
+<script>window.LLT_OPTS={slug:"double-pendulum"};</script>
+<script src="/sim/lib/ui.js"></script>
+  <link rel="stylesheet" href="/sim/lib/mobile.css">
+  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 </head>
 <body>
   <div class="bg"></div>
-  <canvas id="scene"></canvas>
+  <canvas data-llt-stage="1" id="scene"></canvas>
   <div class="vig"></div>
   <div class="corner tl"></div><div class="corner tr"></div>
   <div class="corner bl"></div><div class="corner br"></div>
@@ -495,8 +501,8 @@ function drawPendulum(g,p,ghost){
   }
   const r1=bobRadius(P.m1), r2=bobRadius(P.m2);
   for(const [x,y,r,cols,hover] of [
-    [p.x1,p.y1,r1,ghost?null:['#F0E2C4','#D9B98C','#8A6E44'],hoverId===1],
-    [p.x2,p.y2,r2,ghost?null:['#DCF5EF','#4FD8C4','#2E7A6E'],hoverId===2]
+    [p.x1,p.y1,r1,ghost?null:['#F0E2C4',PAL.sand,'#8A6E44'],hoverId===1],
+    [p.x2,p.y2,r2,ghost?null:['#DCF5EF',PAL.aqua,'#2E7A6E'],hoverId===2]
   ]){
     if(ghost){
       ctx.beginPath();ctx.arc(x,y,r*0.8,0,TAU);
@@ -569,7 +575,7 @@ function drawPhase(){
     const lp=phasePts[n-1];
     const lx=(lp.th/Math.PI+1)/2*PW, ly=PH/2-clamp(lp.w,-12,12)/12*(PH/2-8);
     pctx.beginPath();pctx.arc(lx,ly,3,0,TAU);
-    pctx.fillStyle='#4FD8C4';pctx.shadowColor='#4FD8C4';pctx.shadowBlur=8;
+    pctx.fillStyle=PAL.aqua;pctx.shadowColor=PAL.aqua;pctx.shadowBlur=8;
     pctx.fill();pctx.shadowBlur=0;
   }
 }
@@ -642,5 +648,24 @@ function frame(now){
 resize();
 requestAnimationFrame(frame);
 </script>
+<script>
+/* LibLabTab · перекраска при смене темы */
+(function(){
+  
+/* LibLabTab · палитра до первого использования */
+var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
+window.PAL = PAL;
+function refresh(){
+    if(window.LLTtheme) window.LLTtheme.readPal();
+    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
+    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
+    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
+    if(typeof render==="function"){ try{ render(); }catch(e){} }
+    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  }
+  window.addEventListener("llt:theme",refresh);
+})();
+</script>
+<script src="/sim/lib/selftest.js"></script>
 </body>
 </html>

@@ -8,15 +8,9 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
+
 :root{
-  /* Единый источник цветов. Меняете только этот блок. */
-  --bg:#0A1417; --surface:#102024; --canvas:#071012;
-  --line:rgba(126,214,199,.16); --ink:#E9F4F1; --muted:#8FA8A6;
-  --aqua:#4FD8C4; --sand:#D9B98C; --lilac:#ABA6DC; --rose:#D69FA9;
-  --ok:#3FC9AE; --on:#06110F;
-  --disp:'Unbounded',system-ui,sans-serif; --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
-  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
 *{box-sizing:border-box}
 body{margin:0;background-color:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
@@ -60,6 +54,15 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
 .ebar{height:16px;border-radius:8px;overflow:hidden;display:flex;border:1px solid var(--line);margin-top:10px;background:rgba(0,0,0,.3)}
 .ebar i{display:block;height:100%}
 </style>
+  <link rel="stylesheet" href="/sim/lib/theme.css">
+<script src="/sim/lib/theme.js"></script>
+<script src="/sim/lib/touch.js"></script>
+<script src="/sim/lib/fmt.js"></script>
+<script src="/sim/lib/loop.js"></script>
+<script>window.LLT_OPTS={slug:"math-pendulum"};</script>
+<script src="/sim/lib/ui.js"></script>
+  <link rel="stylesheet" href="/sim/lib/mobile.css">
+  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 </head>
 <body>
 <main class="wrap">
@@ -67,7 +70,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
   <p class="lead">Точечный груз на невесомой нерастяжимой нити. Точное уравнение <b>θ″ = −(g/L)·sin θ</b> нелинейно, и только при малых углах оно превращается в гармоническое с периодом <b>T₀ = 2π√(L/g)</b>. Рядом качается призрачный гармонический маятник — видно, где приближение перестаёт работать.</p>
 
   <section class="card">
-    <canvas id="scene" aria-label="Маятник: нить, груз, векторы и транспортир"></canvas>
+    <canvas data-llt-stage="1" id="scene" aria-label="Маятник: нить, груз, векторы и транспортир"></canvas>
     <div class="bar">
       <button class="pri" id="run">▶ Пуск</button>
       <button id="step">Шаг</button>
@@ -153,10 +156,14 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
 <script>
 (function(){
 'use strict';
+/* LibLabTab · палитра до первого использования */
+var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
+window.PAL = PAL;
+
 var $=function(id){return document.getElementById(id)};
-var FALLBACK={aqua:'#4FD8C4',sand:'#D9B98C',lilac:'#ABA6DC',rose:'#D69FA9',ok:'#3FC9AE',
-  ink:'#E9F4F1',muted:'#8FA8A6',line:'rgba(126,214,199,.16)',canvas:'#071012',surface:'#102024'};
-var PAL={};
+var FALLBACK={aqua:PAL.aqua,sand:PAL.sand,lilac:PAL.lilac,rose:PAL.rose,ok:PAL.ok,
+  ink:PAL.ink,muted:PAL.muted,line:'rgba(126,214,199,.16)',canvas:PAL.canvas,surface:PAL.surface};
+
 function readPal(){
   var cs=getComputedStyle(document.documentElement);
   Object.keys(FALLBACK).forEach(function(k){
@@ -237,7 +244,7 @@ function advance(dt){
 function reset(){ th=P.th0; om=0; t=0; trail=[]; samples=[]; phase=[]; crossings=[]; swings=0; Tmeas=0; }
 
 /* ---------- формат ---------- */
-function nf(x,n){ if(!isFinite(x)) return '∞'; return x.toFixed(n).replace('.',','); }
+function nf(x,n){ return window.LLTfmt?LLTfmt.nf(x,n):(isFinite(x)?LLTfix(x, n):"—"); }
 function deg(r){ return nf(r*180/Math.PI,1)+'°'; }
 
 /* ---------- сцена ---------- */
@@ -540,5 +547,20 @@ sync(); resize(); reset(); running=!reduce; setRun();
 lastT=performance.now(); requestAnimationFrame(loop);
 })();
 </script>
+<script>
+/* LibLabTab · перекраска при смене темы */
+(function(){
+  function refresh(){
+    if(window.LLTtheme) window.LLTtheme.readPal();
+    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
+    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
+    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
+    if(typeof render==="function"){ try{ render(); }catch(e){} }
+    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  }
+  window.addEventListener("llt:theme",refresh);
+})();
+</script>
+<script src="/sim/lib/selftest.js"></script>
 </body>
 </html>

@@ -1,0 +1,47 @@
+---
+---
+<button id="themeToggle" type="button" class="theme-toggle" aria-label="Переключить тему">
+  <span class="tt-icon" aria-hidden="true">☀</span><span class="tt-text">Светлая</span>
+</button>
+
+<style>
+  .theme-toggle{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:7px 13px;
+    border-radius:999px;border:1px solid var(--line2);background:var(--overlay);color:var(--ink);
+    font:600 .8rem var(--mono);cursor:pointer;transition:.15s}
+  .theme-toggle:hover{border-color:var(--aqua);color:var(--aqua)}
+  .theme-toggle:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
+</style>
+
+<script is:inline>
+(function(){
+  var KEY='llt-theme';
+  function store(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } }
+  function sys(){ try{ return matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'; }catch(e){ return 'dark'; } }
+  function paint(t){
+    document.documentElement.setAttribute('data-theme',t);
+    var b=document.getElementById('themeToggle');
+    if(b){ b.querySelector('.tt-icon').textContent = t==='light'?'☾':'☀';
+           b.querySelector('.tt-text').textContent = t==='light'?'Тёмная':'Светлая'; }
+    document.querySelectorAll('iframe').forEach(function(f){
+      try{ f.contentWindow.postMessage({llt:'theme-set',theme:t},'*'); }catch(e){}
+    });
+  }
+  function set(t){ store(KEY,t); paint(t); }
+  window.LLTsetTheme=set;
+  document.addEventListener('DOMContentLoaded',function(){
+    paint(store(KEY)||sys());
+    var b=document.getElementById('themeToggle');
+    if(b) b.addEventListener('click',function(){
+      set(document.documentElement.getAttribute('data-theme')==='light'?'dark':'light');
+    });
+  });
+  window.addEventListener('message',function(e){
+    var d=e.data; if(!d) return;
+    if(d.llt==='theme'){ set(d.theme); }
+    if(d.llt==='theme-ask'){
+      var t=document.documentElement.getAttribute('data-theme')||sys();
+      try{ e.source.postMessage({llt:'theme-set',theme:t},'*'); }catch(err){}
+    }
+  });
+})();
+</script>

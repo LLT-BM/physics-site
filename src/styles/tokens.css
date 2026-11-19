@@ -1,0 +1,22 @@
+/* LibLabTab · единые токены двух тем. Подключается первым в Base.astro. */
+:root{
+  color-scheme:dark;
+  --bg:#0A1417; --surface:#102024; --overlay:#14262A; --canvas:#071012;
+  --ink:#E9F4F1; --muted:#8FA8A6;
+  --line:rgba(126,214,199,.16); --line2:rgba(126,214,199,.30);
+  --aqua:#4FD8C4; --sand:#D9B98C; --lilac:#ABA6DC; --rose:#D69FA9;
+  --ok:#3FC9AE; --deep:#2E9E96; --brass:#C9A96E; --ice:#9FE8DC; --on:#06110F;
+  --scrim:rgba(6,17,15,.72); --shadow:0 18px 44px -30px rgba(0,0,0,.9);
+  --disp:'Unbounded',system-ui,sans-serif;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F2F6F5; --surface:#FFFFFF; --overlay:#E8EFED; --canvas:#FBFDFC;
+  --ink:#11201E; --muted:#5A6B68;
+  --line:rgba(24,86,80,.16); --line2:rgba(24,86,80,.30);
+  --aqua:#0E8578; --sand:#8A6733; --lilac:#57509F; --rose:#A55262;
+  --ok:#0E8578; --deep:#0B6B60; --brass:#8A6733; --ice:#2C7F74; --on:#FFFFFF;
+  --scrim:rgba(255,255,255,.82); --shadow:0 16px 38px -28px rgba(17,32,30,.55);
+}

@@ -1,2 +1,52 @@
+# LibLabTab · редиректы, сжатие, кэш, безопасность
 Redirect 301 /models/ohm-law/ /models/circuit-lab/
 Redirect 301 /sim/ohm.html /sim/circuit.html
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml application/xml application/rss+xml
+</IfModule>
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css application/javascript image/svg+xml application/json
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 hour"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  <FilesMatch "\.(woff2?|png|svg)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType font/woff2 .woff2
+  AddType image/svg+xml .svg
+  AddCharset UTF-8 .html .css .js .svg
+</IfModule>
+
+# Разделы больше не теги — уводим на каталог, чтобы не было 404
+Redirect 301 /tags/электродинамика/ /
+Redirect 301 /tags/механика/ /
+Redirect 301 /tags/оптика/ /
+Redirect 301 /tags/квантовая-физика/ /
+Redirect 301 /tags/молекулярная-физика/ /
+Redirect 301 /tags/гидродинамика/ /
+Redirect 301 /tags/астрономия/ /
+Redirect 301 /tags/масштабы-вселенной/ /
+Redirect 301 /tags/самоорганизация/ /

@@ -1,6 +1,4 @@
-:root{--bg:#0A1417;--panel:#102024;--line:rgba(126,214,199,.16);--ink:#E9F4F1;
-  --mut:#8FA8A6;--amber:#D9B98C;--cyan:#4FD8C4;
-  --mono:'JetBrains Mono',monospace;--disp:'Unbounded',sans-serif}
+:root
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);line-height:1.65;
   font-family:'IBM Plex Sans',system-ui,sans-serif;
