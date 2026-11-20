@@ -25,8 +25,8 @@
     -webkit-mask-image:radial-gradient(80% 75% at 50% 45%,#000 30%,transparent 100%);
             mask-image:radial-gradient(80% 75% at 50% 45%,#000 30%,transparent 100%)}
   #scene{position:fixed;inset:0;z-index:1;touch-action:none;display:block}
-  .vig{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.5;
-    background:radial-gradient(125% 95% at 50% 45%,transparent 55%,var(--bg))}
+  .vig{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.45;
+    background:radial-gradient(125% 95% at 50% 45%,transparent 58%,var(--bg))}
   .corner{position:fixed;width:26px;height:26px;border:1px solid var(--line2);z-index:4;pointer-events:none}
   .tl{top:10px;left:10px;border-right:0;border-bottom:0}
   .tr{top:10px;right:10px;border-left:0;border-bottom:0}
@@ -41,7 +41,7 @@
     box-shadow:0 0 10px var(--warm);animation:pulse 1.7s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
 
-  .chain{position:fixed;right:22px;top:96px;width:284px;z-index:5;padding:18px;
+  .chain{position:fixed;right:22px;top:96px;width:292px;z-index:5;padding:18px;
     background:var(--scrim);backdrop-filter:blur(8px);border:1px solid var(--line2);
     clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)}
   .formula{font:600 21px var(--disp);letter-spacing:.02em;text-align:center;padding:6px 0 2px}
@@ -50,58 +50,51 @@
   .formula sub{font-size:11px;color:var(--mut)}
   .fnote{font:400 9.5px var(--mono);color:var(--mut);text-align:center;letter-spacing:.08em;margin-bottom:12px}
   .steps{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:13px}
-  .steps li{border:1px solid var(--line);background:var(--overlay);padding:8px 11px;transition:border-color .25s}
-  .steps i{display:block;font:600 8.5px var(--mono);letter-spacing:.18em;text-transform:uppercase;
-    color:var(--mut);font-style:normal;margin-bottom:3px}
-  .steps b{font:600 13.5px 'IBM Plex Sans';color:var(--ink)}
-  .steps small{display:block;font:400 10px 'IBM Plex Sans';color:var(--mut);margin-top:2px}
+  .steps li{border:1px solid var(--line);background:var(--overlay);padding:9px 11px;transition:border-color .25s}
+  .steps i{display:block;font:600 9px var(--mono);letter-spacing:.16em;text-transform:uppercase;
+    color:var(--mut);font-style:normal;margin-bottom:4px}
+  .steps b{font:600 14px 'IBM Plex Sans';color:var(--ink)}
+  .steps small{display:block;font:400 10.5px 'IBM Plex Sans';color:var(--mut);margin-top:3px}
   li[data-st=up] b{color:var(--warm)}
   li[data-st=down] b{color:var(--cyan)}
   li[data-st=zero] b{color:var(--mut)}
   li[data-st=up],li[data-st=down]{border-color:var(--line2)}
-  .meters{border-top:1px dashed var(--line2);padding-top:11px}
-  .mrow{display:flex;align-items:center;gap:8px;margin-bottom:9px}
-  .mlab{font:600 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);width:56px;flex:none}
-  .bar{flex:1;min-width:40px;height:8px;background:var(--canvas);border:1px solid var(--line);overflow:hidden}
+  .meters{border-top:1px dashed var(--line2);padding-top:12px}
+  .mrow{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .mlab{font:700 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);width:62px;flex:none}
+  .bar{flex:1;min-width:36px;height:10px;background:var(--canvas);border:1px solid var(--line);border-radius:5px;overflow:hidden}
   .bar div{height:100%;width:0%;background:linear-gradient(90deg,var(--sand),var(--rose));transition:width .12s linear}
-  .mrow b{font:600 12px var(--mono);color:var(--cyan);text-align:center;flex:none}
-  #phiVal{min-width:54px;text-align:right;color:var(--warm)}
+  .mrow b{font:700 13px var(--mono);color:var(--cyan);text-align:center;flex:none}
+  #phiVal{min-width:58px;text-align:right;color:var(--warm)}
   #fluxDir{width:14px}
   .mrow2{display:flex;gap:8px}
-  .mrow2>div{flex:1;min-width:0;border:1px solid var(--line);background:var(--overlay);
-    padding:7px 9px;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
-  .mrow2 span{font:600 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
-  .mrow2 b{font:600 15px var(--mono);white-space:nowrap}
+  .mrow2>div{flex:1;min-width:0;border:1px solid var(--line);background:var(--overlay);border-radius:8px;
+    padding:8px 10px;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+  .mrow2 span{font:700 10px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--mut)}
+  .mrow2 b{font:700 16px var(--mono);white-space:nowrap}
   #emfVal{color:var(--warm)} #iVal{color:var(--cyan)}
-  .note2{margin-top:12px;font:400 10.5px/1.55 'IBM Plex Sans';color:var(--mut)}
+  .note2{margin-top:12px;font:400 11px/1.6 'IBM Plex Sans';color:var(--mut)}
   .note2+.note2{margin-top:6px}
   .note2 em{color:var(--warm);font-style:normal;font-weight:600}
 
   .controls{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;
-    display:flex;align-items:center;gap:11px;padding:10px 16px;flex-wrap:wrap;justify-content:center;
-    background:var(--scrim);backdrop-filter:blur(8px);border:1px solid var(--line2);
-    clip-path:polygon(13px 0,100% 0,100% calc(100% - 13px),calc(100% - 13px) 100%,0 100%,0 13px)}
-  .tgl{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);
-    background:var(--overlay);border:1px solid var(--line);padding:9px 12px;cursor:pointer;
-    transition:.18s;white-space:nowrap;min-height:40px}
+    max-width:min(1180px,calc(100vw - 28px));
+    display:flex;align-items:center;gap:14px;padding:14px 18px;flex-wrap:wrap;justify-content:center;
+    background:var(--scrim);backdrop-filter:blur(10px);border:1px solid var(--line2);border-radius:16px}
+  .tgl{font:700 11.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);
+    background:var(--overlay);border:1px solid var(--line);border-radius:10px;padding:11px 15px;cursor:pointer;
+    transition:.18s;white-space:nowrap;min-height:48px}
   .tgl:hover{color:var(--ink);border-color:var(--cyan);transform:translateY(-1px)}
-  .tgl.on{color:var(--cyan);border-color:var(--cyan)}
-  .tgl.main.on{color:var(--warm);border-color:var(--warm)}
+  .tgl.on{color:var(--cyan);border-color:var(--cyan);background:rgba(79,216,196,.12)}
+  .tgl.main{color:var(--warm);border-color:var(--line2)}
+  .tgl.main.on{color:var(--on);background:var(--warm);border-color:var(--warm)}
   #btnFlip{color:var(--warm);border-color:var(--line2)}
   .flash{animation:flash .4s}
   @keyframes flash{0%{box-shadow:0 0 0 rgba(217,185,140,0)}40%{box-shadow:0 0 22px rgba(217,185,140,.7)}100%{box-shadow:0 0 0 rgba(217,185,140,0)}}
-  .spd{display:flex;align-items:center;gap:8px}
-  .spd .lbl{font:600 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
-  .spd b{font:600 11px var(--mono);color:var(--cyan);min-width:52px}
-  input[type=range]{-webkit-appearance:none;appearance:none;width:104px;height:28px;outline:none;cursor:pointer;background:transparent}
-  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:5px;border:1px solid var(--line2);
-    background:linear-gradient(90deg,var(--deep),var(--aqua))}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;margin-top:-8px;
-    border-radius:50%;background:var(--sand);border:3px solid var(--canvas);box-shadow:0 0 0 3px rgba(217,185,140,.25)}
-  input[type=range]::-moz-range-track{height:8px;border-radius:5px;background:var(--line2)}
-  input[type=range]::-moz-range-progress{height:8px;border-radius:5px;background:var(--aqua)}
-  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--sand);border:3px solid var(--canvas)}
-  input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:3px;border-radius:8px}
+  .spd{display:flex;align-items:center;gap:11px}
+  .spd .lbl{font:700 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+  .spd b{font:700 13px var(--mono);color:var(--sand);white-space:nowrap;text-align:center;min-width:84px;
+    background:rgba(217,185,140,.14);border:1px solid rgba(217,185,140,.38);border-radius:999px;padding:6px 12px}
   .hint{font:400 9.5px var(--mono);color:var(--mut);white-space:nowrap}
   .note{position:fixed;left:26px;bottom:20px;z-index:5;pointer-events:none;
     font:400 9.5px var(--mono);color:var(--mut);letter-spacing:.1em;opacity:.7}
@@ -118,7 +111,25 @@
 <link rel="stylesheet" href="/sim/lib/mobile.css">
 <style data-llt-ios>input,select,textarea{font-size:16px}</style>
 <style data-llt-lenz>
-/* На узких экранах сцена и панели идут в потоке, а не перекрывают друг друга */
+/* Крупные читаемые ползунки: толстый трек с заполнением и большой бегунок */
+.controls input[type=range]{-webkit-appearance:none;appearance:none;
+  width:190px;height:48px;background:transparent;cursor:pointer;margin:0}
+.controls input[type=range]::-webkit-slider-runnable-track{height:14px;border-radius:9px;
+  border:1px solid var(--line2);
+  background:linear-gradient(90deg,var(--deep) 0%,var(--aqua) var(--fill,50%),
+    rgba(126,214,199,.16) var(--fill,50%),rgba(126,214,199,.16) 100%)}
+.controls input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+  width:32px;height:32px;margin-top:-10px;border-radius:50%;background:var(--sand);
+  border:3px solid var(--canvas);cursor:pointer;
+  box-shadow:0 0 0 4px rgba(217,185,140,.26),0 3px 9px rgba(0,0,0,.55)}
+.controls input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 8px rgba(217,185,140,.3),0 3px 9px rgba(0,0,0,.55)}
+.controls input[type=range]::-moz-range-track{height:14px;border-radius:9px;border:1px solid var(--line2);background:rgba(126,214,199,.16)}
+.controls input[type=range]::-moz-range-progress{height:14px;border-radius:9px;background:linear-gradient(90deg,var(--deep),var(--aqua))}
+.controls input[type=range]::-moz-range-thumb{width:30px;height:30px;border-radius:50%;
+  background:var(--sand);border:3px solid var(--canvas);cursor:pointer}
+.controls input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:5px;border-radius:12px}
+
+/* На узких экранах сцена и панели идут в потоке, ползунок занимает всю строку */
 @media (max-width:900px){
   html,body{height:auto;min-height:100%}
   body{display:flex;flex-direction:column;gap:10px;padding:10px 10px 24px}
@@ -130,13 +141,16 @@
   .chain{order:3;position:static !important;width:auto !important;right:auto !important;top:auto !important;
     margin:0 !important;clip-path:none !important;border-radius:12px;padding:14px}
   .controls{order:4;position:static !important;transform:none !important;left:auto !important;
-    right:auto !important;bottom:auto !important;margin:0 !important;clip-path:none !important;
-    border-radius:12px;overflow:visible !important;padding:12px}
+    right:auto !important;bottom:auto !important;margin:0 !important;max-width:none;
+    border-radius:12px;overflow:visible !important;padding:14px;gap:12px}
   .note2,.fnote{display:block !important}
-  .steps b{font-size:13px}
-  .tgl{min-height:44px;font-size:11px}
-  input[type=range]{width:130px;height:40px}
-  input[type=range]::-webkit-slider-thumb{width:26px;height:26px;margin-top:-10px}
+  .spd{flex:1 1 100%;gap:10px}
+  .spd .lbl{min-width:66px}
+  .controls input[type=range]{flex:1;width:auto;height:52px}
+  .controls input[type=range]::-webkit-slider-runnable-track{height:16px}
+  .controls input[type=range]::-webkit-slider-thumb{width:36px;height:36px;margin-top:-11px}
+  .spd b{min-width:92px;font-size:14px}
+  .tgl{flex:1 1 auto;min-height:50px;font-size:12px}
 }
 @media (prefers-reduced-motion:reduce){.live{animation:none}}
 </style>
@@ -144,7 +158,7 @@
 <body>
   <div class="bg"></div>
   <canvas data-llt-stage="1" id="scene" role="img"
-    aria-label="Магнит, катушка и гальванометр: индукционный ток противодействует изменению магнитного потока"></canvas>
+    aria-label="Магнит, катушка и гальванометр: линии поля выходят из полюса N, огибают магнит и входят в полюс S; индукционный ток противодействует изменению потока"></canvas>
   <div class="vig"></div>
   <div class="corner tl"></div><div class="corner tr"></div>
   <div class="corner bl"></div><div class="corner br"></div>
@@ -172,16 +186,16 @@
       </div>
     </div>
     <p class="note2">Индукционный ток всегда направлен так, чтобы <em>противодействовать</em> изменению магнитного потока, его вызывающего. Катушка «сопротивляется» любому изменению — в этом суть правила Ленца.</p>
-    <p class="note2">Линии поля выходят из полюса N, огибают магнит и входят в S. Чем больше линий проходит через витки, тем больше поток Φ.</p>
+    <p class="note2">Линии поля выходят из торца N веером, огибают магнит дугами и входят в торец S. Чем гуще линии проходят через витки, тем больше поток Φ.</p>
     <p class="note2">Шкала оценочная: поток одного витка при контакте принят 0,5 мВб, сопротивление цепи 10 Ом. Знак и форма сигнала точные, абсолютные значения — порядок величины.</p>
   </section>
 
   <footer class="controls">
     <button id="btnAuto" class="tgl main">▶ автоколебания</button>
-    <div class="spd"><span class="lbl">частота</span><input id="freq" type="range" min="20" max="140" value="50" aria-label="Частота автоколебаний"><b id="freqVal">0,50 Гц</b></div>
+    <div class="spd"><span class="lbl">частота</span><input id="freq" type="range" min="20" max="140" value="50" aria-label="Частота автоколебаний, герц"><b id="freqVal">0,50 Гц</b></div>
+    <div class="spd"><span class="lbl">витки</span><input id="turns" type="range" min="1" max="8" value="4" aria-label="Число витков катушки"><b id="turnsVal">N = 4</b></div>
     <button id="btnFlip" class="tgl">⇄ полюса</button>
     <button id="reset" class="tgl">⟲ Сброс</button>
-    <div class="spd"><span class="lbl">витки</span><input id="turns" type="range" min="1" max="8" value="4" aria-label="Число витков катушки"><b id="turnsVal">N = 4</b></div>
     <button class="tgl on" id="tgF">поле</button>
     <button class="tgl on" id="tgC">ток</button>
     <button class="tgl on" id="tgB">Bᵢₙд</button>
@@ -210,7 +224,7 @@ function readPal(){
   for(const k in FB)PL[k]=(cs.getPropertyValue('--'+k)||'').trim()||FB[k];
 }
 readPal();
-addEventListener('llt:theme',()=>{readPal();});
+addEventListener('llt:theme',readPal);
 
 const NF=(typeof window.LLTfix==='function')?window.LLTfix:function(x,n){
   if(typeof x!=='number'||!isFinite(x))return '—';
@@ -224,7 +238,6 @@ const NS=(typeof window.LLTsigned==='function')?window.LLTsigned:function(x,n){
   return (r>0?'+':'')+NF(x,n);
 };
 
-/* Калибровка шкалы: поток одного витка при контакте и сопротивление цепи */
 const CAL={phi0:0.5, R:10};
 
 const S={
@@ -286,60 +299,73 @@ function arrow(x1,y1,x2,y2,color,w,head,alpha){
   ctx.closePath();ctx.fill();
   ctx.globalAlpha=1;
 }
+
+/* Поле стержневого магнита: два магнитных заряда на полюсных гранях.
+   Линии трассируются от торцов, поэтому картина получается дипольной:
+   веер из N, дуги над и под магнитом, вход в S. */
 function fieldDir(x,y,ch){
   let bx=0,by=0;
   for(let i=0;i<ch.length;i++){
-    const c=ch[i],dx=x-c.x,dy=y-c.y,r2=dx*dx+dy*dy+1,k=c.q/(r2*Math.sqrt(r2));
+    const c=ch[i],dx=x-c.x,dy=y-c.y,r2=dx*dx+dy*dy+4,k=c.q/(r2*Math.sqrt(r2));
     bx+=dx*k;by+=dy*k;
   }
   const m=Math.hypot(bx,by);
   return m>1e-14?[bx/m,by/m]:null;
 }
-function traceLine(x,y,ch,inBody){
-  const ds=5,pts=[[x,y]];
-  for(let i=0;i<560;i++){
+function traceLine(x,y,ch,inBody,dir){
+  const ds=6,pts=[[x,y]];
+  for(let i=0;i<430;i++){
     const d1=fieldDir(x,y,ch); if(!d1)break;
-    const d2=fieldDir(x+d1[0]*ds/2,y+d1[1]*ds/2,ch); if(!d2)break;
-    x+=d2[0]*ds;y+=d2[1]*ds;
-    if(x<-40||x>W+40||y<-40||y>H+40)break;
+    const d2=fieldDir(x+d1[0]*dir*ds/2,y+d1[1]*dir*ds/2,ch); if(!d2)break;
+    x+=d2[0]*dir*ds;y+=d2[1]*dir*ds;
+    if(x<-70||x>W+70||y<-70||y>H+70)break;
     pts.push([x,y]);
     if(inBody(x,y))break;
   }
   return pts;
 }
 function strokeLine(pts,alpha){
-  ctx.globalAlpha=alpha;ctx.strokeStyle=PL.sand;ctx.lineWidth=1.3;
+  if(pts.length<3)return;
+  ctx.globalAlpha=alpha;ctx.strokeStyle=PL.sand;ctx.lineWidth=1.6;
   ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
   let total=0;const cum=[0];
   for(let i=1;i<pts.length;i++){total+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);cum.push(total);}
-  if(total>150){
-    ctx.fillStyle=PL.sand;ctx.globalAlpha=Math.min(1,alpha+0.25);
-    for(const f of[0.3,0.72]){
+  if(total>120){
+    ctx.fillStyle=PL.sand;ctx.globalAlpha=Math.min(1,alpha+0.3);
+    const marks=total>420?[0.28,0.62,0.88]:[0.34,0.74];
+    for(const f of marks){
       const target=total*f;let j=1;
       while(j<pts.length-1&&cum[j]<target)j++;
       const p=pts[j-1],q=pts[j],a=Math.atan2(q[1]-p[1],q[0]-p[0]);
-      ctx.beginPath();ctx.moveTo(q[0]+Math.cos(a)*4,q[1]+Math.sin(a)*4);
-      ctx.lineTo(q[0]-Math.cos(a-0.5)*5,q[1]-Math.sin(a-0.5)*5);
-      ctx.lineTo(q[0]-Math.cos(a+0.5)*5,q[1]-Math.sin(a+0.5)*5);
+      ctx.beginPath();ctx.moveTo(q[0]+Math.cos(a)*5,q[1]+Math.sin(a)*5);
+      ctx.lineTo(q[0]-Math.cos(a-0.5)*6,q[1]-Math.sin(a-0.5)*6);
+      ctx.lineTo(q[0]-Math.cos(a+0.5)*6,q[1]-Math.sin(a+0.5)*6);
       ctx.closePath();ctx.fill();
     }
   }
   ctx.globalAlpha=1;
 }
 function fieldLines(g){
-  const s=S.s,cm=S.mx-g.LW/2,half=g.LW/2,delta=g.LW*0.2;
+  const s=S.s;
+  const xL=S.mx-g.LW, xR=S.mx;
+  const half=g.LW/2, delta=g.LW*0.16, cm=S.mx-half;
+  const nFace = s===1 ? xR : xL;
+  const sFace = s===1 ? xL : xR;
   const ch=[{x:cm+s*(half-delta),y:g.axisY,q:1},{x:cm-s*(half-delta),y:g.axisY,q:-1}];
-  const N=ch[0];
-  const inBody=(x,y)=>x>S.mx-g.LW-0.5&&x<S.mx+0.5&&Math.abs(y-g.axisY)<g.LH/2+0.5;
-  const rho=Math.max(delta+g.LH*0.3,g.LH*0.62),n=9;
+  const inBody=(x,y)=>x>xL-0.5&&x<xR+0.5&&Math.abs(y-g.axisY)<g.LH/2+0.5;
+  const off=3, n=5;
   ctx.lineCap='round';ctx.lineJoin='round';
-  for(let k=0;k<n;k++){
-    const phi=Math.acos(1-1.25*k/(n-1)),alpha=0.62-0.30*k/(n-1);
-    const sides=k===0?[1]:[1,-1];
-    for(const m of sides){
-      const sx=N.x+s*rho*Math.cos(phi),sy=g.axisY+m*rho*Math.sin(phi);
-      if(inBody(sx,sy))continue;
-      strokeLine(traceLine(sx,sy,ch,inBody),alpha);
+  /* осевые линии: выходят из N и входят в S строго по оси */
+  strokeLine(traceLine(nFace+s*off,g.axisY,ch,inBody,1),0.66);
+  strokeLine(traceLine(sFace-s*off,g.axisY,ch,inBody,-1).reverse(),0.66);
+  /* веер с полюсных граней: дуги над магнитом и под ним */
+  for(let k=1;k<=n;k++){
+    const t=k/(n+0.35);
+    const y=t*g.LH*0.5;
+    const al=0.66-0.30*(k-1)/(n-1);
+    for(const m of[1,-1]){
+      strokeLine(traceLine(nFace+s*off,g.axisY+m*y,ch,inBody,1),al);
+      strokeLine(traceLine(sFace-s*off,g.axisY+m*y,ch,inBody,-1).reverse(),al);
     }
   }
   ctx.lineCap='butt';
@@ -406,7 +432,6 @@ function poleBadge(x,y,letter,al){
 }
 function drawMagnet(g,now){
   const x0=S.mx-g.LW,y0=g.axisY-g.LH/2,nRight=S.s===1;
-  /* N — тёплый песок, S — холодная сирень: палитра проекта */
   const warm=[PL.sand,PL.brass],cool=[PL.lilac,PL.deep];
   const lc=nRight?cool:warm,rc=nRight?warm:cool;
   ctx.save();
@@ -526,6 +551,12 @@ function updatePanel(phi,In){
   $('emfVal').textContent=NS(S.emf*CAL.phi0,1);
   $('iVal').textContent=NS(S.emf*CAL.phi0/CAL.R,2);
 }
+function paintRange(el){
+  const mn=parseFloat(el.min),mx=parseFloat(el.max),v=parseFloat(el.value);
+  const f=(isFinite(mn)&&isFinite(mx)&&mx>mn)?(v-mn)/(mx-mn)*100:0;
+  el.style.setProperty('--fill',Math.max(0,Math.min(100,f)).toFixed(2)+'%');
+}
+function paintAll(){Array.prototype.forEach.call(document.querySelectorAll('input[type=range]'),paintRange);}
 
 /* ---------- управление ---------- */
 function hitMagnet(x,y,pad){
@@ -560,6 +591,7 @@ function setAuto(on){
   S.auto=on;
   btnAuto.classList.toggle('on',on);
   btnAuto.textContent=on?'⏸ автоколебания':'▶ автоколебания';
+  btnAuto.setAttribute('aria-pressed',String(on));
   if(on){
     const u=clamp((S.mx-geo.cxAuto)/Math.max(1,geo.amp),-1,1);
     S.phase=Math.asin(u);
@@ -568,11 +600,12 @@ function setAuto(on){
 }
 btnAuto.addEventListener('click',()=>setAuto(!S.auto));
 
-function setFreq(v){S.freq=v/100;$('freqVal').textContent=NF(S.freq,2)+' Гц';}
+function setFreq(v){S.freq=v/100;$('freqVal').textContent=NF(S.freq,2)+' Гц';paintRange($('freq'));}
 function setTurns(v){
   const n=+v;
   if(n!==S.turns){S.turns=n;resetHistory();}
   $('turnsVal').textContent='N = '+S.turns;
+  paintRange($('turns'));
 }
 $('freq').addEventListener('input',e=>setFreq(+e.target.value));
 $('turns').addEventListener('input',e=>setTurns(e.target.value));
@@ -603,6 +636,7 @@ $('reset').addEventListener('click',()=>{
     geo=layout();
     S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;
     S.ready=true;
+    paintAll();
   }catch(e){
     if(window.__simFail)window.__simFail('сброс: '+e.message);else location.reload();
   }
@@ -693,8 +727,7 @@ function frame(now){
   if(S.prevMx===null)S.prevMx=S.mx;
   const vRaw=(S.mx-S.prevMx)/Math.max(dt,1e-4);
   S.prevMx=S.mx;
-  const aV=1-Math.exp(-dt/0.045);
-  S.vS+=(vRaw-S.vS)*aV;
+  S.vS+=(vRaw-S.vS)*(1-Math.exp(-dt/0.045));
 
   const d=Math.max(0,geo.coilLeft-geo.rx-S.mx);
   const phi=flux(d);
@@ -743,6 +776,7 @@ S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;
 S.ready=true;
 setFreq(+$('freq').value);
 setTurns($('turns').value);
+paintAll();
 try{selfTest();}catch(e){}
 requestAnimationFrame(frame);
 </script>
