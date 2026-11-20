@@ -60,10 +60,24 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
 <script src="/sim/lib/touch.js"></script>
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
-<script>window.LLT_OPTS={slug:"life-game"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script>
+/* LibLabTab · форматирование чисел ru-RU */
+var NF=(typeof window.LLTfix==='function')?window.LLTfix:function(x,n){
+  if(typeof x!=='number'||!isFinite(x))return '—';
+  n=(n==null?2:n);var p=Math.pow(10,n),r=Math.round(x*p)/p;if(r===0)r=0;
+  var t=Math.abs(r).toFixed(n).split('.').join(',');
+  return r<0?'−'+t:t;
+};
+var NS=(typeof window.LLTsigned==='function')?window.LLTsigned:function(x,n){
+  if(typeof x!=='number'||!isFinite(x))return '—';
+  n=(n==null?2:n);var p=Math.pow(10,n),r=Math.round(x*p)/p;if(r===0)r=0;
+  return (r>0?'+':'')+NF(x,n);
+};
+window.LLT_OPTS={slug:"life-game"};</script>
+<script src="/sim/lib/layout.js"></script>
   <link rel="stylesheet" href="/sim/lib/mobile.css">
   <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <main class="wrap">
@@ -92,7 +106,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       <span class="stat">поле <b id="sDim">—</b></span>
     </div>
     <div id="status" class="status" aria-live="polite"></div>
-    <canvas id="graph" aria-label="График численности по поколениям"></canvas>
+    <canvas data-llt-plot="1" id="graph" aria-label="График численности по поколениям"></canvas>
     <div class="legend">
       <span><i style="background:#4FD8C4"></i>новорождённая</span>
       <span><i style="background:#D9B98C"></i>живёт давно</span>
@@ -103,7 +117,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   </section>
 
   <div class="ctl">
-    <section class="card grp">
+    <section class="card grp" data-level="basic">
       <h2>Фигуры</h2>
       <label for="pat">Поставить фигуру
         <select id="pat"><option value="">— рисую вручную —</option></select>
@@ -112,7 +126,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       <div class="bar"><button id="center">Поставить в центр</button></div>
     </section>
 
-    <section class="card grp b">
+    <section class="card grp b" data-level="adv">
       <h2>Правила B/S</h2>
       <label for="preset">Пресет
         <select id="preset"></select>
@@ -124,7 +138,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       <p id="ruleStr">B3/S23</p>
     </section>
 
-    <section class="card grp c">
+    <section class="card grp c" data-level="adv">
       <h2>Поле и показ</h2>
       <label for="speed">Скорость <output id="o_speed"></output></label>
       <input type="range" id="speed" min="1" max="60" step="1" value="12">

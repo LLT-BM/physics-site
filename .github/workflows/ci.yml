@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Установка зависимостей
+        run: npm ci
+
+      - name: Статическая проверка симуляций
+        run: node tools/check.mjs
+
+      - name: Типы и схемы контента
+        run: npx astro check
+
+      - name: Автотесты физического ядра
+        run: npm test
+
+      - name: Сборка
+        run: npm run build
+
+      - name: Аудит состояния (отчёт, не блокирует)
+        run: node tools/audit-state.mjs --json > audit-state.json
+        continue-on-error: true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: audit-state
+          path: audit-state.json

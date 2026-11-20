@@ -16,7 +16,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "node --test tests/",
+    "audit": "node tools/audit-state.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

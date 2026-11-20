@@ -76,7 +76,7 @@
   </g>
 
   <!-- формулы -->
-  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 13</text>
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB</text>
   <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">ГИДРОДИНАМИКА · НЕРАЗРЫВНОСТЬ · БЕРНУЛЛИ</text>
   <text x="48" y="132" fill="#4FD8C4" font-size="25" font-family="Unbounded, sans-serif" font-weight="600">p + ½ρv² + ρgz = const</text>
   <text x="1152" y="676" fill="#D9B98C" font-size="20" text-anchor="end">A₁v₁ = A₂v₂</text>

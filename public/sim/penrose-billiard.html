@@ -106,9 +106,10 @@ footer a{color:var(--aqua)}
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
 <script>window.LLT_OPTS={slug:"penrose-billiard"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script src="/sim/lib/layout.js"></script>
 <link rel="stylesheet" href="/sim/lib/mobile.css">
 <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <div class="wrap">
@@ -130,7 +131,7 @@ footer a{color:var(--aqua)}
 
 <div id="fatal"></div>
 
-<section class="card" id="lab">
+<section class="card" id="lab" data-level="adv">
   <h2>Лаборатория</h2>
   <div class="grid2">
     <div class="stagebox">
@@ -183,7 +184,7 @@ footer a{color:var(--aqua)}
 </section>
 
 <div class="ctl" id="ctrl">
-  <section class="card b">
+  <section class="card b" data-level="basic">
     <h2>Полость</h2>
     <label>Форма<select id="p_shape"></select></label>
     <label>Параметр формы <output id="o_par"></output></label>
@@ -194,7 +195,7 @@ footer a{color:var(--aqua)}
     <div class="eq" id="shapeEq"></div>
   </section>
 
-  <section class="card c">
+  <section class="card c" data-level="adv">
     <h2>Стенки</h2>
     <label>Тип для назначения<select id="p_surf">
       <option value="0">Зеркало</option><option value="1">Диффузное (Ламберт)</option>
@@ -212,7 +213,7 @@ footer a{color:var(--aqua)}
     <p class="note">Диффузность подмешивает ламбертовское рассеяние даже на зеркальных участках. Ретроотражатель разворачивает луч точно назад.</p>
   </section>
 
-  <section class="card">
+  <section class="card" data-level="basic">
     <h2>Лучи</h2>
     <label>Число лучей <output id="o_n"></output></label>
     <input type="range" id="p_n" min="1" max="900" step="1" value="48">
@@ -231,7 +232,7 @@ footer a{color:var(--aqua)}
     <p class="note">Луч летит непрерывно: за кадр он проходит путь, а не перескакивает от стенки к стенке. Разброс 360° раскладывает лучи равномерно по кругу без дубля направления.</p>
   </section>
 
-  <section class="card d">
+  <section class="card d" data-level="adv">
     <h2>Слои и режимы</h2>
     <label>Режим<select id="p_mode">
       <option value="ray">Живые лучи</option><option value="twin">Близнецы: расхождение</option></select></label>
@@ -249,7 +250,7 @@ footer a{color:var(--aqua)}
   </section>
 </div>
 
-<section class="card" id="diag">
+<section class="card" id="diag" data-level="adv">
   <h2>Диагностика</h2>
   <div class="bar" style="margin:0 0 10px">
     <button class="sm" id="m_poin" aria-pressed="true">Сечение Пуанкаре</button>
@@ -259,12 +260,12 @@ footer a{color:var(--aqua)}
     <span style="flex:1"></span>
     <button class="sm" id="clearDiag">Очистить</button>
   </div>
-  <canvas id="plot" aria-label="Сечение Пуанкаре, расхождение, гистограмма или карта покрытия"></canvas>
+  <canvas data-llt-plot="1" id="plot" aria-label="Сечение Пуанкаре, расхождение, гистограмма или карта покрытия"></canvas>
   <p class="note" id="plotNote"></p>
   <div class="tw"><table id="tbl"></table></div>
 </section>
 
-<section class="card b" id="test">
+<section class="card b" id="test" data-level="adv">
   <h2>Самотест геометрии и оптики</h2>
   <div class="bar" style="margin:0">
     <button class="sm" id="doTest">Прогнать проверку</button>
@@ -274,14 +275,14 @@ footer a{color:var(--aqua)}
   <p class="note">Проверка свойства параболы устроена честно: контур — ломаная, поэтому промах мимо фокуса не нулевой. Тест требует, чтобы при удвоении разрешения промах <b>уменьшался</b> — это доказывает сходимость к точному свойству, а не подгонку допуска.</p>
 </section>
 
-<section class="card b" id="phys">
+<section class="card b" id="phys" data-level="adv">
   <h2>Что здесь происходит</h2>
   <div class="eq">v_max = −2p + 2√(p² + pR√2) · S = √2·v_max · F = V + p·û · сторона квадрата = 2(R − p/√2)</div>
   <p class="note">Дуги обходятся <b>по часовой стрелке</b>: вершина (R,R) даёт дугу от стыка (0,S) к (S,0), следующая — от (S,0) к (0,−S), и так далее. Всего отрезков ровно 4n при n точках на дугу; лишние отрезки означали бы разрыв контура. Числа «зазор стыков» и «ожидается сегментов» показывают это прямо.</p>
   <p class="note">Каждая парабола переводит луч из своего фокуса в пучок, параллельный её оси, а параллельный пучок собирает в фокус. Поэтому луч, вышедший из фокуса <b>наружу, к своей дуге</b>, после отражения летит вдоль диагонали к противоположной дуге и сходится в её фокусе. Демо-слой рисует именно этот путь, а «промах мимо фокуса» измеряет его точность.</p>
 </section>
 
-<footer>LibLabTab · модель 14 · геометрия проверена встроенным самотестом · <a href="/models/penrose-billiard/">страница модели</a></footer>
+<footer>LibLabTab · геометрия проверена встроенным самотестом · <a href="/models/penrose-billiard/">страница модели</a></footer>
 </div>
 
 <script>

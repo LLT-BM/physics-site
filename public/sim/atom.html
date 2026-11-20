@@ -42,10 +42,24 @@ canvas:active{cursor:grabbing}
 <script src="/sim/lib/touch.js"></script>
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
-<script>window.LLT_OPTS={slug:"atom-model"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script>
+/* LibLabTab · форматирование чисел ru-RU */
+var NF=(typeof window.LLTfix==='function')?window.LLTfix:function(x,n){
+  if(typeof x!=='number'||!isFinite(x))return '—';
+  n=(n==null?2:n);var p=Math.pow(10,n),r=Math.round(x*p)/p;if(r===0)r=0;
+  var t=Math.abs(r).toFixed(n).split('.').join(',');
+  return r<0?'−'+t:t;
+};
+var NS=(typeof window.LLTsigned==='function')?window.LLTsigned:function(x,n){
+  if(typeof x!=='number'||!isFinite(x))return '—';
+  n=(n==null?2:n);var p=Math.pow(10,n),r=Math.round(x*p)/p;if(r===0)r=0;
+  return (r>0?'+':'')+NF(x,n);
+};
+window.LLT_OPTS={slug:"atom-model"};</script>
+<script src="/sim/lib/layout.js"></script>
   <link rel="stylesheet" href="/sim/lib/mobile.css">
   <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <main>

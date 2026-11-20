@@ -72,9 +72,10 @@ button.pri{background:var(--obj);color:var(--on);border-color:var(--obj);font-we
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
 <script>window.LLT_OPTS={slug:"lens-image"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script src="/sim/lib/layout.js"></script>
   <link rel="stylesheet" href="/sim/lib/mobile.css">
   <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <main class="wrap">
@@ -112,14 +113,14 @@ button.pri{background:var(--obj);color:var(--on);border-color:var(--obj);font-we
   </section>
 
   <div class="ctl">
-    <section class="card grp l">
+    <section class="card grp l" data-level="basic">
       <h2>Предмет</h2>
       <label for="d">Расстояние d <output id="o_d"></output></label>
       <input type="range" id="d" min="2" max="24" step="0.5">
       <label for="h">Высота h <output id="o_h"></output></label>
       <input type="range" id="h" min="1" max="8" step="0.5">
     </section>
-    <section class="card grp r">
+    <section class="card grp r" data-level="basic">
       <h2>Линза</h2>
       <label for="type">Тип
         <select id="type"><option value="conv">собирающая</option><option value="div">рассеивающая</option></select>
@@ -127,7 +128,7 @@ button.pri{background:var(--obj);color:var(--on);border-color:var(--obj);font-we
       <label for="F">Фокусное |F| <output id="o_F"></output></label>
       <input type="range" id="F" min="4" max="14" step="1">
     </section>
-    <section class="card grp s">
+    <section class="card grp s" data-level="basic">
       <h2>Экран</h2>
       <label for="scr">Положение экрана <output id="o_scr"></output></label>
       <input type="range" id="scr" min="-24" max="24" step="0.5">

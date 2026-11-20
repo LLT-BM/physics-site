@@ -62,9 +62,10 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
 <script>window.LLT_OPTS={slug:"spring-pendulum"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script src="/sim/lib/layout.js"></script>
   <link rel="stylesheet" href="/sim/lib/mobile.css">
   <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <main class="wrap">
@@ -107,7 +108,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
   </section>
 
   <div class="ctl">
-    <section class="card grp">
+    <section class="card grp" data-level="basic">
       <h2>Пружина и груз</h2>
       <label>Расположение<select id="p_orient"><option value="v">вертикально</option><option value="h">горизонтально</option></select></label>
       <label>Жёсткость k <output id="o_k"></output></label>
@@ -123,7 +124,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <p class="note">Масса пружины входит в динамику как mₛ/3, а в статическое растяжение — как mₛ/2. Это разные коэффициенты, и модель их различает.</p>
     </section>
 
-    <section class="card grp b">
+    <section class="card grp b" data-level="adv">
       <h2>Нелинейность и трение</h2>
       <label>Поправка β при x³ <output id="o_b"></output></label>
       <input type="range" id="p_b" min="-1500" max="3000" step="10" value="0">
@@ -136,7 +137,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <p class="note" id="bnote"></p>
     </section>
 
-    <section class="card grp d">
+    <section class="card grp d" data-level="adv">
       <h2>Внешняя сила</h2>
       <label class="chk"><input type="checkbox" id="p_don"> Включить периодическую силу</label>
       <label>Амплитуда F₀ <output id="o_F0"></output></label>
@@ -147,7 +148,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <p class="note" id="dnote"></p>
     </section>
 
-    <section class="card grp c">
+    <section class="card grp c" data-level="adv">
       <h2>Что показывать</h2>
       <label class="chk"><input type="checkbox" id="c_ghost" checked> Призрак: линейные свободные колебания</label>
       <label class="chk"><input type="checkbox" id="c_vec"> Векторы скорости и сил</label>
@@ -168,7 +169,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <button class="sm" id="m_energy" aria-pressed="false">Энергия</button>
       <button class="sm" id="m_res" aria-pressed="false">Резонанс</button>
     </div>
-    <canvas id="plot" aria-label="График смещения, фазовый портрет, энергия или резонансная кривая"></canvas>
+    <canvas data-llt-plot="1" id="plot" aria-label="График смещения, фазовый портрет, энергия или резонансная кривая"></canvas>
     <div class="legend">
       <span><i style="background:var(--aqua)"></i>настоящий маятник</span>
       <span><i style="background:var(--lilac)"></i>линейный эталон</span>

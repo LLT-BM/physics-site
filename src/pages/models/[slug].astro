@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Comments from '../../components/Comments.astro';
-import { published, neighbours, numbered } from '../../lib/models';
+import { published, neighbours } from '../../lib/models';
 import { render } from 'astro:content';
 
 export async function getStaticPaths(){
@@ -12,8 +12,6 @@ const { m } = Astro.props;
 const { Content, headings } = await render(m);
 const toc = headings.filter(h => h.depth === 2);
 const { prev, next } = await neighbours(m.id);
-const nums = await numbered();
-const num = nums.find(x => x.m.id === m.id)?.num ?? '';
 const d = m.data;
 const dateStr = d.date.toLocaleDateString('ru-RU', { timeZone:'UTC', day:'2-digit', month:'2-digit', year:'numeric' });
 
@@ -38,7 +36,6 @@ const jsonLd = {
     </nav>
 
     <header class="mhead">
-      <span class="mnum">{num}</span>
       <h1>{d.title}</h1>
       <p class="lead">{d.description}</p>
       <div class="mmeta">
@@ -122,8 +119,6 @@ const jsonLd = {
   .crumbs a{color:var(--aqua);text-decoration:none}
   .crumbs b{color:var(--ink);font-weight:600}
   .mhead{position:relative;padding-left:0}
-  .mnum{display:inline-block;font:700 .78rem var(--mono);color:var(--sand);
-    border:1px solid var(--line2);border-radius:999px;padding:4px 10px;margin-bottom:8px}
   h1{font:800 clamp(1.5rem,5vw,2.1rem)/1.14 var(--disp);margin:0 0 8px}
   .lead{color:var(--muted);max-width:80ch;margin:0 0 10px}
   .mmeta{display:flex;flex-wrap:wrap;gap:6px}

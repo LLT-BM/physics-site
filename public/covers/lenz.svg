@@ -55,7 +55,7 @@
     <circle cx="1030" cy="580" r="7" fill="#232E2C"/>
     <text x="1030" y="640" fill="#46524F" font-size="16" text-anchor="middle">мкА</text>
   </g>
-  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 02</text>
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB</text>
   <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">ЭЛЕКТРОДИНАМИКА · ε = −dΦ/dt</text>
   <g stroke="#7ED6C7" stroke-opacity=".3" fill="none">
     <path d="M20 44V20h24"/><path d="M1156 20h24v24"/><path d="M1180 706v24h-24"/><path d="M44 730H20v-24"/>

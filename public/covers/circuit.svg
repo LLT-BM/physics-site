@@ -85,7 +85,7 @@
   <text x="275" y="300" fill="#3FC9AE" font-size="14" text-anchor="middle">направление тока</text>
 
   <!-- формулы -->
-  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 10</text>
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB</text>
   <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">ЭЛЕКТРОДИНАМИКА · КОНСТРУКТОР ЦЕПИ</text>
   <text x="48" y="700" fill="#4FD8C4" font-size="26" font-family="Unbounded, sans-serif" font-weight="600">I = U/R</text>
   <text x="1152" y="700" fill="#D9B98C" font-size="26" text-anchor="end" font-family="Unbounded, sans-serif" font-weight="600">I = ℰ/(R + r)</text>

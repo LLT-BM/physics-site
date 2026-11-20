@@ -64,9 +64,10 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
 <script>window.LLT_OPTS={slug:"circuit-lab"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script src="/sim/lib/layout.js"></script>
   <link rel="stylesheet" href="/sim/lib/mobile.css">
   <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <main class="wrap">
@@ -99,7 +100,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
   </section>
 
   <div class="ctl">
-    <section class="card grp">
+    <section class="card grp" data-level="basic">
       <h2>Источник</h2>
       <label>Тип<select id="sType"><option value="dc">постоянный (DC)</option><option value="ac">переменный (AC)</option></select></label>
       <label id="lEmf">ЭДС ℰ <output id="oEmf"></output></label>
@@ -114,7 +115,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <p class="note" id="srcNote"></p>
     </section>
 
-    <section class="card grp b">
+    <section class="card grp b" data-level="adv">
       <h2>Время и показ</h2>
       <label>Скорость модели <output id="oSpd"></output></label>
       <input type="range" id="spd" min="-3" max="3" step="0.05" value="0">
@@ -128,7 +129,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
     </section>
   </div>
 
-  <section class="card grp c">
+  <section class="card grp c" data-level="basic">
     <h2>Участки цепи</h2>
     <div id="editor"></div>
     <p class="note">Вольтметр подключается <b>параллельно</b> участку, амперметр ставится <b>в разрыв</b> ветви. Кнопка «проба» выбирает участок для осциллографа. Диод можно перевернуть — тогда он пропускает ток в обратную сторону.</p>
@@ -140,7 +141,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <button class="sm" id="mIV" aria-pressed="false">ВАХ участка</button>
       <span style="flex:1"></span><span class="tag" id="probeTag">—</span>
     </div>
-    <canvas id="plot" aria-label="Осциллограф и ВАХ"></canvas>
+    <canvas data-llt-plot="1" id="plot" aria-label="Осциллограф и ВАХ"></canvas>
     <div class="legend">
       <span><i style="background:#D9B98C"></i>канал 1: U участка</span>
       <span><i style="background:#4FD8C4"></i>канал 2: ток в цепи</span>

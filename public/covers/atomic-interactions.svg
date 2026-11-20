@@ -84,7 +84,7 @@
   <text x="465" y="682" fill="#4FD8C4" font-size="14" text-anchor="middle">r равн. = 2^⅙σ</text>
 
   <!-- заголовки -->
-  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 08</text>
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB</text>
   <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">МОЛЕКУЛЯРНАЯ ФИЗИКА · ВАН-ДЕР-ВААЛЬС</text>
   <text x="1152" y="716" fill="#4FD8C4" font-size="24" text-anchor="end" font-family="Unbounded, sans-serif" font-weight="600">V = 4ε[(σ/r)¹² − (σ/r)⁶]</text>
 

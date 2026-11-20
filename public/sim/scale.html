@@ -63,9 +63,10 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
 <script>window.LLT_OPTS={slug:"scale-of-universe"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script src="/sim/lib/layout.js"></script>
   <link rel="stylesheet" href="/sim/lib/mobile.css">
   <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <main class="wrap">
@@ -92,14 +93,14 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <div><span>масса для горизонта событий</span><b class="p" id="w_bh">—</b></div>
       <div><span>объектов в кадре</span><b id="w_cnt">—</b></div>
     </div>
-    <canvas id="ladder" aria-label="Обзорная шкала всех масштабов"></canvas>
+    <canvas data-llt-plot="1" id="ladder" aria-label="Обзорная шкала всех масштабов"></canvas>
     <p class="note">Лента внизу — все 62 порядка сразу; рамка показывает текущее окно, клик по ленте переносит туда. Клавиши: <kbd>←</kbd>/<kbd>→</kbd> масштаб, <kbd>↑</kbd>/<kbd>↓</kbd> объекты, <kbd>Пробел</kbd> экскурсия.</p>
   </section>
 
   <section class="card info" id="info"></section>
 
   <div class="ctl">
-    <section class="card grp">
+    <section class="card grp" data-level="basic">
       <h2>Найти объект</h2>
       <input type="text" id="q" placeholder="например: протон, Земля, Андромеда">
       <div class="found" id="found"></div>
@@ -107,7 +108,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <div class="chips" id="cats"></div>
     </section>
 
-    <section class="card grp b">
+    <section class="card grp b" data-level="adv">
       <h2>Горизонт событий по массе</h2>
       <label>Масса</label>
       <div class="row2">
@@ -123,7 +124,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <p class="note" id="bhOut">r_s = 2GM/c². Для Солнца это 2,95 км, для Земли — 8,87 мм.</p>
     </section>
 
-    <section class="card grp c">
+    <section class="card grp c" data-level="adv">
       <h2>Волна де Бройля</h2>
       <div class="row2">
         <div><label>Масса, кг</label><input type="number" id="dbM" value="9.109e-31" step="any" min="0"></div>

@@ -87,7 +87,7 @@
   </g>
 
   <!-- формулы -->
-  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB · 12</text>
+  <text x="48" y="64" fill="#D9B98C" font-size="20" letter-spacing="6">LIBLABTAB</text>
   <text x="48" y="94" fill="#8FA8A6" font-size="16" letter-spacing="3">МЕХАНИКА · КОЛЕБАНИЯ · ЗАКОН ГУКА</text>
   <text x="48" y="662" fill="#4FD8C4" font-size="26" font-family="Unbounded, sans-serif" font-weight="600">T = 2π√(m/k)</text>
   <text x="48" y="700" fill="#8FA8A6" font-size="15">не зависит ни от амплитуды, ни от g · g сдвигает равновесие на mg/k</text>

@@ -76,9 +76,10 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
 <script>window.LLT_OPTS={slug:"lever-moments"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script src="/sim/lib/layout.js"></script>
   <link rel="stylesheet" href="/sim/lib/mobile.css">
   <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <main class="wrap">
@@ -106,21 +107,21 @@ button:disabled{opacity:.45;cursor:not-allowed}
   </section>
 
   <div class="ctl">
-    <section class="card side l">
+    <section class="card side l" data-level="adv">
       <h2>Левый груз</h2>
       <label for="m1">Масса m₁ <output id="o_m1"></output></label>
       <input type="range" id="m1" min="10" max="500" step="10">
       <label for="d1">Плечо l₁ <output id="o_d1"></output></label>
       <input type="range" id="d1" min="5" max="50" step="1">
     </section>
-    <section class="card side r">
+    <section class="card side r" data-level="adv">
       <h2>Правый груз</h2>
       <label for="m2">Масса m₂ <output id="o_m2"></output></label>
       <input type="range" id="m2" min="10" max="500" step="10">
       <label for="d2">Плечо l₂ <output id="o_d2"></output></label>
       <input type="range" id="d2" min="5" max="50" step="1">
     </section>
-    <section class="card side t" id="card3">
+    <section class="card side t" id="card3" data-level="adv">
       <h2>Третий груз</h2>
       <label class="chk"><input type="checkbox" id="chk3"> Включить третий груз</label>
       <label for="side3">Сторона

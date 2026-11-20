@@ -60,9 +60,10 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
 <script>window.LLT_OPTS={slug:"math-pendulum"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script src="/sim/lib/layout.js"></script>
   <link rel="stylesheet" href="/sim/lib/mobile.css">
   <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <main class="wrap">
@@ -103,7 +104,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
   </section>
 
   <div class="ctl">
-    <section class="card grp">
+    <section class="card grp" data-level="basic">
       <h2>Маятник</h2>
       <label>Длина нити L <output id="o_L"></output></label>
       <input type="range" id="p_L" min="0.15" max="3" step="0.005" value="1">
@@ -116,7 +117,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <p class="note">Начальный угол — это начальное условие: его ползунок сбрасывает движение. Остальные параметры меняются на ходу.</p>
     </section>
 
-    <section class="card grp b">
+    <section class="card grp b" data-level="basic">
       <h2>Гравитация</h2>
       <label>Ускорение g <output id="o_g"></output></label>
       <input type="range" id="p_g" min="0.2" max="30" step="0.01" value="9.81">
@@ -126,7 +127,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <p class="note" id="gnote"></p>
     </section>
 
-    <section class="card grp c">
+    <section class="card grp c" data-level="adv">
       <h2>Что показывать</h2>
       <label class="chk"><input type="checkbox" id="c_ghost" checked> Призрачный гармонический маятник</label>
       <label class="chk"><input type="checkbox" id="c_vec"> Векторы скорости, ускорений и сил</label>
@@ -143,7 +144,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border
       <button class="sm" id="m_phase" aria-pressed="false">Фазовый портрет</button>
       <button class="sm" id="m_energy" aria-pressed="false">Энергия</button>
     </div>
-    <canvas id="plot" aria-label="График угла, фазовый портрет или энергия"></canvas>
+    <canvas data-llt-plot="1" id="plot" aria-label="График угла, фазовый портрет или энергия"></canvas>
     <div class="legend">
       <span><i style="background:var(--aqua)"></i>точный маятник</span>
       <span><i style="background:var(--lilac)"></i>гармоническое приближение</span>

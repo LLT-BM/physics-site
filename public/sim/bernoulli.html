@@ -67,27 +67,9 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line2);borde
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
 <script>window.LLT_OPTS={slug:"bernoulli"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script src="/sim/lib/layout.js"></script>
 <link rel="stylesheet" href="/sim/lib/mobile.css">
-<style data-llt-slider>
-/* Крупные, хорошо заметные ползунки */
-.card input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:38px;margin:6px 0 0;background:transparent;cursor:pointer}
-.card input[type=range]::-webkit-slider-runnable-track{height:12px;border-radius:8px;border:1px solid var(--line2);
-  background:linear-gradient(90deg,var(--deep) 0%,var(--aqua) var(--fill,50%),rgba(126,214,199,.16) var(--fill,50%),rgba(126,214,199,.16) 100%)}
-.card input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;margin-top:-8px;
-  border-radius:50%;background:var(--sand);border:3px solid var(--canvas);cursor:pointer;
-  box-shadow:0 0 0 3px rgba(217,185,140,.28),0 3px 8px rgba(0,0,0,.55)}
-.card input[type=range]:active::-webkit-slider-thumb{box-shadow:0 0 0 6px rgba(217,185,140,.3),0 3px 8px rgba(0,0,0,.55)}
-.card input[type=range]::-moz-range-track{height:12px;border-radius:8px;border:1px solid var(--line2);background:rgba(126,214,199,.16)}
-.card input[type=range]::-moz-range-progress{height:12px;border-radius:8px;background:linear-gradient(90deg,var(--deep),var(--aqua))}
-.card input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--sand);border:3px solid var(--canvas);cursor:pointer}
-.card input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:4px;border-radius:10px}
-@media (max-width:900px){
-  .card input[type=range]{height:46px}
-  .card input[type=range]::-webkit-slider-runnable-track{height:14px}
-  .card input[type=range]::-webkit-slider-thumb{width:30px;height:30px;margin-top:-9px}
-}
-</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <main class="wrap">
@@ -131,7 +113,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line2);borde
   </section>
 
   <div class="ctl">
-    <section class="card grp">
+    <section class="card grp" data-level="basic">
       <h2>Жидкость</h2>
       <label>Среда<select id="p_fluid"></select></label>
       <label>Плотность ρ <output id="o_rho"></output></label>
@@ -141,7 +123,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line2);borde
       <p class="note" id="fnote"></p>
     </section>
 
-    <section class="card grp b" id="boxVen">
+    <section class="card grp b" id="boxVen" data-level="basic">
       <h2>Труба</h2>
       <label>Скорость на входе v₁ <output id="o_v1"></output></label>
       <input type="range" id="p_v1" min="0.2" max="12" step="0.05" value="2">
@@ -156,7 +138,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line2);borde
       <p class="note">Давление избыточное, отсчитывается от атмосферного. Отрицательное значение — разрежение.</p>
     </section>
 
-    <section class="card grp d" id="boxReal">
+    <section class="card grp d" id="boxReal" data-level="adv">
       <h2>Реальность</h2>
       <label class="chk"><input type="checkbox" id="p_real"> Реальная жидкость: трение и потери</label>
       <label>Шероховатость ε <output id="o_eps"></output></label>
@@ -167,7 +149,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line2);borde
       <p class="note">Трение по Дарси–Вейсбаху: ламинарно f = 64/Re, турбулентно — Свами–Джейн. Внезапное расширение — потеря Борда–Карно (v₂−v₃)²/2g.</p>
     </section>
 
-    <section class="card grp c hide" id="boxTor">
+    <section class="card grp c hide" id="boxTor" data-level="basic">
       <h2>Бак и отверстие</h2>
       <label>Глубина воды H <output id="o_H"></output></label>
       <input type="range" id="p_H" min="0.2" max="3" step="0.02" value="1">
@@ -183,7 +165,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line2);borde
       <p class="note">Идеальная скорость √(2gh) не зависит от плотности. Реальная струя сжимается за отверстием: C_d ≈ 0,62 для острого края.</p>
     </section>
 
-    <section class="card grp c">
+    <section class="card grp c" data-level="adv">
       <h2>Что показывать</h2>
       <label class="chk"><input type="checkbox" id="c_part" checked> Частицы потока</label>
       <label class="chk"><input type="checkbox" id="c_piez" checked> Пьезометры</label>
@@ -207,7 +189,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line2);borde
       <button class="sm" id="m_head" aria-pressed="false">Линии напора</button>
       <button class="sm" id="m_terms" aria-pressed="false">Слагаемые Бернулли</button>
     </div>
-    <canvas id="plot" aria-label="График давления, напоров или слагаемых Бернулли"></canvas>
+    <canvas data-llt-plot="1" id="plot" aria-label="График давления, напоров или слагаемых Бернулли"></canvas>
     <div class="legend">
       <span><i style="background:var(--sand)"></i>давление / пьезометрический напор</span>
       <span><i style="background:var(--aqua)"></i>скорость / скоростной напор</span>
@@ -217,7 +199,7 @@ kbd{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line2);borde
     <p class="note" id="pnote"></p>
   </section>
 
-  <section class="card grp b">
+  <section class="card grp b" data-level="adv">
     <h2>Самотест модели</h2>
     <div class="bar" style="margin:0">
       <button class="sm" id="doTest">Прогнать проверку</button>

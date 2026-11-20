@@ -59,9 +59,10 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
 <script>window.LLT_OPTS={slug:"atomic-interactions"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script src="/sim/lib/layout.js"></script>
   <link rel="stylesheet" href="/sim/lib/mobile.css">
   <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
 <main class="wrap">
@@ -93,7 +94,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   </section>
 
   <section class="card">
-    <canvas id="plot" aria-label="График потенциальной энергии"></canvas>
+    <canvas data-llt-plot="1" id="plot" aria-label="График потенциальной энергии"></canvas>
     <div class="legend">
       <span><i style="background:#4FD8C4"></i>полный потенциал V(r)</span>
       <span><i style="background:#ABA6DC"></i>отталкивание</span>
@@ -115,7 +116,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
   </section>
 
   <div class="ctl">
-    <section class="card grp">
+    <section class="card grp" data-level="basic">
       <h2>Пара частиц</h2>
       <label for="type">Тип связи
         <select id="type">
@@ -142,7 +143,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       </div>
     </section>
 
-    <section class="card grp b">
+    <section class="card grp b" data-level="adv">
       <h2>Параметры потенциала</h2>
       <div id="pLJ">
         <label for="eps">Глубина ε/k<sub>B</sub> <output id="o_eps"></output></label>
@@ -169,7 +170,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       <p class="note" id="pnote"></p>
     </section>
 
-    <section class="card grp c">
+    <section class="card grp c" data-level="adv">
       <h2>Движение и температура</h2>
       <label for="T">Температура T <output id="o_T"></output></label>
       <input type="range" id="T" min="1" max="600" step="1" value="90">
@@ -178,7 +179,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border
       <p class="note">Кнопка «Нагреть до T» даёт относительному движению кинетическую энергию k<sub>B</sub>T/2 — столько в среднем приходится на одну степень свободы. Если E ≥ 0, пара распадается.</p>
     </section>
 
-    <section class="card grp d">
+    <section class="card grp d" data-level="adv">
       <h2>Что показывать</h2>
       <label class="chk"><input type="checkbox" id="cForce" checked> Векторы сил на частицах</label>
       <label class="chk"><input type="checkbox" id="cComp"> Отдельно отталкивание и притяжение</label>

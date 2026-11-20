@@ -139,14 +139,28 @@
 <script src="/sim/lib/touch.js"></script>
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
-<script>window.LLT_OPTS={slug:"double-pendulum"};</script>
-<script src="/sim/lib/ui.js"></script>
+<script>
+/* LibLabTab · форматирование чисел ru-RU */
+var NF=(typeof window.LLTfix==='function')?window.LLTfix:function(x,n){
+  if(typeof x!=='number'||!isFinite(x))return '—';
+  n=(n==null?2:n);var p=Math.pow(10,n),r=Math.round(x*p)/p;if(r===0)r=0;
+  var t=Math.abs(r).toFixed(n).split('.').join(',');
+  return r<0?'−'+t:t;
+};
+var NS=(typeof window.LLTsigned==='function')?window.LLTsigned:function(x,n){
+  if(typeof x!=='number'||!isFinite(x))return '—';
+  n=(n==null?2:n);var p=Math.pow(10,n),r=Math.round(x*p)/p;if(r===0)r=0;
+  return (r>0?'+':'')+NF(x,n);
+};
+window.LLT_OPTS={slug:"double-pendulum"};</script>
+<script src="/sim/lib/layout.js"></script>
   <link rel="stylesheet" href="/sim/lib/mobile.css">
   <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+  <link rel="stylesheet" href="/sim/lib/layout.css">
 </head>
 <body>
   <div class="bg"></div>
-  <canvas data-llt-stage="1" id="scene"></canvas>
+  <canvas role="img" aria-label="Двойной маятник: два груза на шарнирах, след и двойник с отличием 0,1 градуса" data-llt-fixed="1" data-llt-stage="1" id="scene"></canvas>
   <div class="vig"></div>
   <div class="corner tl"></div><div class="corner tr"></div>
   <div class="corner bl"></div><div class="corner br"></div>
@@ -181,7 +195,7 @@
     </div>
 
     <div class="ph"><b>Фазовый портрет</b><span>θ₂, ω₂</span></div>
-    <canvas id="phase"></canvas>
+    <canvas data-llt-plot="1" id="phase"></canvas>
   </section>
 
   <footer class="controls">
@@ -253,8 +267,10 @@ function reset(){
 
 /* ---------- геометрия ---------- */
 function resize(){
+  const __r=(document.querySelector('[data-llt-stage]')||document.querySelector('canvas')).getBoundingClientRect();
+
   DPR=Math.min(devicePixelRatio||1,2);
-  W=innerWidth;H=innerHeight;
+  W=Math.round(__r.width);H=Math.round(__r.height);
   canvas.width=W*DPR;canvas.height=H*DPR;
   canvas.style.width=W+'px';canvas.style.height=H+'px';
   ctx.setTransform(DPR,0,0,DPR,0,0);
@@ -372,7 +388,7 @@ function togglePlay(){
 $('play').addEventListener('click',togglePlay);
 $('spd').addEventListener('input',e=>{
   speed=e.target.value/100;
-  $('spdVal').textContent='×'+speed.toFixed(1);
+  $('spdVal').textContent='×'+NF(speed, 1);
 });
 $('trailLen').addEventListener('input',e=>{
   trailMax=+e.target.value;
@@ -584,13 +600,13 @@ function drawPhase(){
 function updateLive(){
   const s=[st.th1,st.th2,st.w1,st.w2];
   const [ke,pe]=energy(s);
-  $('lvT1').textContent=(wrapPi(st.th1)*R2D).toFixed(1);
-  $('lvT2').textContent=(wrapPi(st.th2)*R2D).toFixed(1);
-  $('lvW1').textContent=(st.w1*R2D).toFixed(0);
-  $('lvW2').textContent=(st.w2*R2D).toFixed(0);
-  $('lvE').textContent=(ke+pe).toFixed(2);
-  $('lvKE').textContent=ke.toFixed(1);
-  $('tNow').textContent='t = '+t.toFixed(1)+' с';
+  $('lvT1').textContent=NF((wrapPi(st.th1)*R2D), 1);
+  $('lvT2').textContent=NF((wrapPi(st.th2)*R2D), 1);
+  $('lvW1').textContent=NF((st.w1*R2D), 0);
+  $('lvW2').textContent=NF((st.w2*R2D), 0);
+  $('lvE').textContent=NF((ke+pe), 2);
+  $('lvKE').textContent=NF(ke, 1);
+  $('tNow').textContent='t = '+NF(t, 1)+' с';
   const peShift=pe+(P.m1+P.m2)*P.g*P.l1+P.m2*P.g*P.l2;
   $('keBar').style.width=(ke/(ke+peShift+1e-6)*100).toFixed(1)+'%';
 }
@@ -634,7 +650,7 @@ function frame(now){
     const gp=positions(G,gst);
     drawPendulum(G,gp,true);
     const d=Math.hypot(p.x2-gp.x2,p.y2-gp.y2)/G.sc;
-    $('divVal').textContent=d.toFixed(3)+' м';
+    $('divVal').textContent=NF(d, 3)+' м';
     const chip=$('gchip');
     chip.classList.toggle('warn',d>=0.05&&d<0.6);
     chip.classList.toggle('bad',d>=0.6);
