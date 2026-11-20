@@ -8,27 +8,26 @@
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
 <style>
-  
-:root
+  :root{--warm:var(--sand);--mut:var(--muted);--cyan:var(--aqua)}
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%;overflow:visible}
-  body{font-family:'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);
-    background:#060b13;user-select:none;-webkit-user-select:none}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);background:var(--bg);
+    user-select:none;-webkit-user-select:none}
   .bg{position:fixed;inset:0;z-index:0;
     background:
-      radial-gradient(1100px 700px at 78% 8%, rgba(255,170,80,.05), transparent 60%),
-      radial-gradient(1200px 900px at 12% 92%, rgba(60,200,240,.08), transparent 60%),
-      radial-gradient(1600px 1200px at 50% 40%, #0b1626 0%, #070f1c 55%, #050D0E 100%);}
+      radial-gradient(1100px 700px at 78% 8%, rgba(217,185,140,.08), transparent 60%),
+      radial-gradient(1200px 900px at 12% 92%, rgba(79,216,196,.10), transparent 60%),
+      var(--bg)}
   .bg::after{content:'';position:absolute;inset:0;
-    background-image:linear-gradient(rgba(126,214,199,.05) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(126,214,199,.05) 1px,transparent 1px);
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
     background-size:48px 48px;
     -webkit-mask-image:radial-gradient(80% 75% at 50% 45%,#000 30%,transparent 100%);
-            mask-image:radial-gradient(80% 75% at 50% 45%,#000 30%,transparent 100%);}
-  #scene{position:fixed;inset:0;z-index:1;touch-action:none}
-  .vig{position:fixed;inset:0;z-index:2;pointer-events:none;
-    background:radial-gradient(125% 95% at 50% 45%,transparent 55%,rgba(2,5,10,.5))}
-  .corner{position:fixed;width:26px;height:26px;border:1px solid rgba(120,200,255,.28);z-index:4;pointer-events:none}
+            mask-image:radial-gradient(80% 75% at 50% 45%,#000 30%,transparent 100%)}
+  #scene{position:fixed;inset:0;z-index:1;touch-action:none;display:block}
+  .vig{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.5;
+    background:radial-gradient(125% 95% at 50% 45%,transparent 55%,var(--bg))}
+  .corner{position:fixed;width:26px;height:26px;border:1px solid var(--line2);z-index:4;pointer-events:none}
   .tl{top:10px;left:10px;border-right:0;border-bottom:0}
   .tr{top:10px;right:10px;border-left:0;border-bottom:0}
   .bl{bottom:10px;left:10px;border-right:0;border-top:0}
@@ -36,24 +35,22 @@
 
   header{position:fixed;top:22px;left:26px;z-index:5;pointer-events:none}
   .eyebrow{font:600 10px var(--mono);color:var(--warm);letter-spacing:.32em;text-transform:uppercase}
-  h1{font:800 clamp(22px,3vw,34px)/1.05 var(--disp);letter-spacing:.02em;margin:8px 0 8px;
-    text-shadow:0 0 28px rgba(217,185,140,.22)}
+  h1{font:800 clamp(22px,3vw,34px)/1.05 var(--disp);letter-spacing:.02em;margin:8px 0 8px}
   .sub{display:flex;align-items:center;gap:8px;font:400 11px var(--mono);color:var(--mut)}
   .live{width:7px;height:7px;background:var(--warm);border-radius:50%;
     box-shadow:0 0 10px var(--warm);animation:pulse 1.7s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
 
-  .chain{position:fixed;right:22px;top:96px;width:272px;z-index:5;padding:18px;
-    background:linear-gradient(160deg,rgba(16,30,48,.92),rgba(8,15,27,.94));
-    border:1px solid var(--line);
+  .chain{position:fixed;right:22px;top:96px;width:284px;z-index:5;padding:18px;
+    background:var(--scrim);backdrop-filter:blur(8px);border:1px solid var(--line2);
     clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)}
   .formula{font:600 21px var(--disp);letter-spacing:.02em;text-align:center;padding:6px 0 2px}
-  .formula b{display:inline-block;color:#0a1220;background:var(--warm);border-radius:4px;
-    padding:0 7px;margin:0 3px;box-shadow:0 0 16px rgba(217,185,140,.45)}
+  .formula b{display:inline-block;color:var(--on);background:var(--warm);border-radius:4px;
+    padding:0 7px;margin:0 3px}
   .formula sub{font-size:11px;color:var(--mut)}
   .fnote{font:400 9.5px var(--mono);color:var(--mut);text-align:center;letter-spacing:.08em;margin-bottom:12px}
   .steps{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:13px}
-  .steps li{border:1px solid var(--line);background:rgba(10,22,38,.55);padding:8px 11px;transition:border-color .25s}
+  .steps li{border:1px solid var(--line);background:var(--overlay);padding:8px 11px;transition:border-color .25s}
   .steps i{display:block;font:600 8.5px var(--mono);letter-spacing:.18em;text-transform:uppercase;
     color:var(--mut);font-style:normal;margin-bottom:3px}
   .steps b{font:600 13.5px 'IBM Plex Sans';color:var(--ink)}
@@ -61,77 +58,93 @@
   li[data-st=up] b{color:var(--warm)}
   li[data-st=down] b{color:var(--cyan)}
   li[data-st=zero] b{color:var(--mut)}
-  li[data-st=up],li[data-st=down]{border-color:rgba(255,200,130,.3)}
-  .meters{border-top:1px dashed rgba(126,214,199,.22);padding-top:11px}
-  .mrow{display:flex;align-items:center;gap:9px;margin-bottom:9px}
-  .mlab{font:600 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);width:58px}
-  .bar{flex:1;height:8px;background:rgba(8,16,28,.9);border:1px solid var(--line);overflow:hidden}
-  .bar div{height:100%;width:0%;background:linear-gradient(90deg,#ff9d4e,#ff5a4e);
-    box-shadow:0 0 10px rgba(255,140,80,.6);transition:width .12s linear}
-  .mrow b{font:600 12px var(--mono);color:var(--cyan);width:16px;text-align:center}
+  li[data-st=up],li[data-st=down]{border-color:var(--line2)}
+  .meters{border-top:1px dashed var(--line2);padding-top:11px}
+  .mrow{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .mlab{font:600 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);width:56px;flex:none}
+  .bar{flex:1;min-width:40px;height:8px;background:var(--canvas);border:1px solid var(--line);overflow:hidden}
+  .bar div{height:100%;width:0%;background:linear-gradient(90deg,var(--sand),var(--rose));transition:width .12s linear}
+  .mrow b{font:600 12px var(--mono);color:var(--cyan);text-align:center;flex:none}
+  #phiVal{min-width:54px;text-align:right;color:var(--warm)}
+  #fluxDir{width:14px}
   .mrow2{display:flex;gap:8px}
-  .mrow2>div{flex:1;border:1px solid var(--line);background:rgba(10,22,38,.55);
-    padding:7px 9px;display:flex;justify-content:space-between;align-items:baseline}
-  .mrow2 span{font:600 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
-  .mrow2 b{font:600 15px var(--mono)}
+  .mrow2>div{flex:1;min-width:0;border:1px solid var(--line);background:var(--overlay);
+    padding:7px 9px;display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+  .mrow2 span{font:600 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+  .mrow2 b{font:600 15px var(--mono);white-space:nowrap}
   #emfVal{color:var(--warm)} #iVal{color:var(--cyan)}
   .note2{margin-top:12px;font:400 10.5px/1.55 'IBM Plex Sans';color:var(--mut)}
-  .note2 em{color:var(--warm);font-style:600}
+  .note2+.note2{margin-top:6px}
+  .note2 em{color:var(--warm);font-style:normal;font-weight:600}
 
   .controls{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:5;
-    display:flex;align-items:center;gap:11px;padding:10px 16px;
-    background:rgba(10,20,34,.9);border:1px solid var(--line);
+    display:flex;align-items:center;gap:11px;padding:10px 16px;flex-wrap:wrap;justify-content:center;
+    background:var(--scrim);backdrop-filter:blur(8px);border:1px solid var(--line2);
     clip-path:polygon(13px 0,100% 0,100% calc(100% - 13px),calc(100% - 13px) 100%,0 100%,0 13px)}
-  .tgl{font:600 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);
-    background:rgba(12,24,40,.7);border:1px solid var(--line);padding:8px 11px;cursor:pointer;
-    transition:.18s;white-space:nowrap}
-  .tgl:hover{color:var(--ink);border-color:rgba(150,220,255,.4);transform:translateY(-1px)}
-  .tgl.on{color:var(--cyan);border-color:rgba(84,232,255,.5);
-    box-shadow:inset 0 0 12px rgba(84,232,255,.08),0 0 10px rgba(84,232,255,.12)}
-  .tgl.main.on{color:var(--warm);border-color:rgba(217,185,140,.55);
-    box-shadow:inset 0 0 12px rgba(217,185,140,.1),0 0 10px rgba(217,185,140,.15)}
-  #btnFlip{color:var(--warm);border-color:rgba(217,185,140,.35)}
-  #btnFlip:hover{box-shadow:0 0 14px rgba(217,185,140,.25)}
+  .tgl{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);
+    background:var(--overlay);border:1px solid var(--line);padding:9px 12px;cursor:pointer;
+    transition:.18s;white-space:nowrap;min-height:40px}
+  .tgl:hover{color:var(--ink);border-color:var(--cyan);transform:translateY(-1px)}
+  .tgl.on{color:var(--cyan);border-color:var(--cyan)}
+  .tgl.main.on{color:var(--warm);border-color:var(--warm)}
+  #btnFlip{color:var(--warm);border-color:var(--line2)}
   .flash{animation:flash .4s}
   @keyframes flash{0%{box-shadow:0 0 0 rgba(217,185,140,0)}40%{box-shadow:0 0 22px rgba(217,185,140,.7)}100%{box-shadow:0 0 0 rgba(217,185,140,0)}}
   .spd{display:flex;align-items:center;gap:8px}
-  .spd .lbl{font:600 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
-  .spd b{font:600 10.5px var(--mono);color:var(--cyan);min-width:48px}
-  input[type=range]{-webkit-appearance:none;appearance:none;width:96px;height:3px;outline:none;cursor:pointer;
-    background:linear-gradient(90deg,var(--cyan),rgba(120,200,255,.15));border-radius:2px}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;
-    background:#0b1626;border:2px solid var(--cyan);box-shadow:0 0 8px rgba(84,232,255,.6)}
-  input[type=range]::-moz-range-thumb{width:11px;height:11px;border-radius:50%;
-    background:#0b1626;border:2px solid var(--cyan)}
-  .hint{font:400 9.5px var(--mono);color:rgba(140,165,190,.6);white-space:nowrap}
-
+  .spd .lbl{font:600 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+  .spd b{font:600 11px var(--mono);color:var(--cyan);min-width:52px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:104px;height:28px;outline:none;cursor:pointer;background:transparent}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:5px;border:1px solid var(--line2);
+    background:linear-gradient(90deg,var(--deep),var(--aqua))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;margin-top:-8px;
+    border-radius:50%;background:var(--sand);border:3px solid var(--canvas);box-shadow:0 0 0 3px rgba(217,185,140,.25)}
+  input[type=range]::-moz-range-track{height:8px;border-radius:5px;background:var(--line2)}
+  input[type=range]::-moz-range-progress{height:8px;border-radius:5px;background:var(--aqua)}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--sand);border:3px solid var(--canvas)}
+  input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:3px;border-radius:8px}
+  .hint{font:400 9.5px var(--mono);color:var(--mut);white-space:nowrap}
   .note{position:fixed;left:26px;bottom:20px;z-index:5;pointer-events:none;
-    font:400 9.5px var(--mono);color:rgba(140,165,190,.5);letter-spacing:.1em}
-
+    font:400 9.5px var(--mono);color:var(--mut);letter-spacing:.1em;opacity:.7}
+  .offscreen{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
   @media(max-width:1240px){.hint{display:none}}
-  @media(max-width:900px){
-    header{left:14px;top:12px}
-    .chain{right:8px;top:118px;width:206px;padding:12px}
-    .formula{font-size:17px}
-    .steps b{font-size:11.5px}
-    .note2,.fnote{display:none}
-    .controls{left:8px;right:8px;transform:none;bottom:8px;padding:8px 10px;gap:8px;overflow-x:auto}
-    .corner,.note{display:none}
-  }
 </style>
-  <link rel="stylesheet" href="/sim/lib/theme.css">
+<link rel="stylesheet" href="/sim/lib/theme.css">
 <script src="/sim/lib/theme.js"></script>
 <script src="/sim/lib/touch.js"></script>
 <script src="/sim/lib/fmt.js"></script>
 <script src="/sim/lib/loop.js"></script>
 <script>window.LLT_OPTS={slug:"lenz-law"};</script>
 <script src="/sim/lib/ui.js"></script>
-  <link rel="stylesheet" href="/sim/lib/mobile.css">
-  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
+<link rel="stylesheet" href="/sim/lib/mobile.css">
+<style data-llt-ios>input,select,textarea{font-size:16px}</style>
+<style data-llt-lenz>
+/* На узких экранах сцена и панели идут в потоке, а не перекрывают друг друга */
+@media (max-width:900px){
+  html,body{height:auto;min-height:100%}
+  body{display:flex;flex-direction:column;gap:10px;padding:10px 10px 24px}
+  .bg{position:fixed}
+  .vig,.corner,.note{display:none !important}
+  header{order:1;position:static !important;margin:0 !important;padding:0 4px}
+  #scene{order:2;position:relative !important;inset:auto !important;
+    width:100%;height:min(56vh,440px);border:1px solid var(--line2);border-radius:12px}
+  .chain{order:3;position:static !important;width:auto !important;right:auto !important;top:auto !important;
+    margin:0 !important;clip-path:none !important;border-radius:12px;padding:14px}
+  .controls{order:4;position:static !important;transform:none !important;left:auto !important;
+    right:auto !important;bottom:auto !important;margin:0 !important;clip-path:none !important;
+    border-radius:12px;overflow:visible !important;padding:12px}
+  .note2,.fnote{display:block !important}
+  .steps b{font-size:13px}
+  .tgl{min-height:44px;font-size:11px}
+  input[type=range]{width:130px;height:40px}
+  input[type=range]::-webkit-slider-thumb{width:26px;height:26px;margin-top:-10px}
+}
+@media (prefers-reduced-motion:reduce){.live{animation:none}}
+</style>
 </head>
 <body>
   <div class="bg"></div>
-  <canvas data-llt-stage="1" id="scene"></canvas>
+  <canvas data-llt-stage="1" id="scene" role="img"
+    aria-label="Магнит, катушка и гальванометр: индукционный ток противодействует изменению магнитного потока"></canvas>
   <div class="vig"></div>
   <div class="corner tl"></div><div class="corner tr"></div>
   <div class="corner bl"></div><div class="corner br"></div>
@@ -143,7 +156,7 @@
   </header>
 
   <section class="chain">
-    <div class="formula">ε<sub>инд</sub> = <b>−</b> dΦ / dt</div>
+    <div class="formula">ε<sub>инд</sub> = <b>−</b> N·dΦ / dt</div>
     <div class="fnote">знак «минус» — и есть правило Ленца</div>
     <ol class="steps">
       <li id="st1"><i>01 · движение магнита</i><b id="st1b">—</b></li>
@@ -152,52 +165,89 @@
       <li id="st4"><i>04 · взаимодействие</i><b id="st4b">—</b></li>
     </ol>
     <div class="meters">
-      <div class="mrow"><span class="mlab">поток Φ</span><div class="bar"><div id="fluxFill"></div></div><b id="fluxDir">→</b></div>
+      <div class="mrow"><span class="mlab">Φ, мВб</span><div class="bar"><div id="fluxFill"></div></div><b id="phiVal">0,00</b><b id="fluxDir">→</b></div>
       <div class="mrow2">
-        <div><span>ЭДС ε</span><b id="emfVal">0.0</b></div>
-        <div><span>ток I</span><b id="iVal">0.00</b></div>
+        <div><span>ε, мВ</span><b id="emfVal">0,0</b></div>
+        <div><span>I, мА</span><b id="iVal">0,00</b></div>
       </div>
     </div>
-    <p class="note2">Индукционный ток всегда направлен так, чтобы <em>противодействовать</em> изменению магнитного потока, его вызывающего. Катушка «сопротивляется» любому изменению — в этом суть закона Ленца.</p>
+    <p class="note2">Индукционный ток всегда направлен так, чтобы <em>противодействовать</em> изменению магнитного потока, его вызывающего. Катушка «сопротивляется» любому изменению — в этом суть правила Ленца.</p>
+    <p class="note2">Линии поля выходят из полюса N, огибают магнит и входят в S. Чем больше линий проходит через витки, тем больше поток Φ.</p>
+    <p class="note2">Шкала оценочная: поток одного витка при контакте принят 0,5 мВб, сопротивление цепи 10 Ом. Знак и форма сигнала точные, абсолютные значения — порядок величины.</p>
   </section>
 
   <footer class="controls">
     <button id="btnAuto" class="tgl main">▶ автоколебания</button>
-    <div class="spd"><span class="lbl">частота</span><input id="freq" type="range" min="20" max="140" value="50"><b id="freqVal">0.50 Гц</b></div>
+    <div class="spd"><span class="lbl">частота</span><input id="freq" type="range" min="20" max="140" value="50" aria-label="Частота автоколебаний"><b id="freqVal">0,50 Гц</b></div>
     <button id="btnFlip" class="tgl">⇄ полюса</button>
     <button id="reset" class="tgl">⟲ Сброс</button>
-    <div class="spd"><span class="lbl">витки</span><input id="turns" type="range" min="1" max="8" value="4"><b id="turnsVal">N = 4</b></div>
+    <div class="spd"><span class="lbl">витки</span><input id="turns" type="range" min="1" max="8" value="4" aria-label="Число витков катушки"><b id="turnsVal">N = 4</b></div>
     <button class="tgl on" id="tgF">поле</button>
     <button class="tgl on" id="tgC">ток</button>
     <button class="tgl on" id="tgB">Bᵢₙд</button>
     <button class="tgl on" id="tgS">сила</button>
+    <button class="tgl" id="btnTest">✓ тест</button>
   </footer>
 
   <div class="note">Э. Х. Ленц, 1834 · индукционный ток противодействует причине, его вызывающей</div>
+  <div class="offscreen" aria-hidden="true"><table id="testTbl"></table></div>
 
 <script>
 'use strict';
 const TAU=Math.PI*2;
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const canvas=document.getElementById('scene'), ctx=canvas.getContext('2d');
-let W,H,DPR;
+const $=id=>document.getElementById(id);
+let W=900,H=560,DPR=1;
+
+/* ---------- палитра темы ---------- */
+const FB={aqua:'#4FD8C4',sand:'#D9B98C',lilac:'#ABA6DC',rose:'#D69FA9',ok:'#3FC9AE',deep:'#2E9E96',
+  brass:'#C9A96E',ice:'#9FE8DC',ink:'#E9F4F1',muted:'#8FA8A6',canvas:'#071012',surface:'#102024',
+  overlay:'#14262A',line2:'rgba(126,214,199,.30)'};
+const PL={};
+function readPal(){
+  const cs=getComputedStyle(document.documentElement);
+  for(const k in FB)PL[k]=(cs.getPropertyValue('--'+k)||'').trim()||FB[k];
+}
+readPal();
+addEventListener('llt:theme',()=>{readPal();});
+
+const NF=(typeof window.LLTfix==='function')?window.LLTfix:function(x,n){
+  if(typeof x!=='number'||!isFinite(x))return '—';
+  n=(n==null?2:n);const p=Math.pow(10,n);let r=Math.round(x*p)/p;if(r===0)r=0;
+  const t=Math.abs(r).toFixed(n).split('.').join(',');
+  return r<0?'−'+t:t;
+};
+const NS=(typeof window.LLTsigned==='function')?window.LLTsigned:function(x,n){
+  if(typeof x!=='number'||!isFinite(x))return '—';
+  n=(n==null?2:n);const p=Math.pow(10,n);let r=Math.round(x*p)/p;if(r===0)r=0;
+  return (r>0?'+':'')+NF(x,n);
+};
+
+/* Калибровка шкалы: поток одного витка при контакте и сопротивление цепи */
+const CAL={phi0:0.5, R:10};
 
 const S={
   s:1, turns:4, auto:false, phase:0, freq:0.5,
-  mx:0, vS:0, prevMx:null, phiPrev:null, absPrev:null, dAbsS:0,
+  mx:0, ready:false, vS:0, prevMx:null, phiPrev:null, absPrev:null, dAbsS:0,
   emf:0, needle:0, drag:false, dragOff:0, hover:false,
   show:{field:true,current:true,bind:true,force:true}
 };
-let geo={}, dashOff=0, tG=0;
+let geo={}, dashOff=0;
 
 function resize(){
   DPR=Math.min(devicePixelRatio||1,2);
-  W=innerWidth; H=innerHeight;
-  canvas.width=W*DPR; canvas.height=H*DPR;
-  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const r=canvas.getBoundingClientRect();
+  W=Math.max(300,Math.round(r.width||innerWidth));
+  H=Math.max(260,Math.round(r.height||innerHeight));
+  canvas.width=Math.round(W*DPR); canvas.height=Math.round(H*DPR);
   ctx.setTransform(DPR,0,0,DPR,0,0);
+  geo=layout();
+  if(!S.ready){S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;S.ready=true;}
+  else S.mx=clamp(S.mx,geo.xmin,geo.xmax);
 }
 addEventListener('resize',resize);
+if(window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
 
 function layout(){
   const axisY=H*0.40;
@@ -212,19 +262,21 @@ function layout(){
   const meterCx=coilX+16;
   const meterCy=Math.min(axisY+ry+clamp(H*0.20,112,168), H-96-mh/2);
   return {axisY,ry,rx,gap,Nt,coilX,coilLeft,coilRight,LW,LH,xmin,xmax,mw,mh,meterCx,meterCy,
-          cxAuto:(xmin+xmax)/2, amp:(xmax-xmin)*0.42};
+          cxAuto:(xmin+xmax)/2, amp:(xmax-xmin)*0.42, phi:0};
 }
 function flux(d){
   const D0=geo.ry*1.3;
   return S.s*S.turns*Math.pow(1+(d/D0)*(d/D0),-1.5);
 }
 function setMx(x){S.mx=clamp(x,geo.xmin,geo.xmax);}
+function resetHistory(){S.phiPrev=null;S.absPrev=null;S.prevMx=null;S.emf=0;S.dAbsS=0;}
 
 /* ---------- графика ---------- */
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);
   ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
-function arrow(x1,y1,x2,y2,color,w,head){
+function arrow(x1,y1,x2,y2,color,w,head,alpha){
   head=head||8;
+  ctx.globalAlpha=alpha==null?1:alpha;
   ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w;
   ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
   const a=Math.atan2(y2-y1,x2-x1);
@@ -232,74 +284,102 @@ function arrow(x1,y1,x2,y2,color,w,head){
   ctx.lineTo(x2-head*Math.cos(a-0.42),y2-head*Math.sin(a-0.42));
   ctx.lineTo(x2-head*Math.cos(a+0.42),y2-head*Math.sin(a+0.42));
   ctx.closePath();ctx.fill();
+  ctx.globalAlpha=1;
+}
+function fieldDir(x,y,ch){
+  let bx=0,by=0;
+  for(let i=0;i<ch.length;i++){
+    const c=ch[i],dx=x-c.x,dy=y-c.y,r2=dx*dx+dy*dy+1,k=c.q/(r2*Math.sqrt(r2));
+    bx+=dx*k;by+=dy*k;
+  }
+  const m=Math.hypot(bx,by);
+  return m>1e-14?[bx/m,by/m]:null;
+}
+function traceLine(x,y,ch,inBody){
+  const ds=5,pts=[[x,y]];
+  for(let i=0;i<560;i++){
+    const d1=fieldDir(x,y,ch); if(!d1)break;
+    const d2=fieldDir(x+d1[0]*ds/2,y+d1[1]*ds/2,ch); if(!d2)break;
+    x+=d2[0]*ds;y+=d2[1]*ds;
+    if(x<-40||x>W+40||y<-40||y>H+40)break;
+    pts.push([x,y]);
+    if(inBody(x,y))break;
+  }
+  return pts;
+}
+function strokeLine(pts,alpha){
+  ctx.globalAlpha=alpha;ctx.strokeStyle=PL.sand;ctx.lineWidth=1.3;
+  ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
+  let total=0;const cum=[0];
+  for(let i=1;i<pts.length;i++){total+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);cum.push(total);}
+  if(total>150){
+    ctx.fillStyle=PL.sand;ctx.globalAlpha=Math.min(1,alpha+0.25);
+    for(const f of[0.3,0.72]){
+      const target=total*f;let j=1;
+      while(j<pts.length-1&&cum[j]<target)j++;
+      const p=pts[j-1],q=pts[j],a=Math.atan2(q[1]-p[1],q[0]-p[0]);
+      ctx.beginPath();ctx.moveTo(q[0]+Math.cos(a)*4,q[1]+Math.sin(a)*4);
+      ctx.lineTo(q[0]-Math.cos(a-0.5)*5,q[1]-Math.sin(a-0.5)*5);
+      ctx.lineTo(q[0]-Math.cos(a+0.5)*5,q[1]-Math.sin(a+0.5)*5);
+      ctx.closePath();ctx.fill();
+    }
+  }
+  ctx.globalAlpha=1;
 }
 function fieldLines(g){
-  const cxm=S.mx-g.LW/2, m=S.s;
-  const Ls=[1.15,1.8,2.5];
-  ctx.lineWidth=1.1;
-  for(let li=0;li<Ls.length;li++){
-    const C=g.LW*Ls[li], a=0.42-0.11*li;
-    for(const mir of[1,-1]){
-      const pts=[];
-      for(let th=0.30;th<=Math.PI-0.29;th+=0.06){
-        const r=C*Math.sin(th)*Math.sin(th);
-        pts.push([cxm+m*r*Math.cos(th), g.axisY-mir*r*Math.sin(th)]);
-      }
-      ctx.strokeStyle=`rgba(255,168,96,${a})`;
-      ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
-      for(const f of[0.28,0.72]){
-        const i=Math.floor(pts.length*f), p=pts[i], q=pts[i+1];
-        arrow(p[0],p[1],q[0],q[1],`rgba(255,168,96,${a+0.15})`,1.1,6);
-      }
+  const s=S.s,cm=S.mx-g.LW/2,half=g.LW/2,delta=g.LW*0.2;
+  const ch=[{x:cm+s*(half-delta),y:g.axisY,q:1},{x:cm-s*(half-delta),y:g.axisY,q:-1}];
+  const N=ch[0];
+  const inBody=(x,y)=>x>S.mx-g.LW-0.5&&x<S.mx+0.5&&Math.abs(y-g.axisY)<g.LH/2+0.5;
+  const rho=Math.max(delta+g.LH*0.3,g.LH*0.62),n=9;
+  ctx.lineCap='round';ctx.lineJoin='round';
+  for(let k=0;k<n;k++){
+    const phi=Math.acos(1-1.25*k/(n-1)),alpha=0.62-0.30*k/(n-1);
+    const sides=k===0?[1]:[1,-1];
+    for(const m of sides){
+      const sx=N.x+s*rho*Math.cos(phi),sy=g.axisY+m*rho*Math.sin(phi);
+      if(inBody(sx,sy))continue;
+      strokeLine(traceLine(sx,sy,ch,inBody),alpha);
     }
   }
-  // осевые линии к катушке
-  for(const yo of[0,-g.LH*0.55,g.LH*0.55]){
-    const x1=S.mx+6, x2=Math.min(S.mx+g.LW*1.15, g.coilLeft-g.rx-6);
-    if(x2-x1>14){
-      const al=clamp(0.5-(g.coilLeft-S.mx)/900,0.08,0.45);
-      arrow(x1,g.axisY+yo,x2,g.axisY+yo,`rgba(255,168,96,${al})`,1.2,6);
-    }
-  }
+  ctx.lineCap='butt';
 }
 function drawCoil(g,In,dirB){
-  // свечение потока внутри катушки
-  const phiN=Math.abs(In)>0?0:0; // (заполняется ниже через geo.phiAbs)
-  const aGlow=0.24*clamp(Math.abs(geo.phi)/S.turns,0,1);
+  const aGlow=0.24*clamp(Math.abs(g.phi)/S.turns,0,1);
   if(aGlow>0.02){
-    ctx.fillStyle=`rgba(255,160,90,${aGlow})`;
+    ctx.globalAlpha=aGlow;ctx.fillStyle=PL.sand;
     ctx.beginPath();ctx.ellipse(g.coilX,g.axisY,g.rx+(g.Nt-1)*g.gap/2+7,g.ry-4,0,0,TAU);ctx.fill();
+    ctx.globalAlpha=1;
   }
   for(let i=0;i<g.Nt;i++){
     const x=g.coilLeft+i*g.gap;
     ctx.lineWidth=Math.max(3,g.ry*0.045);
-    ctx.strokeStyle='rgba(150,96,48,.5)';
+    ctx.globalAlpha=0.5;ctx.strokeStyle=PL.brass;
     ctx.beginPath();ctx.ellipse(x,g.axisY,g.rx,g.ry,0,Math.PI/2,Math.PI*1.5);ctx.stroke();
+    ctx.globalAlpha=1;
     const grd=ctx.createLinearGradient(0,g.axisY-g.ry,0,g.axisY+g.ry);
-    grd.addColorStop(0,PAL.sand);grd.addColorStop(.5,PAL.brass);grd.addColorStop(1,'#6E5636');
+    grd.addColorStop(0,PL.sand);grd.addColorStop(.5,PL.brass);grd.addColorStop(1,PL.brass);
     ctx.strokeStyle=grd;
     ctx.beginPath();ctx.ellipse(x,g.axisY,g.rx,g.ry,0,Math.PI*1.5,Math.PI*2.5);ctx.stroke();
   }
-  // символы тока ⊙ / ⊗
   if(S.show.current&&Math.abs(In)>0.045){
-    const al=clamp(Math.abs(In)*1.7,0,1);
-    const topOut=In>0;
+    const al=clamp(Math.abs(In)*1.7,0,1),topOut=In>0;
     for(let i=0;i<g.Nt;i++){
       const x=g.coilLeft+i*g.gap;
       sym(x,g.axisY-g.ry,topOut,al);
       sym(x,g.axisY+g.ry,!topOut,al);
     }
   }
-  // полюсы катушки + индуцированное поле
   if(S.show.bind&&Math.abs(In)>0.045&&dirB!==0){
     const al=clamp(Math.abs(In)*1.7,0,1);
-    const x1=g.coilLeft-g.rx-14, x2=g.coilRight+g.rx+14;
+    const x1=g.coilLeft-g.rx-14,x2=g.coilRight+g.rx+14;
     ctx.setLineDash([7,6]);
-    arrow(dirB>0?x1:x2, g.axisY, dirB>0?x2:x1, g.axisY, `rgba(84,232,255,${0.85*al})`,2,10);
+    arrow(dirB>0?x1:x2,g.axisY,dirB>0?x2:x1,g.axisY,PL.aqua,2,10,0.85*al);
     ctx.setLineDash([]);
     ctx.font='600 11px "JetBrains Mono",monospace';
-    ctx.fillStyle=`rgba(84,232,255,${al})`;ctx.textAlign='center';
+    ctx.globalAlpha=al;ctx.fillStyle=PL.aqua;ctx.textAlign='center';
     ctx.fillText('Bинд',g.coilX,g.axisY-12);
+    ctx.globalAlpha=1;
     poleBadge(g.coilLeft-g.rx-32,g.axisY,dirB<0?'N':'S',al);
     poleBadge(g.coilRight+g.rx+32,g.axisY,dirB>0?'N':'S',al);
     ctx.textAlign='left';
@@ -307,30 +387,31 @@ function drawCoil(g,In,dirB){
 }
 function sym(x,y,out,al){
   ctx.beginPath();ctx.arc(x,y,6.5,0,TAU);
-  ctx.fillStyle='rgba(8,16,28,.92)';ctx.fill();
-  ctx.strokeStyle=`rgba(120,235,255,${al})`;ctx.lineWidth=1.6;ctx.stroke();
-  ctx.fillStyle=`rgba(120,235,255,${al})`;ctx.strokeStyle=`rgba(120,235,255,${al})`;
+  ctx.globalAlpha=.92;ctx.fillStyle=PL.canvas;ctx.fill();
+  ctx.globalAlpha=al;ctx.strokeStyle=PL.aqua;ctx.fillStyle=PL.aqua;ctx.lineWidth=1.6;ctx.stroke();
   if(out){ctx.beginPath();ctx.arc(x,y,2.2,0,TAU);ctx.fill();}
   else{ctx.lineWidth=1.5;ctx.beginPath();
     ctx.moveTo(x-3.2,y-3.2);ctx.lineTo(x+3.2,y+3.2);
     ctx.moveTo(x+3.2,y-3.2);ctx.lineTo(x-3.2,y+3.2);ctx.stroke();}
+  ctx.globalAlpha=1;
 }
 function poleBadge(x,y,letter,al){
   ctx.beginPath();ctx.arc(x,y,11,0,TAU);
-  ctx.fillStyle='rgba(8,16,28,.9)';ctx.fill();
-  ctx.strokeStyle=`rgba(84,232,255,${0.8*al})`;ctx.lineWidth=1.5;ctx.stroke();
-  ctx.fillStyle=`rgba(84,232,255,${al})`;
+  ctx.globalAlpha=.9;ctx.fillStyle=PL.canvas;ctx.fill();
+  ctx.globalAlpha=0.8*al;ctx.strokeStyle=PL.aqua;ctx.lineWidth=1.5;ctx.stroke();
+  ctx.globalAlpha=al;ctx.fillStyle=PL.aqua;
   ctx.font='700 10px Unbounded,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.fillText(letter,x,y+0.5);
-  ctx.textBaseline='alphabetic';
+  ctx.textBaseline='alphabetic';ctx.globalAlpha=1;
 }
 function drawMagnet(g,now){
   const x0=S.mx-g.LW,y0=g.axisY-g.LH/2,nRight=S.s===1;
+  /* N — тёплый песок, S — холодная сирень: палитра проекта */
+  const warm=[PL.sand,PL.brass],cool=[PL.lilac,PL.deep];
+  const lc=nRight?cool:warm,rc=nRight?warm:cool;
   ctx.save();
-  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=18;ctx.shadowOffsetY=10;
+  ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=18;ctx.shadowOffsetY=10;
   rr(x0,y0,g.LW,g.LH,9);ctx.clip();
-  const blue=['#8ab6ff','#2f5cc4'], red=['#ff8a6e',PAL.sand];
-  const lc=nRight?blue:red, rc=nRight?red:blue;
   let grd=ctx.createLinearGradient(0,y0,0,y0+g.LH);
   grd.addColorStop(0,lc[0]);grd.addColorStop(1,lc[1]);
   ctx.fillStyle=grd;ctx.fillRect(x0,y0,g.LW/2,g.LH);
@@ -339,23 +420,23 @@ function drawMagnet(g,now){
   ctx.fillStyle=grd;ctx.fillRect(x0+g.LW/2,y0,g.LW/2,g.LH);
   ctx.restore();
   rr(x0,y0,g.LW,g.LH,9);
-  ctx.strokeStyle='rgba(230,240,255,.3)';ctx.lineWidth=1.2;ctx.stroke();
-  ctx.strokeStyle='rgba(8,14,24,.6)';
+  ctx.strokeStyle=PL.line2;ctx.lineWidth=1.2;ctx.stroke();
+  ctx.strokeStyle='rgba(8,14,24,.55)';
   ctx.beginPath();ctx.moveTo(x0+g.LW/2,y0);ctx.lineTo(x0+g.LW/2,y0+g.LH);ctx.stroke();
   ctx.font='800 '+Math.round(g.LH*0.46)+'px Unbounded,sans-serif';
   ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillStyle='rgba(255,255,255,.94)';
+  ctx.fillStyle=PL.canvas;
   ctx.fillText(nRight?'S':'N',x0+g.LW*0.25,g.axisY+1);
   ctx.fillText(nRight?'N':'S',x0+g.LW*0.75,g.axisY+1);
   ctx.textAlign='left';ctx.textBaseline='alphabetic';
   if(S.hover||S.drag){
     rr(x0-4,y0-4,g.LW+8,g.LH+8,11);
-    ctx.strokeStyle='rgba(84,232,255,.55)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.strokeStyle=PL.aqua;ctx.globalAlpha=.6;ctx.lineWidth=1.5;ctx.stroke();ctx.globalAlpha=1;
   }
   if(!S.drag&&!S.auto&&Math.abs(S.vS)<12){
-    ctx.globalAlpha=0.35+0.25*Math.sin(now*0.004);
+    ctx.globalAlpha=0.5+0.3*Math.sin(now*0.004);
     ctx.font='600 10px "JetBrains Mono",monospace';
-    ctx.fillStyle='#cfe6f5';ctx.textAlign='center';
+    ctx.fillStyle=PL.ink;ctx.textAlign='center';
     ctx.fillText('⟵  тяните магнит  ⟶',x0+g.LW/2,y0-16);
     ctx.textAlign='left';ctx.globalAlpha=1;
   }
@@ -367,33 +448,34 @@ function drawWires(g,In,dt){
   const leadL=[[g.coilLeft,g.axisY+g.ry],[g.coilLeft,ty],[tL.x,ty],[tL.x,tL.y]];
   const leadR=[[g.coilRight,g.axisY+g.ry],[g.coilRight,ty-10],[tR.x,ty-10],[tR.x,tR.y]];
   for(const p of[leadL,leadR]){
-    ctx.strokeStyle='#2A3A38';ctx.lineWidth=3;ctx.lineJoin='round';
+    ctx.globalAlpha=.75;ctx.strokeStyle=PL.muted;ctx.lineWidth=3;ctx.lineJoin='round';
     ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();
+    ctx.globalAlpha=1;
   }
   if(S.show.current&&Math.abs(In)>0.05){
     dashOff+=In*dt*170;
-    ctx.lineWidth=2;ctx.strokeStyle=`rgba(120,230,255,${clamp(Math.abs(In)*1.5,0,0.95)})`;
+    ctx.lineWidth=2;ctx.strokeStyle=PL.aqua;ctx.globalAlpha=clamp(Math.abs(In)*1.5,0,0.95);
     ctx.setLineDash([5,11]);
     ctx.lineDashOffset=-dashOff;
     ctx.beginPath();leadL.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();
     ctx.lineDashOffset=dashOff;
     ctx.beginPath();leadR.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();
-    ctx.setLineDash([]);ctx.lineDashOffset=0;
+    ctx.setLineDash([]);ctx.lineDashOffset=0;ctx.globalAlpha=1;
   }
 }
 function drawMeter(g){
   const mCx=g.meterCx,mCy=g.meterCy,mw=g.mw,mh=g.mh;
   ctx.save();
-  ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=16;ctx.shadowOffsetY=8;
-  rr(mCx-mw/2,mCy-mh/2,mw,mh,10);ctx.fillStyle='#0f1b2b';ctx.fill();
+  ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=16;ctx.shadowOffsetY=8;
+  rr(mCx-mw/2,mCy-mh/2,mw,mh,10);ctx.fillStyle=PL.surface;ctx.fill();
   ctx.restore();
   rr(mCx-mw/2,mCy-mh/2,mw,mh,10);
-  ctx.strokeStyle='rgba(126,214,199,.25)';ctx.lineWidth=1;ctx.stroke();
+  ctx.strokeStyle=PL.line2;ctx.lineWidth=1;ctx.stroke();
   const dw=mw*0.84,dh=mh*0.62,dx=mCx-dw/2,dy=mCy-mh/2+mh*0.12;
   rr(dx,dy,dw,dh,7);ctx.fillStyle='#EFE6D6';ctx.fill();
   const pivX=mCx,pivY=dy+dh*0.95,R=dh*0.82;
   for(let a=-60;a<=60;a+=10){
-    const rad=(a-90)*Math.PI/180, major=a%30===0;
+    const rad=(a-90)*Math.PI/180,major=a%30===0;
     const r1=R*(major?0.80:0.87),r2=R*0.95;
     ctx.strokeStyle=a===0?'#232E2C':'#7a8994';ctx.lineWidth=major?2:1;
     ctx.beginPath();
@@ -405,29 +487,28 @@ function drawMeter(g){
   ctx.fillText('−',pivX-R*0.6,pivY-R*0.28);
   ctx.fillText('+',pivX+R*0.6,pivY-R*0.28);
   ctx.font='600 '+Math.round(mw*0.062)+'px "JetBrains Mono",monospace';
-  ctx.fillText('мкА',pivX,pivY-R*0.42);
+  ctx.fillText('мА',pivX,pivY-R*0.42);
   const ang=(clamp(S.needle,-1.15,1.15)*55-90)*Math.PI/180;
-  ctx.strokeStyle=PAL.brass;ctx.lineWidth=2.5;
+  ctx.strokeStyle='#8A6733';ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(pivX-10*Math.cos(ang),pivY-10*Math.sin(ang));
   ctx.lineTo(pivX+R*0.92*Math.cos(ang),pivY+R*0.92*Math.sin(ang));ctx.stroke();
   ctx.beginPath();ctx.arc(pivX,pivY,4.5,0,TAU);ctx.fillStyle='#232E2C';ctx.fill();
   ctx.font='600 '+Math.round(mw*0.058)+'px "JetBrains Mono",monospace';
-  ctx.fillStyle='rgba(143,168,166,.85)';
+  ctx.fillStyle=PL.muted;
   ctx.fillText('ГАЛЬВАНОМЕТР',mCx,mCy+mh*0.38);
   ctx.textAlign='left';
   for(const tx of[mCx-mw*0.22,mCx+mw*0.22]){
     ctx.beginPath();ctx.arc(tx,mCy-mh/2,3.6,0,TAU);
-    ctx.fillStyle='#c9a25f';ctx.fill();
+    ctx.fillStyle=PL.brass;ctx.fill();
     ctx.strokeStyle='rgba(8,14,24,.7)';ctx.lineWidth=1;ctx.stroke();
   }
 }
 
 /* ---------- панель ---------- */
-const $=id=>document.getElementById(id);
 function setState(id,st){$(id).setAttribute('data-st',st);}
-function updatePanel(phi,In,now){
-  const thr=14, moving=S.vS>thr?1:S.vS<-thr?-1:0;
-  const eps=0.14, cur=Math.abs(S.emf)>eps&&moving!==0;
+function updatePanel(phi,In){
+  const thr=14,moving=S.vS>thr?1:S.vS<-thr?-1:0;
+  const cur=Math.abs(S.emf)>0.14&&moving!==0;
   const growing=S.dAbsS>0.05;
   setState('st1',moving===0?'zero':moving>0?'up':'down');
   $('st1b').textContent=moving>0?'→ приближается к катушке':moving<0?'← удаляется от катушки':'магнит покоится';
@@ -436,35 +517,43 @@ function updatePanel(phi,In,now){
   const ccw=(S.s*S.vS)>0;
   setState('st3',!cur?'zero':ccw?'down':'up');
   $('st3b').textContent=!cur?'отсутствует':ccw?'против часовой ↺':'по часовой ↻';
-  $('st3s').textContent=!cur?'цепь разомкнута для потока: нет изменений — нет тока':'если смотреть со стороны магнита';
+  $('st3s').textContent=!cur?'нет изменения потока — нет тока':'если смотреть со стороны магнита';
   setState('st4',moving===0?'zero':moving>0?'up':'down');
   $('st4b').textContent=moving>0?'катушка отталкивает магнит':moving<0?'катушка притягивает магнит':'нет взаимодействия';
   $('fluxFill').style.width=(clamp(Math.abs(phi)/S.turns,0,1)*100).toFixed(1)+'%';
   $('fluxDir').textContent=Math.abs(phi)<0.02?'·':phi>0?'→':'←';
-  $('emfVal').textContent=LLTsigned(S.emf, 1);
-  $('iVal').textContent=LLTsigned(In, 2);
+  $('phiVal').textContent=NS(phi*CAL.phi0,2);
+  $('emfVal').textContent=NS(S.emf*CAL.phi0,1);
+  $('iVal').textContent=NS(S.emf*CAL.phi0/CAL.R,2);
 }
 
 /* ---------- управление ---------- */
-function hitMagnet(x,y){
-  const pad=10;
+function hitMagnet(x,y,pad){
   return x>S.mx-geo.LW-pad&&x<S.mx+pad&&Math.abs(y-geo.axisY)<geo.LH/2+pad;
 }
+function local(ev){
+  const r=canvas.getBoundingClientRect();
+  return {x:(ev.clientX-r.left)*(W/r.width), y:(ev.clientY-r.top)*(H/r.height)};
+}
 canvas.addEventListener('pointerdown',e=>{
-  if(hitMagnet(e.clientX,e.clientY)){
-    S.drag=true;S.dragOff=S.mx-e.clientX;
+  const p=local(e);
+  if(hitMagnet(p.x,p.y,e.pointerType==='touch'?26:12)){
+    S.drag=true;S.dragOff=S.mx-p.x;
     if(S.auto)setAuto(false);
-    canvas.setPointerCapture(e.pointerId);
+    try{canvas.setPointerCapture(e.pointerId);}catch(_){}
+    e.preventDefault();
   }
 });
 canvas.addEventListener('pointermove',e=>{
-  if(S.drag){setMx(e.clientX+S.dragOff);}
-  else{S.hover=hitMagnet(e.clientX,e.clientY);}
+  const p=local(e);
+  if(S.drag){setMx(p.x+S.dragOff);}
+  else{S.hover=hitMagnet(p.x,p.y,12);}
   canvas.style.cursor=S.drag?'grabbing':S.hover?'ew-resize':'default';
 });
 const endDrag=()=>{S.drag=false;canvas.style.cursor=S.hover?'ew-resize':'default';};
 canvas.addEventListener('pointerup',endDrag);
 canvas.addEventListener('pointercancel',endDrag);
+canvas.addEventListener('lostpointercapture',endDrag);
 
 const btnAuto=$('btnAuto');
 function setAuto(on){
@@ -479,16 +568,16 @@ function setAuto(on){
 }
 btnAuto.addEventListener('click',()=>setAuto(!S.auto));
 
-$('freq').addEventListener('input',e=>{
-  S.freq=e.target.value/100;
-  $('freqVal').textContent=S.freq.toFixed(2)+' Гц';
-});
-$('turns').addEventListener('input',e=>{
-  S.turns=+e.target.value;
+function setFreq(v){S.freq=v/100;$('freqVal').textContent=NF(S.freq,2)+' Гц';}
+function setTurns(v){
+  const n=+v;
+  if(n!==S.turns){S.turns=n;resetHistory();}
   $('turnsVal').textContent='N = '+S.turns;
-});
+}
+$('freq').addEventListener('input',e=>setFreq(+e.target.value));
+$('turns').addEventListener('input',e=>setTurns(e.target.value));
 $('btnFlip').addEventListener('click',()=>{
-  S.s*=-1;
+  S.s*=-1;resetHistory();
   $('btnFlip').classList.remove('flash');void $('btnFlip').offsetWidth;
   $('btnFlip').classList.add('flash');
 });
@@ -496,26 +585,107 @@ function bindTgl(id,key){
   $(id).addEventListener('click',()=>{
     S.show[key]=!S.show[key];
     $(id).classList.toggle('on',S.show[key]);
+    $(id).setAttribute('aria-pressed',String(S.show[key]));
   });
+  $(id).setAttribute('aria-pressed','true');
 }
 bindTgl('tgF','field');bindTgl('tgC','current');bindTgl('tgB','bind');bindTgl('tgS','force');
 
+$('reset').addEventListener('click',()=>{
+  try{
+    setAuto(false);
+    const f=$('freq'),t=$('turns');
+    f.value=f.defaultValue;setFreq(+f.value);
+    S.turns=+t.defaultValue;t.value=t.defaultValue;$('turnsVal').textContent='N = '+S.turns;
+    S.s=1;S.phase=0;S.needle=0;S.vS=0;
+    resetHistory();
+    S.drag=false;S.hover=false;
+    geo=layout();
+    S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;
+    S.ready=true;
+  }catch(e){
+    if(window.__simFail)window.__simFail('сброс: '+e.message);else location.reload();
+  }
+});
+
 addEventListener('keydown',e=>{
+  const tag=e.target&&e.target.tagName;
+  if(tag==='BUTTON'||tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
   if(e.code==='Space'){e.preventDefault();setAuto(!S.auto);}
   else if(e.code==='KeyF'){$('btnFlip').click();}
   else if(e.key==='ArrowRight'){if(S.auto)setAuto(false);setMx(S.mx+26);}
   else if(e.key==='ArrowLeft'){if(S.auto)setAuto(false);setMx(S.mx-26);}
 });
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden){last=performance.now();resetHistory();}
+});
+
+/* ---------- самотест ---------- */
+function simRun(o){
+  const g=layout();
+  const N=o.turns, s=o.s, f=o.freq, dt=1/240, dur=o.dur||3;
+  const D0=g.ry*1.3;
+  let phase=0, prev=null, emf=0, mx=g.cxAuto, mxPrev=mx;
+  let max=-Infinity, min=Infinity, sApp=0, sRec=0;
+  for(let t=0;t<dur;t+=dt){
+    phase+=TAU*f*dt; mxPrev=mx;
+    mx=clamp(g.cxAuto+g.amp*Math.sin(phase),g.xmin,g.xmax);
+    const d=Math.max(0,g.coilLeft-g.rx-mx);
+    const phi=s*N*Math.pow(1+(d/D0)*(d/D0),-1.5);
+    if(prev===null){prev=phi;continue;}
+    const raw=-(phi-prev)/dt; prev=phi;
+    emf+=(raw-emf)*(1-Math.exp(-dt/0.05));
+    if(t>dur*0.35){
+      max=Math.max(max,emf); min=Math.min(min,emf);
+      const v=(mx-mxPrev)/dt;
+      if(v>25&&!sApp)sApp=Math.sign(emf);
+      if(v<-25&&!sRec)sRec=Math.sign(emf);
+    }
+  }
+  return {max:max===-Infinity?0:max, min:min===Infinity?0:min, sApp, sRec};
+}
+function selfTest(){
+  const rows=[];
+  const add=(n,got,exp,ok)=>rows.push([n,got,exp,ok]);
+  const base={turns:4,s:1,freq:0.5,dur:3};
+  const still=simRun({...base,freq:0});
+  add('Неподвижный магнит: ЭДС = 0',NF(Math.max(Math.abs(still.max),Math.abs(still.min)),4),'0,0000',
+      Math.abs(still.max)<1e-9&&Math.abs(still.min)<1e-9);
+  const a4=simRun(base), a8=simRun({...base,turns:8});
+  const rN=a4.max>0?a8.max/a4.max:0;
+  add('Удвоение витков → ЭДС ×2',NF(rN,4),'2,0000',Math.abs(rN-2)<1e-6);
+  const f1=simRun({...base,freq:1});
+  const rF=a4.max>0?f1.max/a4.max:0;
+  add('Удвоение частоты → ЭДС ≈×2',NF(rF,3),'2,0 ± 0,3',Math.abs(rF-2)<0.3);
+  const inv=simRun({...base,s:-1});
+  add('Переворот полюсов меняет знак',NF(inv.max,3),NF(-a4.min,3),Math.abs(inv.max+a4.min)<1e-6);
+  add('Приближение N: ЭДС < 0',a4.sApp<0?'отрицательна':'положительна','отрицательна',a4.sApp<0);
+  add('Удаление N: ЭДС > 0',a4.sRec>0?'положительна':'отрицательна','положительна',a4.sRec>0);
+  const ok=rows.filter(r=>r[3]).length;
+  $('testTbl').innerHTML='<thead><tr><th>Проверка</th><th>Модель</th><th>Ожидание</th><th>Итог</th></tr></thead><tbody>'+
+    rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+(r[3]?'✓':'✗')+'</td></tr>').join('')+
+    '</tbody><tfoot><tr><td colspan="4">Пройдено '+ok+' из '+rows.length+'</td></tr></tfoot>';
+  return {ok,total:rows.length};
+}
+$('btnTest').addEventListener('click',()=>{
+  try{
+    const r=selfTest();
+    const prev=$('modeTxt').textContent;
+    $('modeTxt').textContent='самотест: '+r.ok+' из '+r.total;
+    setTimeout(()=>{ if($('modeTxt').textContent.indexOf('самотест')===0) $('modeTxt').textContent=prev; },4000);
+  }catch(e){ if(window.__simFail)window.__simFail('самотест: '+e.message); }
+});
+try{window.__selfTest=selfTest;}catch(e){}
 
 /* ---------- цикл ---------- */
 let last=performance.now();
 function frame(now){
   requestAnimationFrame(frame);
   let dt=(now-last)/1000;last=now;
+  if(!(dt>0))dt=0;
   if(dt>0.033)dt=0.033;
-  tG+=dt;
   geo=layout();
-  if(S.mx===0)S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;
+  if(!S.ready){S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;S.ready=true;}
   if(S.auto&&!S.drag){
     S.phase+=TAU*S.freq*dt;
     setMx(geo.cxAuto+geo.amp*Math.sin(S.phase));
@@ -523,7 +693,8 @@ function frame(now){
   if(S.prevMx===null)S.prevMx=S.mx;
   const vRaw=(S.mx-S.prevMx)/Math.max(dt,1e-4);
   S.prevMx=S.mx;
-  S.vS+=(vRaw-S.vS)*0.35;
+  const aV=1-Math.exp(-dt/0.045);
+  S.vS+=(vRaw-S.vS)*aV;
 
   const d=Math.max(0,geo.coilLeft-geo.rx-S.mx);
   const phi=flux(d);
@@ -531,93 +702,49 @@ function frame(now){
   const emfRaw=-(phi-S.phiPrev)/Math.max(dt,1e-4);
   const dAbsRaw=(Math.abs(phi)-S.absPrev)/Math.max(dt,1e-4);
   S.phiPrev=phi;S.absPrev=Math.abs(phi);
-  S.emf+=(emfRaw-S.emf)*0.3;
-  S.dAbsS+=(dAbsRaw-S.dAbsS)*0.3;
+  const aE=1-Math.exp(-dt/0.05);
+  S.emf+=(emfRaw-S.emf)*aE;
+  S.dAbsS+=(dAbsRaw-S.dAbsS)*aE;
   geo.phi=phi;
   const In=clamp(S.emf*0.07,-1,1);
   S.needle+=(In-S.needle)*Math.min(1,dt*9);
-  const dirB=Math.abs(S.emf)>0.14?-Math.sign(S.emf*0+ (phi-S.phiPrev))*Math.sign(-(phi-S.phiPrev))*Math.sign(S.emf>0?1:-1):0;
-  const dirBv=Math.abs(In)>0.045?(S.emf>0?-1:1)*Math.sign(phi!==0?phi:S.s)*Math.sign(phi!==0?1:1):0;
-  // направление индуцированного поля вдоль +x: против знака dΦ/dt
-  const dirBf=Math.abs(In)>0.045?(S.dAbsS>0?-Math.sign(phi||S.s):Math.sign(phi||S.s)):0;
+  const dirB=Math.abs(In)>0.045?Math.sign(S.emf):0;
 
-  /* рисуем */
   ctx.clearRect(0,0,W,H);
-  // ось установки
-  ctx.setLineDash([2,7]);ctx.strokeStyle='rgba(140,180,220,.14)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(20,geo.axisY);ctx.lineTo(W-20,geo.axisY);ctx.stroke();ctx.setLineDash([]);
+  ctx.setLineDash([2,7]);ctx.globalAlpha=.3;ctx.strokeStyle=PL.muted;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(20,geo.axisY);ctx.lineTo(W-20,geo.axisY);ctx.stroke();
+  ctx.setLineDash([]);ctx.globalAlpha=1;
 
   if(S.show.field)fieldLines(geo);
   drawWires(geo,In,dt);
-  drawCoil(geo,In,dirBf);
+  drawCoil(geo,In,dirB);
   drawMagnet(geo,now);
 
-  // стрелка скорости
   if(Math.abs(S.vS)>14){
     const len=clamp(Math.abs(S.vS)*0.09,26,72)*Math.sign(S.vS);
-    arrow(S.mx-geo.LW/2-len,geo.axisY+geo.LH/2+22,S.mx-geo.LW/2,geo.axisY+geo.LH/2+22,'#cfe6f5',2,8);
-    ctx.font='600 11px "JetBrains Mono",monospace';ctx.fillStyle='#cfe6f5';
+    arrow(S.mx-geo.LW/2-len,geo.axisY+geo.LH/2+22,S.mx-geo.LW/2,geo.axisY+geo.LH/2+22,PL.ink,2,8);
+    ctx.font='600 11px "JetBrains Mono",monospace';ctx.fillStyle=PL.ink;
     ctx.fillText('v',S.mx-geo.LW/2-6,geo.axisY+geo.LH/2+38);
   }
-  // сила противодействия
   if(S.show.force&&Math.abs(In)>0.06&&Math.abs(S.vS)>14){
     const len=clamp(30+70*Math.abs(In),30,100)*-Math.sign(S.vS);
     const y=geo.axisY-geo.LH/2-18;
-    arrow(S.mx-geo.LW/2,y,S.mx-geo.LW/2+len,y,PAL.sand,2.5,10);
-    ctx.font='600 11px "JetBrains Mono",monospace';ctx.fillStyle=PAL.sand;
+    arrow(S.mx-geo.LW/2,y,S.mx-geo.LW/2+len,y,PL.rose,2.5,10);
+    ctx.font='600 11px "JetBrains Mono",monospace';ctx.fillStyle=PL.rose;
     ctx.fillText('F',S.mx-geo.LW/2+len/2-4,y-9);
   }
   drawMeter(geo);
-  updatePanel(phi,In,now);
+  updatePanel(phi,In);
 }
 
 resize();
 geo=layout();
 S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;
+S.ready=true;
+setFreq(+$('freq').value);
+setTurns($('turns').value);
+try{selfTest();}catch(e){}
 requestAnimationFrame(frame);
-</script>
-<script>
-/* LibLabTab · сброс Ленца */
-(function(){
-  
-/* LibLabTab · палитра до первого использования */
-var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
-window.PAL = PAL;
-var b=document.getElementById("reset");
-  if(!b||b.__lenzWired)return; b.__lenzWired=true;
-  b.addEventListener("click",function(){
-    try{
-      setAuto(false);
-      var f=$("freq"), t=$("turns");
-      f.value=f.defaultValue; S.freq=(+f.value)/100;
-      $("freqVal").textContent=S.freq.toFixed(2)+" Гц";
-      t.value=t.defaultValue; S.turns=+t.value;
-      $("turnsVal").textContent="N = "+S.turns;
-      S.s=1; S.phase=0; S.emf=0; S.dAbsS=0; S.needle=0; S.vS=0;
-      S.phiPrev=null; S.absPrev=null; S.prevMx=null;
-      S.drag=false; S.hover=false;
-      geo=layout();
-      S.mx=geo.xmin+(geo.xmax-geo.xmin)*0.35;
-    }catch(e){
-      if(window.__simFail) window.__simFail("сброс: "+e.message);
-      else location.reload();
-    }
-  });
-})();
-</script>
-<script>
-/* LibLabTab · перекраска при смене темы */
-(function(){
-  function refresh(){
-    if(window.LLTtheme) window.LLTtheme.readPal();
-    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
-    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
-    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
-    if(typeof render==="function"){ try{ render(); }catch(e){} }
-    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
-  }
-  window.addEventListener("llt:theme",refresh);
-})();
 </script>
 <script src="/sim/lib/selftest.js"></script>
 </body>
