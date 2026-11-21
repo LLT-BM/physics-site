@@ -30,7 +30,7 @@ button,.btn{min-height:44px}
   .lead{font-size:.95rem}
   .model-frame{aspect-ratio:4/5;min-height:420px}
   .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{min-width:520px}
+  .llt-tablewrap>table,.tw>table{min-width:520px}
 }
 @media (max-width:420px){
   .rd{grid-template-columns:1fr 1fr}

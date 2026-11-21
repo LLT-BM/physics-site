@@ -282,7 +282,7 @@ function cm(a){ return nf(a*100,2)+' см'; }
 var sc=$('scene'),sx=sc.getContext('2d'),pl=$('plot'),px=pl.getContext('2d');
 var W=900,HS=400,HP=270,dpr=1;
 function resize(){
-  W=Math.max(300,Math.round(sc.parentNode.clientWidth-28));
+  W=Math.max(300,Math.round(sc.parentNode.clientWidth));
   dpr=Math.min(2,window.devicePixelRatio||1);
   HS=Math.max(310,Math.round(Math.min(440,W*0.48)));
   HP=Math.max(230,Math.round(Math.min(300,W*0.30)));

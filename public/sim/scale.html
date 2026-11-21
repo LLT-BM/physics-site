@@ -349,7 +349,7 @@ var $=function(id){return document.getElementById(id)};
   function vis(o){ return filt[o.c] && o.L<=logW+0.02 && dsz(o.d)>=1.6; }
 
   function resize(){
-    W=Math.max(300,Math.round(st.parentNode.clientWidth-28));
+    W=Math.max(300,Math.round(st.parentNode.clientWidth));
     dpr=Math.min(2,window.devicePixelRatio||1);
     Hs=Math.max(260,Math.round(Math.min(400,W*0.40))); Hl=76;
     st.width=W*dpr; st.height=Hs*dpr; st.style.height=Hs+'px'; sx.setTransform(dpr,0,0,dpr,0,0);

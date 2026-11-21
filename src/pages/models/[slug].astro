@@ -45,7 +45,6 @@ const jsonLd = {
         <span class="mchip">{dateStr}</span>
         <span class="mchip">ядро v{d.coreVersion}</span>
       </div>
-      <div class="mtags">{d.tags.map(t => <a class="tag" href={`/tags/${t}/`}>#{t}</a>)}</div>
     </header>
 
     <section class="stage-wrap">
@@ -59,7 +58,7 @@ const jsonLd = {
         <span id="testState" class="tstate" role="status" aria-live="polite"></span>
       </div>
       <div id="testBox" class="testbox hide">
-        <div class="tw"><table id="testOut"></table></div>
+        <div class="tw llt-tablewrap"><table id="testOut"></table></div>
       </div>
     </section>
 
@@ -67,7 +66,7 @@ const jsonLd = {
       <section class="cps" id="контрольные-точки">
         <h2>Контрольные точки</h2>
         <p class="note">Введите эти настройки в модели и сверьте показания. Значения пересчитаны независимо от кода симуляции.</p>
-        <div class="tw">
+        <div class="tw llt-tablewrap">
           <table>
             <thead><tr><th>Что проверяем</th><th>Настройки</th><th>Ожидаемое значение</th></tr></thead>
             <tbody>
@@ -124,9 +123,6 @@ const jsonLd = {
   .mmeta{display:flex;flex-wrap:wrap;gap:6px}
   .mchip{font:600 .72rem var(--mono);padding:5px 9px;border-radius:999px;border:1px solid var(--line2);color:var(--muted)}
   .mchip.sec{color:var(--aqua)} .mchip.ok{color:var(--ok)} .mchip.sand{color:var(--sand)}
-  .mtags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
-  .tag{font:400 .72rem var(--mono);color:var(--muted);text-decoration:none;padding:4px 8px;border:1px solid var(--line);border-radius:999px}
-  .tag:hover{color:var(--aqua);border-color:var(--aqua)}
   .stage-wrap{margin-top:16px}
   .tbtn{font:inherit;font-size:16px;font-weight:600;min-height:44px;padding:10px 14px;border-radius:999px;
     border:1px solid var(--aqua);background:var(--aqua);color:var(--on);cursor:pointer;touch-action:manipulation}
@@ -159,7 +155,6 @@ const jsonLd = {
   .prose :global(li){margin-bottom:6px}
   .prose :global(code){font-family:var(--mono);font-size:.86em;background:var(--overlay);padding:2px 6px;border-radius:6px}
   .prose :global(strong){color:var(--sand)}
-  .prose :global(table){margin:12px 0;font-size:.84rem}
   .prose :global(blockquote){margin:12px 0;padding:10px 14px;border-left:3px solid var(--lilac);background:var(--overlay);border-radius:0 10px 10px 0}
   .ans{border:1px solid var(--line);border-radius:11px;background:var(--surface);margin-bottom:8px;overflow:hidden}
   .ans>summary{cursor:pointer;padding:12px 13px;font-size:.94rem;list-style:none;display:flex;gap:9px;align-items:flex-start;min-height:48px}
@@ -180,6 +175,9 @@ const jsonLd = {
     .nb.right{text-align:left}
     table{min-width:480px}
   }
+
+  .prose :global(pre){max-width:100%;overflow-x:auto}
+  .prose :global(img),.prose :global(svg){max-width:100%}
 </style>
 
 <script is:inline>

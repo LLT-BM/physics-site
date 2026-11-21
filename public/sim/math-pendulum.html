@@ -252,7 +252,7 @@ function deg(r){ return nf(r*180/Math.PI,1)+'°'; }
 var sc=$('scene'),sx=sc.getContext('2d'),pl=$('plot'),px=pl.getContext('2d');
 var W=900,HS=380,HP=270,dpr=1;
 function resize(){
-  W=Math.max(300,Math.round(sc.parentNode.clientWidth-28));
+  W=Math.max(300,Math.round(sc.parentNode.clientWidth));
   dpr=Math.min(2,window.devicePixelRatio||1);
   HS=Math.max(300,Math.round(Math.min(430,W*0.46)));
   HP=Math.max(230,Math.round(Math.min(300,W*0.30)));

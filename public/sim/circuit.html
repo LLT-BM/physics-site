@@ -476,7 +476,7 @@ $('preset').addEventListener('change',function(e){
 var sch=$('sch'),sx=sch.getContext('2d'),pl=$('plot'),px=pl.getContext('2d');
 var W=900,HS=300,HP=280,dpr=1;
 function resize(){
-  W=Math.max(300,Math.round(sch.parentNode.clientWidth-28));
+  W=Math.max(300,Math.round(sch.parentNode.clientWidth));
   dpr=Math.min(2,window.devicePixelRatio||1);
   HS=Math.max(240,Math.round(Math.min(340,W*0.36)));
   HP=Math.max(230,Math.round(Math.min(320,W*0.32)));

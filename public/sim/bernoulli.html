@@ -398,7 +398,7 @@ function tor(){
 var sc=$('scene'),sx=sc.getContext('2d'),pl=$('plot'),px=pl.getContext('2d');
 var W=900,HS=440,HP=290,dpr=1;
 function resize(){
-  W=Math.max(300,Math.round(sc.parentNode.clientWidth-28));
+  W=Math.max(300,Math.round(sc.parentNode.clientWidth));
   dpr=Math.min(2,window.devicePixelRatio||1);
   HS=Math.max(330,Math.round(Math.min(500,W*0.56)));
   HP=Math.max(240,Math.round(Math.min(320,W*0.32)));

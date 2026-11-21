@@ -1,13 +1,24 @@
 ---
 import Base from '../layouts/Base.astro';
-import { published, sections, tagIndex } from '../lib/models';
+import { published, sections } from '../lib/models';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const items = await published();
+const all = await published();
 const secs = await sections();
-const tags = await tagIndex();
-const total = items.length;
+const total = all.length;
+
+const LABEL: Record<string, string> = {
+  'механика': 'Механика',
+  'электричество': 'Электричество',
+  'оптика': 'Оптика',
+  'молекулярная-физика': 'Молекулярная физика',
+  'квантовая-физика': 'Квантовая физика',
+  'нелинейная-динамика': 'Нелинейная динамика',
+  'гидродинамика': 'Гидродинамика',
+  'астрономия': 'Астрономия'
+};
+const label = (s: string) => LABEL[s] ?? s;
 
 const inlineCover = (file?: string) => {
   if (!file) return null;
@@ -19,63 +30,50 @@ const inlineCover = (file?: string) => {
   <section class="hero">
     <h1>Физика, которую можно потрогать</h1>
     <p>Интерактивные симуляции прямо в браузере: тяните магнит, крутите маятник, собирайте цепь, меняйте параметры — и смотрите, как работают законы природы.</p>
-    <p class="count">моделей в каталоге: <b>{total}</b> · разделов: <b>{secs.length}</b></p>
+    <p class="count">моделей: <b>{total}</b> · тем: <b>{secs.length}</b></p>
   </section>
 
-  <nav class="filters" aria-label="Разделы и свойства">
-    <div class="frow">
-      <span class="flab">Раздел</span>
-      <button class="fchip on" data-kind="section" data-val="">все</button>
-      {secs.map(([s, list]) => (
-        <button class="fchip" data-kind="section" data-val={s}>{s} <i>{list.length}</i></button>
-      ))}
-    </div>
-    <div class="frow">
-      <span class="flab">Уровень</span>
-      <button class="fchip on" data-kind="level" data-val="">любой</button>
-      <button class="fchip" data-kind="level" data-val="базовый">базовый</button>
-      <button class="fchip" data-kind="level" data-val="продвинутый">продвинутый</button>
-    </div>
-    <div class="frow">
-      <span class="flab">Свойство</span>
-      <button class="fchip on" data-kind="tag" data-val="">все</button>
-      {tags.map(([t, list]) => (
-        <a class="fchip" href={`/tags/${t}/`}>{t} <i>{list.length}</i></a>
-      ))}
-    </div>
-    <div class="frow">
-      <label class="sr" for="q">Поиск по каталогу</label>
-      <input id="q" type="search" placeholder="поиск: маятник, диод, Бернулли…" autocomplete="off" />
-      <span id="found" class="found" aria-live="polite"></span>
-    </div>
+  <nav class="topics" aria-label="Темы каталога">
+    <button class="topic on" data-sec="">Все темы <i>{total}</i></button>
+    {secs.map(([s, list]) => (
+      <button class="topic" data-sec={s}>{label(s)} <i>{list.length}</i></button>
+    ))}
+    <label class="sr" for="q">Поиск по каталогу</label>
+    <input id="q" type="search" placeholder="поиск: маятник, диод, Бернулли…" autocomplete="off" />
+    <span id="found" class="found" aria-live="polite"></span>
   </nav>
 
-  <div class="cards" id="cards">
-    {items.map((m) => {
-      const svg = inlineCover(m.data.cover);
-      return (
-        <a class="card" href={`/models/${m.id}/`}
-           data-section={m.data.section} data-level={m.data.level}
-           data-tags={m.data.tags.join(' ')}
-           data-text={(m.data.title + ' ' + m.data.description + ' ' + m.data.tags.join(' ')).toLowerCase()}>
-          {svg ? <div class="cover" aria-hidden="true" set:html={svg} />
-               : <div class="nocover" aria-hidden="true"><span>{m.data.title.charAt(0)}</span></div>}
-          <div class="card-body">
-            <div class="meta">
-              <span class="sec">{m.data.section}</span>
-              <span class={'lvl ' + (m.data.level === 'базовый' ? 'b' : 'a')}>{m.data.level}</span>
-              {m.data.grade && <span class="grade">{m.data.grade}</span>}
-            </div>
-            <h2>{m.data.title}</h2>
-            <p>{m.data.description}</p>
-            <div class="tagline">{m.data.tags.map(t => <span class="tag">#{t}</span>)}</div>
-            <span class="open">открыть модель →</span>
-          </div>
-        </a>
-      );
-    })}
-  </div>
-  <p id="empty" class="empty hide">Ничего не найдено. Сбросьте фильтры или измените запрос.</p>
+  {secs.map(([s, list]) => (
+    <section class="group" data-group={s} id={s}>
+      <header class="ghead">
+        <h2>{label(s)}</h2>
+        <a class="gmore" href={`/sections/${s}/`}>о теме →</a>
+      </header>
+      <div class="cards">
+        {list.map(m => {
+          const svg = inlineCover(m.data.cover);
+          return (
+            <a class="card" href={`/models/${m.id}/`}
+               data-sec={m.data.section}
+               data-text={(m.data.title + ' ' + m.data.description + ' ' + m.data.section).toLowerCase()}>
+              {svg ? <div class="cover" aria-hidden="true" set:html={svg} />
+                   : <div class="nocover" aria-hidden="true"><span>{m.data.title.charAt(0)}</span></div>}
+              <div class="card-body">
+                <div class="meta">
+                  <span class="sec">{label(m.data.section)}</span>
+                  {m.data.grade && <span class="grade">{m.data.grade} класс</span>}
+                </div>
+                <h3>{m.data.title}</h3>
+                <p>{m.data.description}</p>
+                <span class="open">открыть модель →</span>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  ))}
+  <p id="empty" class="empty hide">Ничего не найдено. Сбросьте тему или измените запрос.</p>
 </Base>
 
 <style>
@@ -84,66 +82,71 @@ const inlineCover = (file?: string) => {
   .hero p{color:var(--muted);max-width:74ch;margin:0 0 6px}
   .count{font-family:var(--mono);font-size:.86rem}
   .count b{color:var(--aqua)}
-  .filters{margin:14px 0 4px;display:grid;gap:8px}
-  .frow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-  .flab{font:600 .72rem var(--mono);color:var(--muted);min-width:74px}
-  .fchip{font:600 .76rem var(--mono);padding:8px 11px;min-height:36px;border-radius:999px;
-    border:1px solid var(--line2);background:var(--overlay);color:var(--ink);cursor:pointer;text-decoration:none}
-  .fchip i{font-style:normal;color:var(--muted)}
-  .fchip.on{background:var(--aqua);color:var(--on);border-color:var(--aqua)}
-  .fchip.on i{color:var(--on)}
-  #q{flex:1;min-width:200px;font:inherit;font-size:16px;padding:10px 12px;border-radius:10px;
+  .topics{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0 6px;
+    position:sticky;top:0;z-index:20;padding:10px 0;background:var(--bg)}
+  .topic{font:600 .8rem var(--mono);padding:9px 13px;min-height:40px;border-radius:999px;
+    border:1px solid var(--line2);background:var(--overlay);color:var(--ink);cursor:pointer}
+  .topic i{font-style:normal;color:var(--muted);margin-left:4px}
+  .topic.on{background:var(--aqua);color:var(--on);border-color:var(--aqua)}
+  .topic.on i{color:var(--on)}
+  #q{flex:1;min-width:210px;font:inherit;font-size:16px;padding:11px 13px;border-radius:10px;
     border:1px solid var(--line2);background:var(--surface);color:var(--ink)}
   .found{font:600 .78rem var(--mono);color:var(--aqua)}
-  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:14px}
-  .card{position:relative;display:block;text-decoration:none;color:var(--ink);
-    background:var(--surface);border:1px solid var(--line);border-radius:15px;overflow:hidden;
-    box-shadow:var(--shadow);transition:.16s}
+  .group{margin-top:22px}
+  .group.hide{display:none}
+  .ghead{display:flex;align-items:baseline;gap:12px;margin-bottom:10px;
+    padding-left:11px;border-left:4px solid var(--aqua)}
+  .ghead h2{font:700 1.15rem var(--disp);margin:0}
+  .gmore{margin-left:auto;font:600 .78rem var(--mono);color:var(--aqua);text-decoration:none}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(292px,1fr));gap:14px}
+  .card{display:block;text-decoration:none;color:var(--ink);background:var(--surface);
+    border:1px solid var(--line);border-radius:15px;overflow:hidden;box-shadow:var(--shadow);transition:.16s}
   .card:hover{border-color:var(--aqua);transform:translateY(-2px)}
+  .card.hide{display:none}
   .cover,.nocover{aspect-ratio:1200/750;background:var(--canvas);display:block}
   .cover :global(svg){width:100%;height:100%;display:block}
   .nocover{display:grid;place-items:center;font:800 3rem var(--disp);color:var(--line2)}
   .card-body{padding:12px 13px 14px}
   .meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:7px}
-  .sec,.lvl,.grade{font:600 .7rem var(--mono);padding:4px 8px;border-radius:999px;border:1px solid var(--line2)}
-  .sec{color:var(--aqua)}
-  .lvl.b{color:var(--ok)} .lvl.a{color:var(--sand)}
-  .grade{color:var(--muted)}
-  h2{font:600 1.05rem var(--disp);margin:0 0 6px;line-height:1.25}
+  .sec,.grade{font:600 .7rem var(--mono);padding:4px 9px;border-radius:999px;border:1px solid var(--line2)}
+  .sec{color:var(--aqua)} .grade{color:var(--muted)}
+  h3{font:600 1.05rem var(--disp);margin:0 0 6px;line-height:1.25}
   .card-body p{margin:0;color:var(--muted);font-size:.9rem}
-  .tagline{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
-  .tag{font:400 .7rem var(--mono);color:var(--muted);padding:3px 7px;border:1px solid var(--line);border-radius:999px}
   .open{display:inline-block;margin-top:10px;font:600 .8rem var(--mono);color:var(--aqua)}
-  .empty{margin-top:16px;color:var(--muted);font-family:var(--mono);font-size:.86rem}
+  .empty{margin-top:18px;color:var(--muted);font-family:var(--mono);font-size:.86rem}
   .hide{display:none}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-  @media (max-width:640px){ .cards{grid-template-columns:1fr} .flab{min-width:100%} }
+  @media (max-width:640px){ .cards{grid-template-columns:1fr} .topics{position:static} }
 </style>
 
 <script is:inline>
 (function(){
-  var state={section:'',level:'',tag:''};
-  var cards=[].slice.call(document.querySelectorAll('#cards .card'));
-  var q=document.getElementById('q'), found=document.getElementById('found'), empty=document.getElementById('empty');
+  var sec = '';
+  var groups = [].slice.call(document.querySelectorAll('.group'));
+  var cards = [].slice.call(document.querySelectorAll('.card'));
+  var q = document.getElementById('q'), found = document.getElementById('found'), empty = document.getElementById('empty');
   function apply(){
-    var s=(q.value||'').trim().toLowerCase(), n=0;
+    var s = (q.value || '').trim().toLowerCase(), n = 0;
     cards.forEach(function(c){
-      var ok=(!state.section||c.dataset.section===state.section)
-           &&(!state.level||c.dataset.level===state.level)
-           &&(!s||c.dataset.text.indexOf(s)>=0);
-      c.classList.toggle('hide',!ok); if(ok)n++;
+      var ok = (!sec || c.dataset.sec === sec) && (!s || c.dataset.text.indexOf(s) >= 0);
+      c.classList.toggle('hide', !ok);
+      if(ok) n++;
     });
-    found.textContent='найдено: '+n;
-    empty.classList.toggle('hide',n>0);
+    groups.forEach(function(g){
+      var visible = g.querySelectorAll('.card:not(.hide)').length;
+      g.classList.toggle('hide', visible === 0);
+    });
+    found.textContent = 'найдено: ' + n;
+    empty.classList.toggle('hide', n > 0);
   }
-  document.querySelectorAll('.fchip[data-kind]').forEach(function(b){
-    b.addEventListener('click',function(){
-      var k=b.dataset.kind; state[k]=b.dataset.val;
-      document.querySelectorAll('.fchip[data-kind="'+k+'"]').forEach(function(x){ x.classList.toggle('on',x===b); });
+  document.querySelectorAll('.topic').forEach(function(b){
+    b.addEventListener('click', function(){
+      sec = b.dataset.sec;
+      document.querySelectorAll('.topic').forEach(function(x){ x.classList.toggle('on', x === b); });
       apply();
     });
   });
-  q.addEventListener('input',apply);
+  q.addEventListener('input', apply);
   apply();
 })();
 </script>

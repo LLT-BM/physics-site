@@ -708,7 +708,7 @@ function resize(){
   dpr=Math.min(S.q,window.devicePixelRatio||1);
   st.width=Math.round(W*dpr);st.height=Math.round(H*dpr);st.style.height=H+'px';
   sx.setTransform(dpr,0,0,dpr,0,0);
-  PW=Math.max(280,Math.round(pl.parentNode.getBoundingClientRect().width-28));
+  PW=Math.max(280,Math.round(pl.parentNode.getBoundingClientRect().width));
   PH=Math.max(230,Math.round(Math.min(340,PW*0.34)));
   pl.width=Math.round(PW*dpr);pl.height=Math.round(PH*dpr);pl.style.height=PH+'px';
   px.setTransform(dpr,0,0,dpr,0,0);

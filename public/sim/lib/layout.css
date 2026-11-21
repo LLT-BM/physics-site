@@ -1,18 +1,19 @@
-/* LibLabTab · единый каркас: сцена слева, две сворачиваемые секции справа. */
+/* LibLabTab · каркас без пустых зон и сдвигов. */
 body.llt-layout{display:block !important;margin:0 !important;padding:0 !important;
-  height:auto !important;min-height:100%;overflow-x:hidden;background:var(--bg)}
+  height:auto !important;min-height:100%;overflow-x:clip;background:var(--bg)}
 body.llt-layout .wrap{max-width:none !important;margin:0 !important;padding:0 !important;
-  position:static !important;display:block !important}
+  position:static !important;display:block !important;min-height:0 !important}
 body.llt-layout .vig,body.llt-layout .corner,body.llt-layout #lltDock{display:none !important}
 body.llt-layout.llt-docked{padding-bottom:0 !important}
 body.llt-layout .llt-adv{display:none !important}
 
 .llt-shell{display:grid;grid-template-columns:minmax(0,1fr) 352px;gap:14px;
-  padding:14px;align-items:start;min-height:100vh}
+  padding:14px;align-items:start}
 body.llt-side-off .llt-shell{grid-template-columns:minmax(0,1fr)}
 body.llt-side-off .llt-side{display:none}
 
-.llt-main{display:flex;flex-direction:column;gap:10px;min-width:0}
+.llt-main{display:flex;flex-direction:column;gap:10px;min-width:0;max-width:100%}
+.llt-main>*,.llt-side>*,.llt-sec-body>*{min-width:0;max-width:100%}
 .llt-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .llt-head h1{font:700 clamp(1.05rem,2.2vw,1.4rem)/1.2 var(--disp);margin:0;color:var(--ink);
   position:static !important;letter-spacing:0}
@@ -24,27 +25,27 @@ body.llt-side-off .llt-side{display:none}
 .llt-btn:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
 
 .llt-stage{position:relative;border:1px solid var(--line2);border-radius:14px;
-  background:var(--canvas);overflow:hidden;min-width:0}
-.llt-stage:empty{display:none}
-.llt-stage>canvas,.llt-stage>svg{display:block;width:100%;border-radius:0;background:transparent}
+  background:var(--canvas);overflow:hidden;min-width:0;line-height:0;font-size:0}
+.llt-stage>canvas,.llt-stage>svg{display:block;width:100%;max-width:100%;border-radius:0;background:transparent}
 .llt-stage>canvas[data-llt-fixed="1"],.llt-stage>svg[data-llt-fixed="1"]{
   position:relative !important;inset:auto !important;left:auto !important;top:auto !important;
   height:clamp(320px,62vh,760px) !important}
-.llt-stage .hud{position:absolute;left:12px;top:12px}
+.llt-stage .hud{position:absolute;left:12px;top:12px;line-height:1.4;font-size:12px}
 .llt-stage .prog{position:absolute;left:12px;right:12px;bottom:12px}
 .llt-pagehead{position:static !important;inset:auto !important;transform:none !important;
   width:auto !important;max-width:none !important;margin:0 !important;padding:0 !important;
   background:none !important;border:0 !important;clip-path:none !important;backdrop-filter:none !important}
 
 .llt-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.llt-bar .bar,.llt-bar .controls,.llt-bar footer{position:static !important;inset:auto !important;
-  transform:none !important;left:auto !important;right:auto !important;bottom:auto !important;
-  width:auto !important;max-width:none !important;margin:0 !important;flex:1;min-width:0;
-  clip-path:none !important;border-radius:12px;overflow:visible !important}
+.llt-bar .bar,.llt-bar .controls,.llt-bar .row,.llt-bar footer{position:static !important;
+  inset:auto !important;transform:none !important;width:auto !important;max-width:none !important;
+  margin:0 !important;flex:1;min-width:0;clip-path:none !important;border-radius:12px;overflow:visible !important;
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.llt-bar button{min-height:44px}
+.llt-bar .llt-reset{border-color:var(--rose);color:var(--rose)}
 .llt-read{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:8px}
 .llt-read .rd{margin:0 !important;display:contents}
 .llt-read .meters,.llt-read .stats{position:static !important;width:auto !important;margin:0 !important}
-.llt-status:empty{display:none}
 .llt-status .status{margin:0 !important}
 
 .llt-side{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow-y:auto;
@@ -66,15 +67,26 @@ body.llt-side-off .llt-side{display:none}
   padding-left:9px;border-left:3px solid var(--aqua)}
 .llt-sec-body .ctl{display:flex !important;flex-direction:column;gap:12px;margin:0 !important}
 .llt-sec-body .note,.llt-sec-body .note2,.llt-sec-body .chain,.llt-sec-body .controls,
-.llt-sec-body header,.llt-sec-body .fnote,.llt-sec-body .hint,.llt-sec-body .legend{
+.llt-sec-body header,.llt-sec-body .fnote,.llt-sec-body .hint,.llt-sec-body .legend,
+.llt-sec-body .row,.llt-sec-body .eq{
   position:static !important;inset:auto !important;transform:none !important;
   width:auto !important;max-width:none !important;margin:0 !important;
   clip-path:none !important;display:block !important;opacity:1 !important}
+.llt-sec-body .tw,.llt-sec-body .tablewrap{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.llt-sec-body table{min-width:0;width:100%}
+.llt-sec-body table:empty,.llt-sec-body tbody:empty{display:none}
+.llt-sec-body canvas{max-width:100%}
 .llt-sec-body .spd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .llt-sec-body .spd .lbl{font:700 11px var(--mono);color:var(--ink);text-transform:uppercase;min-width:64px}
 .llt-sec-body .spd b{font:700 13px var(--mono);color:var(--sand);white-space:nowrap;
   background:rgba(217,185,140,.14);border:1px solid rgba(217,185,140,.38);border-radius:999px;padding:4px 10px}
-.llt-empty{display:none !important}
+
+/* пустые контейнеры не занимают места */
+.llt-empty,.llt-stage:empty,.llt-bar:empty,.llt-read:empty,.llt-status:empty,
+.llt-sec-body:empty,.llt-pagehead:empty,.llt-head:empty,
+.llt-sec-body .bar:empty,.llt-sec-body .row:empty,.llt-sec-body .actions:empty,
+.llt-sec-body .btns:empty,.llt-sec-body .controls:empty,
+.llt-sec-body .rd:empty,.llt-sec-body .stats:empty{display:none !important}
 
 body.llt-layout input[type=range]{-webkit-appearance:none;appearance:none;
   width:100%;min-width:120px;height:44px;background:transparent;cursor:pointer;margin:4px 0 0}
@@ -96,7 +108,7 @@ body.llt-layout label{display:flex;justify-content:space-between;align-items:cen
   font-size:.88rem;color:var(--ink);margin-top:10px;flex-wrap:wrap}
 body.llt-layout output{font:700 .84rem var(--mono);color:var(--sand);white-space:nowrap;
   background:rgba(217,185,140,.14);border:1px solid rgba(217,185,140,.38);border-radius:999px;padding:3px 10px}
-body.llt-layout select,body.llt-layout input[type=number],body.llt-layout input[type=text]{font-size:16px}
+body.llt-layout select,body.llt-layout input[type=number],body.llt-layout input[type=text]{font-size:16px;max-width:100%}
 body.llt-layout .chk{min-height:40px}
 body.llt-layout .chk input{width:21px;height:21px}
 body.llt-layout button{min-height:42px}
@@ -119,3 +131,18 @@ body.llt-layout #lltBack,body.llt-layout .llt-theme-btn{position:static !importa
   .llt-read{grid-template-columns:1fr 1fr}
   .llt-head h1{font-size:1.05rem}
 }
+/* llt-metrics-v2 */
+.llt-shell .panel,.llt-shell .panels,.llt-shell .gchip,.llt-shell .dock,
+.llt-shell .side,.llt-shell .sidebar,.llt-shell .chain,.llt-shell .controls,
+.llt-shell .row,.llt-shell .note,.llt-shell .note2,.llt-shell .fnote,
+.llt-shell .hint,.llt-shell .legend,.llt-shell .eq,.llt-shell header,.llt-shell footer{
+  position:static !important;inset:auto !important;transform:none !important;
+  left:auto !important;right:auto !important;top:auto !important;bottom:auto !important;
+  width:auto !important;max-width:100% !important;margin:0 !important;clip-path:none !important}
+.llt-stage .hud{position:absolute !important;left:12px !important;top:12px !important;width:auto !important}
+.llt-stage .prog{position:absolute !important;left:12px !important;right:12px !important;bottom:12px !important}
+.llt-stage>canvas+canvas,.llt-stage>canvas+svg{margin-top:8px}
+.llt-shell .info{display:grid !important;grid-template-columns:1fr !important;gap:10px}
+.llt-shell .tw,.llt-shell .tablewrap{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.llt-shell table{max-width:none}
+.llt-sec-body>.tw{margin:0 !important}

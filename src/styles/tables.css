@@ -1,0 +1,103 @@
+/* LibLabTab · таблицы: прокрутка вместо распирания, липкая первая колонка,
+   подсказка и копирование в TSV. Подключается последним в Base.astro. */
+
+.llt-tableframe{
+  position:relative;margin:16px 0;max-width:100%;min-width:0;
+  border:1px solid var(--line);border-radius:14px;background:var(--surface);
+  box-shadow:var(--shadow);overflow:hidden}
+.llt-tableframe::before,.llt-tableframe::after{
+  content:"";position:absolute;top:0;bottom:0;width:34px;pointer-events:none;
+  opacity:0;transition:opacity .18s ease;z-index:3}
+.llt-tableframe::before{left:0;background:linear-gradient(90deg,var(--surface) 12%,transparent)}
+.llt-tableframe::after{right:0;background:linear-gradient(270deg,var(--surface) 12%,transparent)}
+.llt-tableframe[data-overflow="1"][data-at-start="0"]::before{opacity:1}
+.llt-tableframe[data-overflow="1"][data-at-end="0"]::after{opacity:1}
+
+.llt-tablebar{display:flex;align-items:center;gap:10px;padding:9px 12px;
+  border-bottom:1px solid var(--line);background:var(--overlay)}
+.llt-tabletitle{font:600 .76rem var(--mono);color:var(--muted);letter-spacing:.02em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.llt-tablecopy{margin-left:auto;flex:none;font:600 .74rem var(--mono);min-height:34px;
+  padding:6px 12px;border-radius:999px;border:1px solid var(--line2);
+  background:transparent;color:var(--aqua);cursor:pointer;transition:.15s;touch-action:manipulation}
+.llt-tablecopy:hover{border-color:var(--aqua);background:rgba(79,216,196,.12)}
+.llt-tablecopy:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
+.llt-tablecopy[data-state="ok"]{color:var(--ok);border-color:var(--ok)}
+.llt-tablecopy[data-state="fail"]{color:var(--rose);border-color:var(--rose)}
+
+.llt-tablewrap{position:relative;max-width:100%;overflow-x:auto;overflow-y:hidden;
+  overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+  scrollbar-color:var(--aqua) var(--canvas);scrollbar-width:thin}
+.llt-tablewrap:focus-visible{outline:3px solid var(--aqua);outline-offset:-3px}
+.llt-tablewrap::-webkit-scrollbar{height:11px}
+.llt-tablewrap::-webkit-scrollbar-track{background:var(--canvas)}
+.llt-tablewrap::-webkit-scrollbar-thumb{border-radius:8px;border:2px solid var(--canvas);
+  background:linear-gradient(90deg,var(--deep),var(--aqua))}
+.llt-tablewrap::-webkit-scrollbar-thumb:hover{background:linear-gradient(90deg,var(--aqua),var(--ice))}
+.llt-tablewrap::-webkit-scrollbar-corner{background:var(--canvas)}
+
+.llt-tablewrap>table,
+.prose .llt-tablewrap>table,
+.cps .llt-tablewrap>table{
+  display:table;width:100%;min-width:520px;max-width:none;margin:0;
+  border-collapse:separate;border-spacing:0;white-space:normal;
+  font-family:var(--mono);font-size:.8rem;font-variant-numeric:tabular-nums}
+
+.llt-tablewrap th,.llt-tablewrap td{
+  padding:9px 11px;text-align:left;vertical-align:top;
+  border-bottom:1px solid var(--line);white-space:nowrap}
+.llt-tablewrap thead th{
+  position:sticky;top:0;z-index:2;background:var(--overlay);color:var(--muted);
+  font-weight:600;font-size:.74rem;letter-spacing:.02em;text-transform:none;
+  border-bottom:1px solid var(--line2)}
+.llt-tablewrap tbody tr:nth-child(even) td{background:rgba(126,214,199,.045)}
+.llt-tablewrap tbody tr:hover td{background:rgba(79,216,196,.10)}
+.llt-tablewrap tbody tr:last-child td{border-bottom:0}
+.llt-tablewrap td.num,.llt-tablewrap th.num{text-align:right}
+.llt-tablewrap .mono{font-family:var(--mono)}
+.llt-tablewrap .exp{color:var(--sand)}
+.llt-tablewrap .pass{color:var(--ok);font-weight:700}
+.llt-tablewrap .fail{color:var(--rose);font-weight:700}
+.llt-tablewrap tfoot td{background:var(--overlay);color:var(--muted);font-weight:600}
+
+.llt-tableframe[data-overflow="1"] .llt-tablewrap th:first-child,
+.llt-tableframe[data-overflow="1"] .llt-tablewrap td:first-child{
+  position:sticky;left:0;z-index:1;background:var(--surface);
+  box-shadow:1px 0 0 var(--line2)}
+.llt-tableframe[data-overflow="1"] .llt-tablewrap thead th:first-child{z-index:3;background:var(--overlay)}
+.llt-tableframe[data-overflow="1"] .llt-tablewrap tbody tr:nth-child(even) td:first-child{background:var(--surface)}
+.llt-tableframe[data-overflow="1"] .llt-tablewrap tbody tr:hover td:first-child{background:var(--overlay)}
+
+.llt-tablehint{position:absolute;right:10px;bottom:10px;z-index:4;
+  font:600 .7rem var(--mono);color:var(--sand);padding:4px 10px;border-radius:999px;
+  border:1px solid rgba(217,185,140,.42);background:var(--scrim);backdrop-filter:blur(6px);
+  pointer-events:none;opacity:0;transition:opacity .2s ease}
+.llt-tableframe[data-overflow="1"][data-at-end="0"][data-touched="0"] .llt-tablehint{opacity:1}
+
+.prose{min-width:0;overflow-x:clip}
+.cps{min-width:0}
+.cps .tw,.prose .tw{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* Запасной вариант до запуска скрипта и без JavaScript:
+   голая таблица прокручивается сама и не распирает страницу. */
+.prose>table,.cps>table,article>table{
+  display:block;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;
+  margin:16px 0;border:1px solid var(--line);border-radius:12px;
+  -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+  scrollbar-color:var(--aqua) var(--canvas);scrollbar-width:thin}
+.prose>table::-webkit-scrollbar,.cps>table::-webkit-scrollbar,article>table::-webkit-scrollbar{height:10px}
+.prose>table::-webkit-scrollbar-track,.cps>table::-webkit-scrollbar-track,article>table::-webkit-scrollbar-track{background:var(--canvas)}
+.prose>table::-webkit-scrollbar-thumb,.cps>table::-webkit-scrollbar-thumb,article>table::-webkit-scrollbar-thumb{
+  border-radius:8px;border:2px solid var(--canvas);background:linear-gradient(90deg,var(--deep),var(--aqua))}
+.prose>table th,.prose>table td,.cps>table th,.cps>table td{white-space:nowrap}
+.prose pre{max-width:100%;overflow-x:auto}
+.prose img,.prose svg{max-width:100%}
+
+@media (max-width:640px){
+  .llt-tablewrap>table,.prose .llt-tablewrap>table,.cps .llt-tablewrap>table{font-size:.76rem}
+  .llt-tablewrap th,.llt-tablewrap td{padding:8px 9px}
+  .llt-tablebar{padding:8px 10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .llt-tableframe::before,.llt-tableframe::after,.llt-tablehint{transition:none}
+}

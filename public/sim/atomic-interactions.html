@@ -340,7 +340,7 @@ var $=function(id){return document.getElementById(id)};
 
   /* ---------- сцена ---------- */
   function resize(){
-    W=Math.max(300,Math.round(sc.parentNode.clientWidth-28));
+    W=Math.max(300,Math.round(sc.parentNode.clientWidth));
     dpr=Math.min(2,window.devicePixelRatio||1);
     H1=Math.max(190,Math.round(W*0.26)); H2=Math.max(260,Math.round(W*0.36));
     sc.width=W*dpr; sc.height=H1*dpr; sc.style.height=H1+'px'; sx.setTransform(dpr,0,0,dpr,0,0);

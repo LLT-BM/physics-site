@@ -1,0 +1,56 @@
+{
+  "base": "http://localhost:4321",
+  "checked": 81,
+  "clean": 78,
+  "findings": [
+    {
+      "kind": "model",
+      "name": "atomic-interactions",
+      "size": "phone",
+      "path": "/models/atomic-interactions/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.llt-tabletitle",
+            "extra": 19
+          },
+          {
+            "sel": "span.llt-tabletitle",
+            "extra": 80
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "bernoulli",
+      "size": "phone",
+      "path": "/models/bernoulli/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.llt-tabletitle",
+            "extra": 102
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "penrose-billiard",
+      "size": "phone",
+      "path": "/models/penrose-billiard/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.llt-tabletitle",
+            "extra": 64
+          }
+        ]
+      },
+      "errors": []
+    }
+  ]
+}

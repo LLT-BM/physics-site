@@ -1,0 +1,169 @@
+---
+---
+<script>
+  function headingFor(frame: HTMLElement): string {
+    let node: Element | null = frame.previousElementSibling;
+    while (node) {
+      if (/^H[2-4]$/.test(node.tagName)) return (node.textContent || '').trim();
+      node = node.previousElementSibling;
+    }
+    const parent = frame.parentElement;
+    if (parent) {
+      let p: Element | null = parent.previousElementSibling;
+      while (p) {
+        if (/^H[2-4]$/.test(p.tagName)) return (p.textContent || '').trim();
+        p = p.previousElementSibling;
+      }
+      const inner = parent.querySelector('h2,h3,h4');
+      if (inner && !frame.contains(inner)) return (inner.textContent || '').trim();
+    }
+    return 'Таблица';
+  }
+
+  function toTSV(table: HTMLTableElement): string {
+    return Array.from(table.rows).map(r => Array.from(r.cells)
+      .map(c => (c.textContent || '').replace(/\s+/g, ' ').trim().replace(/\t/g, ' '))
+      .join('\t')).join('\n');
+  }
+
+  async function copyText(text: string): Promise<boolean> {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch { /* запасной способ ниже */ }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch { return false; }
+  }
+
+  /* Любая таблица без прокрутки получает рамку и скроллер */
+  function wrapBareTables() {
+    document.querySelectorAll<HTMLTableElement>('.prose table, .cps table, article table').forEach(table => {
+      if (table.closest('.llt-tablewrap') || table.closest('.offscreen')) return;
+
+      const existing = table.parentElement;
+      if (existing && (existing.classList.contains('tw') || existing.classList.contains('tablewrap'))) {
+        const frame = document.createElement('div');
+        frame.className = 'llt-tableframe';
+        existing.parentNode!.insertBefore(frame, existing);
+        existing.classList.add('llt-tablewrap');
+        frame.appendChild(existing);
+        return;
+      }
+
+      const frame = document.createElement('div');
+      frame.className = 'llt-tableframe';
+      const wrap = document.createElement('div');
+      wrap.className = 'llt-tablewrap';
+      wrap.setAttribute('tabindex', '0');
+      wrap.setAttribute('role', 'region');
+      table.parentNode!.insertBefore(frame, table);
+      wrap.appendChild(table);
+      frame.appendChild(wrap);
+    });
+  }
+
+  function setup(frame: HTMLElement) {
+    if (frame.dataset.ready === '1') return;
+    const wrap = frame.querySelector('.llt-tablewrap') as HTMLElement | null;
+    const table = wrap && wrap.querySelector('table') as HTMLTableElement | null;
+    if (!wrap || !table) return;
+    frame.dataset.ready = '1';
+
+    if (!wrap.hasAttribute('tabindex')) wrap.setAttribute('tabindex', '0');
+    if (!wrap.hasAttribute('role')) wrap.setAttribute('role', 'region');
+    const name = headingFor(frame);
+    wrap.setAttribute('aria-label', name + ' — таблица, прокручивается по горизонтали');
+
+    const bar = document.createElement('div');
+    bar.className = 'llt-tablebar';
+    const title = document.createElement('span');
+    title.className = 'llt-tabletitle';
+    title.textContent = name;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'llt-tablecopy';
+    btn.textContent = 'копировать';
+    btn.setAttribute('aria-label', 'Скопировать таблицу «' + name + '» в буфер обмена');
+    bar.appendChild(title);
+    bar.appendChild(btn);
+    frame.insertBefore(bar, wrap);
+
+    const hint = document.createElement('span');
+    hint.className = 'llt-tablehint';
+    hint.textContent = 'листайте →';
+    hint.setAttribute('aria-hidden', 'true');
+    frame.appendChild(hint);
+
+    const state = () => {
+      const over = wrap.scrollWidth - wrap.clientWidth;
+      frame.dataset.overflow = over > 4 ? '1' : '0';
+      frame.dataset.atStart = wrap.scrollLeft <= 2 ? '1' : '0';
+      frame.dataset.atEnd = wrap.scrollLeft >= over - 2 ? '1' : '0';
+    };
+    if (frame.dataset.touched === undefined) frame.dataset.touched = '0';
+
+    wrap.addEventListener('scroll', () => {
+      state();
+      if (wrap.scrollLeft > 10) frame.dataset.touched = '1';
+    }, { passive: true });
+
+    wrap.addEventListener('keydown', e => {
+      const step = Math.max(80, Math.round(wrap.clientWidth * 0.6));
+      if (e.key === 'ArrowRight') { wrap.scrollLeft += step; e.preventDefault(); }
+      else if (e.key === 'ArrowLeft') { wrap.scrollLeft -= step; e.preventDefault(); }
+      else if (e.key === 'Home') { wrap.scrollLeft = 0; e.preventDefault(); }
+      else if (e.key === 'End') { wrap.scrollLeft = wrap.scrollWidth; e.preventDefault(); }
+    });
+
+    let timer = 0;
+    btn.addEventListener('click', async () => {
+      const ok = await copyText(toTSV(table));
+      btn.dataset.state = ok ? 'ok' : 'fail';
+      btn.textContent = ok ? 'скопировано' : 'не удалось';
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        btn.textContent = 'копировать';
+        delete btn.dataset.state;
+      }, 1800);
+    });
+
+    if (window.ResizeObserver) {
+      const ro = new ResizeObserver(state);
+      ro.observe(wrap);
+      ro.observe(table);
+    }
+    window.addEventListener('resize', state, { passive: true });
+    state();
+    requestAnimationFrame(state);
+  }
+
+  function scan() {
+    wrapBareTables();
+    document.querySelectorAll<HTMLElement>('.llt-tableframe').forEach(setup);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scan);
+  else scan();
+
+  const mo = new MutationObserver(records => {
+    for (const r of records) {
+      for (const n of Array.from(r.addedNodes)) {
+        if (n.nodeType !== 1) continue;
+        const el = n as HTMLElement;
+        if (el.tagName === 'TABLE' || el.querySelector?.('table')) { scan(); return; }
+      }
+    }
+  });
+  mo.observe(document.body, { childList: true, subtree: true });
+</script>

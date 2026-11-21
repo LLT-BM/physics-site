@@ -3,6 +3,8 @@ import '../styles/tokens.css';
 import '../styles/global.css';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import '../styles/mobile.css';
+import '../styles/tables.css';
+import TableScroll from '../components/TableScroll.astro';
 import FrameBridge from '../components/FrameBridge.astro';
 
 interface Props {
@@ -76,5 +78,6 @@ const ogImage = new URL(image.replace('.svg', '.png'), Astro.site);
     <a href="https://github.com/LLT-BM/physics-site">исходники</a>
   </footer>
   <FrameBridge />
+  <TableScroll />
 </body>
 </html>

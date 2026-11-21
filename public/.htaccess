@@ -66,3 +66,25 @@ Redirect 301 /account/ /
   Header set Referrer-Policy "strict-origin-when-cross-origin"
   Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 </IfModule>
+# Каталог только по темам: старые теги уводим на разделы
+Redirect 301 /tags/механика/ /sections/механика/
+Redirect 301 /tags/электродинамика/ /sections/электричество/
+Redirect 301 /tags/оптика/ /sections/оптика/
+Redirect 301 /tags/квантовая-физика/ /sections/квантовая-физика/
+Redirect 301 /tags/молекулярная-физика/ /sections/молекулярная-физика/
+Redirect 301 /tags/гидродинамика/ /sections/гидродинамика/
+Redirect 301 /tags/астрономия/ /sections/астрономия/
+Redirect 301 /tags/хаос/ /sections/нелинейная-динамика/
+Redirect 301 /tags/колебания/ /sections/механика/
+Redirect 301 /tags/статика/ /sections/механика/
+Redirect 301 /tags/клеточные-автоматы/ /sections/нелинейная-динамика/
+Redirect 301 /tags/ван-дер-ваальс/ /sections/молекулярная-физика/
+Redirect 301 /tags/масштабы/ /sections/астрономия/
+Redirect 301 /tags/масштабы-вселенной/ /sections/астрономия/
+Redirect 301 /tags/постоянный-ток/ /sections/электричество/
+Redirect 301 /tags/переменный-ток/ /sections/электричество/
+Redirect 301 /tags/геометрическая-оптика/ /sections/оптика/
+Redirect 301 /tags/самоорганизация/ /sections/нелинейная-динамика/
+Redirect 301 /tags/школьный-курс/ /
+Redirect 301 /tags/3d/ /
+Redirect 301 /tags/численные-методы/ /
