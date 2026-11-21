@@ -1,0 +1,311 @@
+---
+interface Props { src: string; title: string; slug: string }
+const { src, title, slug } = Astro.props;
+---
+<div class="shell" data-shell data-slug={slug}>
+  <div class="stagecol">
+    <div class="stage" data-stage>
+      <iframe data-frame src={src} title={`Интерактивная модель: ${title}`}
+              loading="eager" allow="fullscreen" referrerpolicy="same-origin"></iframe>
+      <div class="stage-wait" data-wait>Загружаем сцену…</div>
+    </div>
+
+    <div class="toolbar" data-toolbar role="toolbar" aria-label="Управление моделью"></div>
+    <div class="telemetry" data-telemetry aria-live="off"></div>
+
+    <p class="stage-note hide" data-fallback>
+      Модель работает внутри сцены. Если органы управления не появились снаружи —
+      <a href={src} target="_blank" rel="noopener">откройте её на весь экран</a>.
+    </p>
+  </div>
+
+  <aside class="sidecol" aria-label="Настройки модели">
+    <div class="side-head">
+      <a class="ghostbtn" href="/">← каталог</a>
+      <a class="ghostbtn" href={src} target="_blank" rel="noopener">на весь экран ↗</a>
+      <button class="ghostbtn" type="button" data-expand>развернуть всё</button>
+    </div>
+
+    <section class="panel" data-panel="basic">
+      <h2>Простые настройки</h2>
+      <p class="panel-note">Школьный уровень: то, что меняет картину сразу.</p>
+      <div class="controls" data-basic></div>
+      <p class="panel-empty" data-basic-empty>Настройки появятся после загрузки сцены.</p>
+    </section>
+
+    <details class="disc" data-disc="advanced" data-tone="sand">
+      <summary>
+        <span class="disc-mark" aria-hidden="true"></span>
+        <span class="disc-title">Точные настройки</span>
+        <span class="disc-count" data-adv-count>0</span>
+      </summary>
+      <div class="disc-body"><div class="controls" data-advanced></div></div>
+    </details>
+
+    <details class="disc" data-disc="presets" data-tone="lilac">
+      <summary>
+        <span class="disc-mark" aria-hidden="true"></span>
+        <span class="disc-title">Готовые примеры</span>
+        <span class="disc-count" data-pre-count>0</span>
+      </summary>
+      <div class="disc-body"><div class="presets" data-presets></div></div>
+    </details>
+  </aside>
+</div>
+
+<script>
+  type Ctl = {
+    key: string; kind: 'range'|'select'|'check'|'number'|'action'|'preset';
+    label: string; unit?: string; level: 'basic'|'adv';
+    min?: number; max?: number; step?: number; value?: any;
+    options?: { value: string; label: string }[]; group?: string;
+  };
+  type Manifest = { slug: string; controls: Ctl[]; actions: Ctl[]; presets: Ctl[] };
+  type Reading = { key: string; label: string; value: string };
+
+  const shellEl = document.querySelector('[data-shell]') as HTMLElement | null;
+
+  if (shellEl) {
+    /* Отдельная не-nullable ссылка: сужение типа не теряется во вложенных функциях. */
+    const root: HTMLElement = shellEl;
+
+    const frame = root.querySelector('[data-frame]') as HTMLIFrameElement;
+    const stage = root.querySelector('[data-stage]') as HTMLElement;
+    const wait = root.querySelector('[data-wait]') as HTMLElement;
+    const toolbar = root.querySelector('[data-toolbar]') as HTMLElement;
+    const telemetry = root.querySelector('[data-telemetry]') as HTMLElement;
+    const basicBox = root.querySelector('[data-basic]') as HTMLElement;
+    const advBox = root.querySelector('[data-advanced]') as HTMLElement;
+    const preBox = root.querySelector('[data-presets]') as HTMLElement;
+    const basicEmpty = root.querySelector('[data-basic-empty]') as HTMLElement;
+    const fallback = root.querySelector('[data-fallback]') as HTMLElement;
+    const advCount = root.querySelector('[data-adv-count]') as HTMLElement;
+    const preCount = root.querySelector('[data-pre-count]') as HTMLElement;
+    const advDisc = root.querySelector('[data-disc="advanced"]') as HTMLElement;
+    const preDisc = root.querySelector('[data-disc="presets"]') as HTMLElement;
+    const expand = root.querySelector('[data-expand]') as HTMLButtonElement;
+    const slug = root.dataset.slug || 'model';
+
+    const store = {
+      get(k: string){ try { return localStorage.getItem(k); } catch { return null; } },
+      set(k: string, v: string){ try { localStorage.setItem(k, v); } catch {} }
+    };
+
+    let manifest: Manifest | null = null;
+    const nodes = new Map<string, HTMLElement>();
+
+    const post = (msg: Record<string, unknown>) => {
+      try { frame.contentWindow?.postMessage({ llt: 'cmd', ...msg }, location.origin); } catch {}
+    };
+
+    const fmt = (v: number, step?: number) => {
+      const d = step && step < 1 ? Math.min(4, String(step).split('.')[1]?.length || 2) : 0;
+      return new Intl.NumberFormat('ru-RU', { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
+    };
+
+    const buildControl = (c: Ctl): HTMLElement | null => {
+      if (c.kind === 'action' || c.kind === 'preset') {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = c.kind === 'preset' ? 'presetbtn' : 'actbtn';
+        b.textContent = c.label;
+        b.addEventListener('click', () => post({ op: 'press', key: c.key }));
+        nodes.set(c.key, b);
+        return b;
+      }
+
+      const wrap = document.createElement('div');
+      wrap.className = 'ctl';
+      const id = 'ctl-' + slug + '-' + c.key;
+
+      const head = document.createElement('label');
+      head.className = 'ctl-head';
+      head.setAttribute('for', id);
+      const name = document.createElement('span');
+      name.textContent = c.label;
+      const out = document.createElement('output');
+      out.className = 'ctl-out';
+      head.appendChild(name);
+      head.appendChild(out);
+      wrap.appendChild(head);
+
+      let input: HTMLInputElement | HTMLSelectElement;
+
+      if (c.kind === 'select') {
+        const s = document.createElement('select');
+        (c.options || []).forEach(o => {
+          const opt = document.createElement('option');
+          opt.value = o.value; opt.textContent = o.label;
+          s.appendChild(opt);
+        });
+        s.value = String(c.value ?? '');
+        out.textContent = s.selectedOptions[0]?.textContent || '';
+        input = s;
+      } else if (c.kind === 'check') {
+        const i = document.createElement('input');
+        i.type = 'checkbox';
+        i.checked = !!c.value;
+        wrap.classList.add('ctl-check');
+        out.remove();
+        head.insertBefore(i, name);
+        input = i;
+      } else if (c.kind === 'number') {
+        const i = document.createElement('input');
+        i.type = 'number';
+        i.inputMode = 'decimal';
+        if (c.min !== undefined) i.min = String(c.min);
+        if (c.max !== undefined) i.max = String(c.max);
+        if (c.step !== undefined) i.step = String(c.step);
+        i.value = String(c.value ?? '');
+        out.textContent = String(c.value ?? '') + (c.unit ? ' ' + c.unit : '');
+        input = i;
+      } else {
+        const i = document.createElement('input');
+        i.type = 'range';
+        i.min = String(c.min ?? 0);
+        i.max = String(c.max ?? 100);
+        i.step = String(c.step ?? 1);
+        i.value = String(c.value ?? 0);
+        const paint = () => {
+          const mn = +i.min, mx = +i.max, v = +i.value;
+          const f = mx > mn ? ((v - mn) / (mx - mn)) * 100 : 0;
+          i.style.setProperty('--fill', Math.max(0, Math.min(100, f)).toFixed(2) + '%');
+          out.textContent = fmt(v, c.step) + (c.unit ? ' ' + c.unit : '');
+        };
+        paint();
+        i.addEventListener('input', paint);
+        input = i;
+      }
+
+      input.id = id;
+      input.setAttribute('aria-label', c.label + (c.unit ? ', ' + c.unit : ''));
+
+      const send = () => {
+        const el = input as HTMLInputElement;
+        const v = el.type === 'checkbox' ? el.checked : el.value;
+        if (c.kind === 'select') out.textContent = (input as HTMLSelectElement).selectedOptions[0]?.textContent || '';
+        if (c.kind === 'number') out.textContent = String(v) + (c.unit ? ' ' + c.unit : '');
+        post({ op: 'set', key: c.key, value: v });
+      };
+      input.addEventListener('input', send);
+      input.addEventListener('change', send);
+      wrap.appendChild(input);
+      nodes.set(c.key, input);
+      return wrap;
+    };
+
+    const render = (m: Manifest) => {
+      manifest = m;
+      toolbar.innerHTML = ''; basicBox.innerHTML = ''; advBox.innerHTML = ''; preBox.innerHTML = '';
+      nodes.clear();
+
+      m.actions.forEach(a => { const n = buildControl(a); if (n) toolbar.appendChild(n); });
+      toolbar.classList.toggle('hide', m.actions.length === 0);
+
+      let nb = 0, na = 0;
+      m.controls.forEach(c => {
+        const n = buildControl(c);
+        if (!n) return;
+        if (c.level === 'basic') { basicBox.appendChild(n); nb++; }
+        else { advBox.appendChild(n); na++; }
+      });
+      m.presets.forEach(p => { const n = buildControl(p); if (n) preBox.appendChild(n); });
+
+      advCount.textContent = String(na);
+      preCount.textContent = String(m.presets.length);
+      basicEmpty.classList.toggle('hide', nb > 0);
+      advDisc.classList.toggle('hide', na === 0);
+      preDisc.classList.toggle('hide', m.presets.length === 0);
+      fallback.classList.add('hide');
+      stage.dataset.live = '1';
+      wait.classList.add('hide');
+    };
+
+    const renderTelemetry = (rows: Reading[]) => {
+      const seen = new Set<string>();
+      rows.slice(0, 12).forEach(r => {
+        seen.add(r.key);
+        let chip = telemetry.querySelector('[data-tk="' + CSS.escape(r.key) + '"]') as HTMLElement | null;
+        if (!chip) {
+          chip = document.createElement('div');
+          chip.className = 'tchip';
+          chip.dataset.tk = r.key;
+          const l = document.createElement('span'); l.className = 'tl';
+          const v = document.createElement('b'); v.className = 'tv';
+          chip.appendChild(l); chip.appendChild(v);
+          telemetry.appendChild(chip);
+        }
+        (chip.querySelector('.tl') as HTMLElement).textContent = r.label;
+        (chip.querySelector('.tv') as HTMLElement).textContent = r.value;
+      });
+      Array.from(telemetry.children).forEach(ch => {
+        if (!seen.has((ch as HTMLElement).dataset.tk || '')) ch.remove();
+      });
+    };
+
+    const syncValues = (values: Record<string, unknown>) => {
+      if (!manifest) return;
+      manifest.controls.forEach(c => {
+        if (!(c.key in values)) return;
+        const el = nodes.get(c.key) as HTMLInputElement | HTMLSelectElement | undefined;
+        if (!el) return;
+        const v = values[c.key];
+        if ((el as HTMLInputElement).type === 'checkbox') (el as HTMLInputElement).checked = !!v;
+        else if (String(el.value) !== String(v)) el.value = String(v);
+        el.dispatchEvent(new Event('input'));
+        const out = el.closest('.ctl')?.querySelector('.ctl-out') as HTMLElement | null;
+        if (out && c.kind === 'range') out.textContent = fmt(+(el as HTMLInputElement).value, c.step) + (c.unit ? ' ' + c.unit : '');
+      });
+    };
+
+    window.addEventListener('message', e => {
+      if (e.source !== frame.contentWindow) return;
+      const d = e.data;
+      if (!d || typeof d !== 'object') return;
+      if (d.llt === 'hello' && d.manifest) render(d.manifest as Manifest);
+      else if (d.llt === 'telemetry' && Array.isArray(d.rows)) renderTelemetry(d.rows as Reading[]);
+      else if (d.llt === 'values' && d.values) syncValues(d.values as Record<string, unknown>);
+      else if (d.llt === 'stage-size' && d.height) stage.style.setProperty('--stage-h', d.height + 'px');
+    });
+
+    const attachBridge = () => {
+      try {
+        const doc = frame.contentDocument;
+        if (!doc) throw new Error('no document');
+        if (doc.querySelector('script[data-llt-bridge]')) return;
+        const s = doc.createElement('script');
+        s.src = '/sim/lib/bridge.js';
+        s.dataset.lltBridge = '1';
+        s.dataset.slug = slug;
+        (doc.head || doc.documentElement).appendChild(s);
+      } catch {
+        fallback.classList.remove('hide');
+        wait.classList.add('hide');
+      }
+    };
+
+    frame.addEventListener('load', () => {
+      wait.classList.add('hide');
+      attachBridge();
+      setTimeout(() => { if (!manifest) fallback.classList.remove('hide'); }, 2600);
+    });
+
+    let allOpen = false;
+    expand.addEventListener('click', () => {
+      allOpen = !allOpen;
+      document.querySelectorAll<HTMLDetailsElement>('details.disc').forEach(d => {
+        d.open = allOpen;
+        const key = d.dataset.disc;
+        if (key) store.set('llt-disc:' + slug + ':' + key, allOpen ? '1' : '0');
+      });
+      expand.textContent = allOpen ? 'свернуть всё' : 'развернуть всё';
+    });
+
+    document.querySelectorAll<HTMLDetailsElement>('details.disc[data-disc]').forEach(d => {
+      const key = 'llt-disc:' + slug + ':' + d.dataset.disc;
+      const saved = store.get(key);
+      if (saved !== null) d.open = saved === '1';
+      d.addEventListener('toggle', () => store.set(key, d.open ? '1' : '0'));
+    });
+  }
+</script>

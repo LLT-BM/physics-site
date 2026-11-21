@@ -19,3 +19,7 @@ audit-state.json
 # системное
 .DS_Store
 Thumbs.db
+# артефакты и корзина чистки
+.repo-trash/
+layout-audit/
+layout-audit.json

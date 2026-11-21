@@ -1,6 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Comments from '../../components/Comments.astro';
+import Disclosure from '../../components/Disclosure.astro';
+import ModelShell from '../../components/ModelShell.astro';
+import '../../styles/model.css';
 import { published, neighbours } from '../../lib/models';
 import { render } from 'astro:content';
 
@@ -9,210 +12,76 @@ export async function getStaticPaths(){
   return list.map(m => ({ params: { slug: m.id }, props: { m } }));
 }
 const { m } = Astro.props;
-const { Content, headings } = await render(m);
-const toc = headings.filter(h => h.depth === 2);
+const { Content } = await render(m);
 const { prev, next } = await neighbours(m.id);
 const d = m.data;
+const lead = d.lead ?? d.description;
 const dateStr = d.date.toLocaleDateString('ru-RU', { timeZone:'UTC', day:'2-digit', month:'2-digit', year:'numeric' });
 
 const jsonLd = {
   '@context':'https://schema.org', '@type':'LearningResource',
-  name: d.title, description: d.description, url: new URL(Astro.url.pathname, Astro.site).href,
+  name:d.title, description:d.description,
+  url:new URL(Astro.url.pathname, Astro.site).href,
   inLanguage:'ru', learningResourceType:'interactive simulation',
-  educationalLevel: d.grade ?? d.level, teaches: d.section,
-  keywords: d.tags.join(', '), datePublished: d.date.toISOString(),
-  isAccessibleForFree: true,
-  interactivityType:'active',
+  educationalLevel:d.grade ?? d.level, teaches:d.section,
+  datePublished:d.date.toISOString(), isAccessibleForFree:true, interactivityType:'active',
   publisher:{ '@type':'Organization', name:'LibLabTab', url:'https://liblabtab.ru' }
 };
 ---
 <Base title={`${d.title} — LibLabTab`} description={d.description}
       image={d.cover} imageAlt={`${d.title}: интерактивная модель, ${d.section}`} jsonLd={jsonLd}>
-
   <article class="model">
-    <nav class="crumbs" aria-label="Навигация">
-      <a href="/">каталог</a><span>›</span><a href={`/?section=${encodeURIComponent(d.section)}`}>{d.section}</a>
-      <span>›</span><b>{d.title}</b>
-    </nav>
-
     <header class="mhead">
       <h1>{d.title}</h1>
-      <p class="lead">{d.description}</p>
       <div class="mmeta">
-        <span class="mchip sec">{d.section}</span>
-        <span class={'mchip ' + (d.level === 'базовый' ? 'ok' : 'sand')}>{d.level}</span>
-        {d.grade && <span class="mchip">{d.grade} класс</span>}
-        <span class="mchip">{dateStr}</span>
+        <a class="mchip sec" href={`/sections/${d.section}/`}>{d.section}</a>
+        {d.grade && <span class="mchip grade">{d.grade} класс</span>}
+        <span class="mchip">{d.level}</span>
         <span class="mchip">ядро v{d.coreVersion}</span>
+        <span class="mchip">{dateStr}</span>
       </div>
     </header>
+    <p class="mlead">{lead}</p>
 
-    <section class="stage-wrap">
-      <div class="model-frame">
-        <iframe id="simFrame" src={`/sim/${d.model}`} title={`Интерактивная модель: ${d.title}`}
-                loading="lazy" allow="fullscreen"></iframe>
-      </div>
-      <div class="frame-bar">
-        <a href={`/sim/${d.model}`} target="_blank" rel="noopener">↗ на весь экран</a>
-        <button id="btnTest" type="button" class="tbtn">✓ Проверить модель</button>
-        <span id="testState" class="tstate" role="status" aria-live="polite"></span>
-      </div>
-      <div id="testBox" class="testbox hide">
-        <div class="tw llt-tablewrap"><table id="testOut"></table></div>
-      </div>
-    </section>
+    <ModelShell src={`/sim/${d.model}`} title={d.title} slug={m.id} />
 
-    {d.checkpoints.length > 0 && (
-      <section class="cps" id="контрольные-точки">
-        <h2>Контрольные точки</h2>
-        <p class="note">Введите эти настройки в модели и сверьте показания. Значения пересчитаны независимо от кода симуляции.</p>
-        <div class="tw llt-tablewrap">
-          <table>
-            <thead><tr><th>Что проверяем</th><th>Настройки</th><th>Ожидаемое значение</th></tr></thead>
-            <tbody>
-              {d.checkpoints.map(c => (
-                <tr><td>{c.name}</td><td class="mono">{c.setup}</td><td class="mono exp">{c.expected}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    )}
+    <div class="blocks">
+      <Disclosure id="theory" title="Что происходит" tone="aqua" hint="коротко о физике">
+        <div class="prose"><Content /></div>
+      </Disclosure>
 
-    {toc.length > 2 && (
-      <nav class="toc" aria-label="Содержание">
-        <span class="tlab">Содержание</span>
-        {toc.map(h => <a href={`#${h.slug}`}>{h.text}</a>)}
-        {d.answers.length > 0 && <a href="#ответы">Ответы</a>}
-        {d.checkpoints.length > 0 && <a href="#контрольные-точки">Контрольные точки</a>}
-      </nav>
-    )}
+      {d.limits.length > 0 && (
+        <Disclosure id="limits" title="Границы модели" tone="rose" count={d.limits.length}>
+          <ul class="limits">{d.limits.map(x => <li>{x}</li>)}</ul>
+        </Disclosure>
+      )}
 
-    <div class="prose"><Content /></div>
+      {d.checkpoints.length > 0 && (
+        <Disclosure id="checks" title="Контрольные точки" tone="sand" count={d.checkpoints.length}
+                    hint="введите настройки и сверьте показания">
+          <div class="llt-tableframe">
+            <div class="llt-tablewrap" tabindex="0" role="region" aria-label="Контрольные точки">
+              <table>
+                <thead><tr><th>Что проверяем</th><th>Настройки</th><th>Ожидаемое значение</th></tr></thead>
+                <tbody>
+                  {d.checkpoints.map(c => (
+                    <tr><td>{c.name}</td><td class="mono">{c.setup}</td><td class="mono exp">{c.expected}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </Disclosure>
+      )}
 
-    {d.answers.length > 0 && (
-      <section class="answers" id="ответы">
-        <h2>Ответы на вопросы для самопроверки</h2>
-        <p class="note">Сначала попробуйте сами — потом раскройте.</p>
-        {d.answers.map((it, i) => (
-          <details class="ans">
-            <summary><span class="qn">{i + 1}</span>{it.q}</summary>
-            <div class="abody">{it.a}</div>
-          </details>
-        ))}
-      </section>
-    )}
+      <Disclosure id="comments" title="Комментарии" tone="lilac">
+        <Comments term={d.title} />
+      </Disclosure>
+    </div>
 
     <nav class="neigh" aria-label="Соседние модели">
       {prev ? <a class="nb" href={`/models/${prev.id}/`}><i>← предыдущая</i><b>{prev.data.title}</b></a> : <span />}
       {next ? <a class="nb right" href={`/models/${next.id}/`}><i>следующая →</i><b>{next.data.title}</b></a> : <span />}
     </nav>
-
-    <Comments term={d.title} />
   </article>
 </Base>
-
-<style>
-  .model{max-width:1000px;margin:0 auto}
-  .crumbs{display:flex;flex-wrap:wrap;gap:7px;align-items:center;font:600 .76rem var(--mono);color:var(--muted);margin-bottom:10px}
-  .crumbs a{color:var(--aqua);text-decoration:none}
-  .crumbs b{color:var(--ink);font-weight:600}
-  .mhead{position:relative;padding-left:0}
-  h1{font:800 clamp(1.5rem,5vw,2.1rem)/1.14 var(--disp);margin:0 0 8px}
-  .lead{color:var(--muted);max-width:80ch;margin:0 0 10px}
-  .mmeta{display:flex;flex-wrap:wrap;gap:6px}
-  .mchip{font:600 .72rem var(--mono);padding:5px 9px;border-radius:999px;border:1px solid var(--line2);color:var(--muted)}
-  .mchip.sec{color:var(--aqua)} .mchip.ok{color:var(--ok)} .mchip.sand{color:var(--sand)}
-  .stage-wrap{margin-top:16px}
-  .tbtn{font:inherit;font-size:16px;font-weight:600;min-height:44px;padding:10px 14px;border-radius:999px;
-    border:1px solid var(--aqua);background:var(--aqua);color:var(--on);cursor:pointer;touch-action:manipulation}
-  .tstate{font:600 .78rem var(--mono);color:var(--aqua)}
-  .testbox{margin-top:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:10px 12px}
-  .testbox.hide{display:none}
-  .cps,.answers{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
-  .cps h2,.answers h2{font:600 1.05rem var(--disp);margin:0 0 8px;padding-left:11px;border-left:4px solid var(--sand)}
-  .answers h2{border-color:var(--lilac)}
-  .note{color:var(--muted);font-size:.88rem;margin:0 0 10px}
-  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{width:100%;border-collapse:collapse;font-size:.86rem}
-  th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-  th{color:var(--muted);font:600 .74rem var(--mono)}
-  .mono{font-family:var(--mono);font-size:.8rem}
-  .exp{color:var(--sand)}
-  .pass{color:var(--ok);font-weight:700} .fail{color:var(--rose);font-weight:700}
-  .toc{position:sticky;top:64px;z-index:20;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
-    margin:18px 0 4px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;
-    background:var(--scrim);backdrop-filter:blur(8px)}
-  .tlab{font:600 .7rem var(--mono);color:var(--muted);margin-right:4px}
-  .toc a{font:600 .76rem var(--mono);color:var(--ink);text-decoration:none;padding:6px 10px;
-    border-radius:999px;border:1px solid transparent;min-height:34px;display:inline-flex;align-items:center}
-  .toc a:hover{color:var(--aqua);border-color:var(--line2);background:var(--overlay)}
-  .prose{margin-top:14px;line-height:1.68}
-  .prose :global(h2){font:600 1.15rem var(--disp);margin:26px 0 10px;padding-left:11px;border-left:4px solid var(--aqua);scroll-margin-top:110px}
-  .prose :global(h3){font:600 1rem var(--disp);margin:18px 0 8px;scroll-margin-top:110px}
-  .prose :global(p){margin:0 0 12px}
-  .prose :global(ul),.prose :global(ol){margin:0 0 12px;padding-left:22px}
-  .prose :global(li){margin-bottom:6px}
-  .prose :global(code){font-family:var(--mono);font-size:.86em;background:var(--overlay);padding:2px 6px;border-radius:6px}
-  .prose :global(strong){color:var(--sand)}
-  .prose :global(blockquote){margin:12px 0;padding:10px 14px;border-left:3px solid var(--lilac);background:var(--overlay);border-radius:0 10px 10px 0}
-  .ans{border:1px solid var(--line);border-radius:11px;background:var(--surface);margin-bottom:8px;overflow:hidden}
-  .ans>summary{cursor:pointer;padding:12px 13px;font-size:.94rem;list-style:none;display:flex;gap:9px;align-items:flex-start;min-height:48px}
-  .ans>summary::-webkit-details-marker{display:none}
-  .qn{flex:none;width:22px;height:22px;border-radius:50%;background:var(--overlay);color:var(--lilac);
-    font:700 .72rem var(--mono);display:grid;place-items:center;margin-top:1px}
-  .ans[open]>summary{border-bottom:1px solid var(--line);color:var(--aqua)}
-  .abody{padding:12px 13px;color:var(--muted);font-size:.92rem;line-height:1.6}
-  .neigh{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
-  .nb{display:block;text-decoration:none;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
-  .nb:hover{border-color:var(--aqua)}
-  .nb i{display:block;font:600 .72rem var(--mono);color:var(--muted);font-style:normal;margin-bottom:4px}
-  .nb b{font:600 .94rem var(--disp);color:var(--ink)}
-  .nb.right{text-align:right}
-  @media (max-width:720px){
-    .toc{position:static;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
-    .neigh{grid-template-columns:1fr}
-    .nb.right{text-align:left}
-    table{min-width:480px}
-  }
-
-  .prose :global(pre){max-width:100%;overflow-x:auto}
-  .prose :global(img),.prose :global(svg){max-width:100%}
-</style>
-
-<script is:inline>
-(function(){
-  var btn=document.getElementById('btnTest'), st=document.getElementById('testState');
-  var box=document.getElementById('testBox'), out=document.getElementById('testOut');
-  var frame=document.getElementById('simFrame');
-  if(!btn||!frame) return;
-  var timer=null;
-  function render(res){
-    clearTimeout(timer);
-    if(!res||!res.rows||!res.rows.length){
-      st.textContent='в этой модели встроенный самотест пока не подключён — сверьте таблицу ниже вручную';
-      box.classList.add('hide'); return;
-    }
-    st.textContent='пройдено '+res.ok+' из '+res.total;
-    out.innerHTML='<thead><tr><th>Проверка</th><th>Модель</th><th>Эталон</th><th>Итог</th></tr></thead><tbody>'+
-      res.rows.map(function(r){
-        return '<tr><td>'+r.name+'</td><td class="mono">'+r.got+'</td><td class="mono exp">'+r.want+
-               '</td><td class="'+(r.ok?'pass':'fail')+'">'+(r.ok?'✓':'✗')+'</td></tr>';
-      }).join('')+'</tbody>';
-    box.classList.remove('hide');
-  }
-  window.addEventListener('message',function(e){
-    if(e.source!==frame.contentWindow) return;
-    var d=e.data; if(!d||d.llt!=='selftest-result') return;
-    render(d.result);
-  });
-  btn.addEventListener('click',function(){
-    st.textContent='проверяем…';
-    try{ frame.contentWindow.postMessage({llt:'selftest-run',id:String(Date.now())},'*'); }
-    catch(e){ st.textContent='не удалось связаться с моделью'; return; }
-    timer=setTimeout(function(){
-      st.textContent='модель не ответила — откройте её на весь экран и попробуйте снова';
-    },4000);
-  });
-})();
-</script>

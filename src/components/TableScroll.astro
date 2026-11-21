@@ -32,21 +32,27 @@
         await navigator.clipboard.writeText(text);
         return true;
       }
-    } catch { /* запасной способ ниже */ }
+    } catch { /* переходим к запасному способу */ }
+
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+    document.body.appendChild(ta);
     try {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.setAttribute('readonly', '');
-      ta.style.cssText = 'position:fixed;left:-9999px;top:0';
-      document.body.appendChild(ta);
       ta.select();
-      const ok = document.execCommand('copy');
+      ta.setSelectionRange(0, ta.value.length);
+      /* Устаревший API вызывается через собственный тип: он остаётся единственным
+         способом копирования в небезопасном контексте и в старых Safari. */
+      const legacy = document as unknown as { execCommand(cmd: string): boolean };
+      return legacy.execCommand('copy');
+    } catch {
+      return false;
+    } finally {
       document.body.removeChild(ta);
-      return ok;
-    } catch { return false; }
+    }
   }
 
-  /* Любая таблица без прокрутки получает рамку и скроллер */
   function wrapBareTables() {
     document.querySelectorAll<HTMLTableElement>('.prose table, .cps table, article table').forEach(table => {
       if (table.closest('.llt-tablewrap') || table.closest('.offscreen')) return;
@@ -76,7 +82,7 @@
   function setup(frame: HTMLElement) {
     if (frame.dataset.ready === '1') return;
     const wrap = frame.querySelector('.llt-tablewrap') as HTMLElement | null;
-    const table = wrap && wrap.querySelector('table') as HTMLTableElement | null;
+    const table = wrap ? wrap.querySelector('table') as HTMLTableElement | null : null;
     if (!wrap || !table) return;
     frame.dataset.ready = '1';
 

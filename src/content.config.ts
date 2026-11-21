@@ -20,6 +20,8 @@ const models = defineCollection({
     title: z.string(),
     date: z.coerce.date(),
     description: z.string(),
+    /** Одна-две фразы под заголовком. Единственная теория, видимая сразу. */
+    lead: z.string().optional(),
     tags: z.array(z.enum(TAGS)).default([]),
     model: z.string(),
     cover: z.string(),
@@ -29,10 +31,12 @@ const models = defineCollection({
     order: z.number().int().positive(),
     coreVersion: z.string().default('1'),
     draft: z.boolean().default(false),
-    answers: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
+    /** Эталонные значения для сверки. Блок свёрнут по умолчанию. */
     checkpoints: z.array(z.object({
       name: z.string(), setup: z.string(), expected: z.string()
     })).default([]),
+    /** Что модель упрощает. Блок свёрнут по умолчанию. */
+    limits: z.array(z.string()).default([]),
     aliases: z.array(z.string()).default([])
   })
 });

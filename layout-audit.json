@@ -1,8 +1,54 @@
 {
   "base": "http://localhost:4321",
   "checked": 81,
-  "clean": 78,
+  "clean": 54,
   "findings": [
+    {
+      "kind": "model",
+      "name": "atom-model",
+      "size": "phone",
+      "path": "/models/atom-model/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.disc-title",
+            "extra": 19
+          }
+        ]
+      },
+      "errors": [
+        "Cannot read properties of undefined (reading '0')",
+        "Cannot read properties of undefined (reading '0')",
+        "Cannot read properties of undefined (reading '0')",
+        "Cannot read properties of undefined (reading '0')"
+      ]
+    },
+    {
+      "kind": "model",
+      "name": "atom-model",
+      "size": "tablet",
+      "path": "/models/atom-model/",
+      "issues": {},
+      "errors": [
+        "Cannot read properties of undefined (reading '0')",
+        "Cannot read properties of undefined (reading '0')",
+        "Cannot read properties of undefined (reading '0')",
+        "Cannot read properties of undefined (reading '0')"
+      ]
+    },
+    {
+      "kind": "model",
+      "name": "atom-model",
+      "size": "desktop",
+      "path": "/models/atom-model/",
+      "issues": {},
+      "errors": [
+        "Cannot read properties of undefined (reading '0')",
+        "Cannot read properties of undefined (reading '0')",
+        "Cannot read properties of undefined (reading '0')",
+        "Cannot read properties of undefined (reading '0')"
+      ]
+    },
     {
       "kind": "model",
       "name": "atomic-interactions",
@@ -12,11 +58,15 @@
         "clipped": [
           {
             "sel": "span.llt-tabletitle",
-            "extra": 19
+            "extra": 71
           },
           {
             "sel": "span.llt-tabletitle",
-            "extra": 80
+            "extra": 132
+          },
+          {
+            "sel": "span.disc-title",
+            "extra": 16
           }
         ]
       },
@@ -30,8 +80,295 @@
       "issues": {
         "clipped": [
           {
+            "sel": "b.tv",
+            "extra": 94
+          },
+          {
+            "sel": "span.tl",
+            "extra": 5
+          },
+          {
             "sel": "span.llt-tabletitle",
-            "extra": 102
+            "extra": 154
+          },
+          {
+            "sel": "span.disc-title",
+            "extra": 19
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "bernoulli",
+      "size": "tablet",
+      "path": "/models/bernoulli/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "b.tv",
+            "extra": 76
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "bernoulli",
+      "size": "desktop",
+      "path": "/models/bernoulli/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "b.tv",
+            "extra": 89
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "circuit-lab",
+      "size": "phone",
+      "path": "/models/circuit-lab/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 18
+          },
+          {
+            "sel": "span.tl",
+            "extra": 25
+          },
+          {
+            "sel": "span.tl",
+            "extra": 51
+          },
+          {
+            "sel": "span.tl",
+            "extra": 31
+          },
+          {
+            "sel": "span.tl",
+            "extra": 18
+          },
+          {
+            "sel": "span.tl",
+            "extra": 20
+          },
+          {
+            "sel": "span.tl",
+            "extra": 20
+          },
+          {
+            "sel": "span.tl",
+            "extra": 20
+          },
+          {
+            "sel": "span.tl",
+            "extra": 20
+          },
+          {
+            "sel": "span.disc-title",
+            "extra": 16
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "circuit-lab",
+      "size": "tablet",
+      "path": "/models/circuit-lab/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 7
+          },
+          {
+            "sel": "span.tl",
+            "extra": 33
+          },
+          {
+            "sel": "span.tl",
+            "extra": 13
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "circuit-lab",
+      "size": "desktop",
+      "path": "/models/circuit-lab/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 13
+          },
+          {
+            "sel": "span.tl",
+            "extra": 20
+          },
+          {
+            "sel": "span.tl",
+            "extra": 46
+          },
+          {
+            "sel": "span.tl",
+            "extra": 26
+          },
+          {
+            "sel": "span.tl",
+            "extra": 13
+          },
+          {
+            "sel": "span.tl",
+            "extra": 15
+          },
+          {
+            "sel": "span.tl",
+            "extra": 15
+          },
+          {
+            "sel": "span.tl",
+            "extra": 15
+          },
+          {
+            "sel": "span.tl",
+            "extra": 15
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "double-pendulum",
+      "size": "phone",
+      "path": "/models/double-pendulum/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.disc-title",
+            "extra": 16
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "lens-image",
+      "size": "phone",
+      "path": "/models/lens-image/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.disc-title",
+            "extra": 16
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "lenz-law",
+      "size": "phone",
+      "path": "/models/lenz-law/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.disc-title",
+            "extra": 16
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "lever-moments",
+      "size": "phone",
+      "path": "/models/lever-moments/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.disc-title",
+            "extra": 16
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "life-game",
+      "size": "phone",
+      "path": "/models/life-game/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.disc-title",
+            "extra": 16
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "math-pendulum",
+      "size": "phone",
+      "path": "/models/math-pendulum/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "b.tv",
+            "extra": 28
+          },
+          {
+            "sel": "span.disc-title",
+            "extra": 16
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "math-pendulum",
+      "size": "tablet",
+      "path": "/models/math-pendulum/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "b.tv",
+            "extra": 10
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "math-pendulum",
+      "size": "desktop",
+      "path": "/models/math-pendulum/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "b.tv",
+            "extra": 23
           }
         ]
       },
@@ -45,8 +382,172 @@
       "issues": {
         "clipped": [
           {
+            "sel": "span.tl",
+            "extra": 5
+          },
+          {
+            "sel": "span.tl",
+            "extra": 25
+          },
+          {
+            "sel": "span",
+            "extra": 13
+          },
+          {
             "sel": "span.llt-tabletitle",
-            "extra": 64
+            "extra": 116
+          },
+          {
+            "sel": "span.disc-title",
+            "extra": 16
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "penrose-billiard",
+      "size": "tablet",
+      "path": "/models/penrose-billiard/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 7
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "penrose-billiard",
+      "size": "desktop",
+      "path": "/models/penrose-billiard/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 20
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "scale-of-universe",
+      "size": "phone",
+      "path": "/models/scale-of-universe/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 5
+          },
+          {
+            "sel": "span.tl",
+            "extra": 44
+          },
+          {
+            "sel": "span.disc-title",
+            "extra": 16
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "scale-of-universe",
+      "size": "tablet",
+      "path": "/models/scale-of-universe/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 26
+          },
+          {
+            "sel": "b.tv",
+            "extra": 10
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "scale-of-universe",
+      "size": "desktop",
+      "path": "/models/scale-of-universe/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 39
+          },
+          {
+            "sel": "b.tv",
+            "extra": 23
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "spring-pendulum",
+      "size": "phone",
+      "path": "/models/spring-pendulum/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 25
+          },
+          {
+            "sel": "span.tl",
+            "extra": 12
+          },
+          {
+            "sel": "span.disc-title",
+            "extra": 19
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "spring-pendulum",
+      "size": "tablet",
+      "path": "/models/spring-pendulum/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 7
+          }
+        ]
+      },
+      "errors": []
+    },
+    {
+      "kind": "model",
+      "name": "spring-pendulum",
+      "size": "desktop",
+      "path": "/models/spring-pendulum/",
+      "issues": {
+        "clipped": [
+          {
+            "sel": "span.tl",
+            "extra": 20
+          },
+          {
+            "sel": "span.tl",
+            "extra": 7
           }
         ]
       },

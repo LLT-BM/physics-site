@@ -7,544 +7,772 @@
 <link rel="canonical" href="https://liblabtab.ru/models/life-game/">
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
-<style>
-
-:root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;background-color:var(--bg);color:var(--ink);
-  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-  background-size:46px 46px;font:16px/1.5 var(--sans)}
-.wrap{max-width:960px;margin:0 auto;padding:20px 16px 40px}
-h1{font:800 1.7rem/1.15 var(--disp);margin:0 0 8px;letter-spacing:-.01em}
-.lead{margin:0 0 16px;color:var(--muted);max-width:70ch}
-.lead b{color:var(--ink);font-family:var(--mono);white-space:nowrap}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
-.holder{position:relative}
-canvas#field{display:block;width:100%;border-radius:10px;background:#071012;touch-action:none;cursor:crosshair}
-canvas#graph{display:block;width:100%;height:56px;margin-top:10px;border-radius:8px;background:rgba(0,0,0,.28)}
-.note{margin:8px 2px 0;font-size:.85rem;color:var(--muted)}
-.status{margin-top:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-family:var(--mono);font-size:.9rem;font-weight:600}
-.status.ok{border-color:var(--ok);color:var(--ok)}
-.status.warn{border-color:var(--warn);color:var(--warn)}
-.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
-button{font:inherit;font-family:var(--sans);min-height:44px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
-button.pri{background:var(--cyan);color:var(--on);border-color:var(--cyan);font-weight:600}
-button[aria-pressed="true"]{border-color:var(--cyan);color:var(--cyan)}
-button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
-.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.stat{font-family:var(--mono);font-size:.82rem;padding:6px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
-.stat b{color:var(--ink)}
-.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:12px}
-.grp h2{font:600 1rem var(--disp);margin:0 0 6px;padding-left:10px;border-left:4px solid var(--cyan)}
-.grp.b h2{border-color:var(--amber)} .grp.c h2{border-color:var(--pink)}
-label{display:flex;justify-content:space-between;align-items:baseline;font-size:.92rem;margin-top:10px;gap:8px}
-output{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:600;color:var(--cyan)}
-input[type=range]{width:100%;height:30px;margin:2px 0 0;-webkit-appearance:none;appearance:none;background:transparent;accent-color:var(--cyan)}
-select{font:inherit;font-family:var(--mono);font-size:.88rem;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);max-width:100%}
-.chk{display:flex;align-items:center;gap:8px;font-size:.9rem;margin-top:10px;cursor:pointer;user-select:none}
-.chk input{width:18px;height:18px;accent-color:var(--cyan);flex:none}
-.rules{margin-top:8px}
-.rrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px}
-.rrow span{font-family:var(--mono);font-size:.82rem;color:var(--muted);min-width:74px}
-.rrow label{display:inline-flex;align-items:center;gap:3px;margin:0;font-family:var(--mono);font-size:.8rem;color:var(--muted);cursor:pointer}
-.rrow input{width:15px;height:15px;margin:0}
-.rrow.b input{accent-color:var(--amber)} .rrow.s input{accent-color:var(--cyan)}
-#ruleStr{font-family:var(--mono);font-size:.95rem;color:var(--amber);margin:8px 0 0}
-.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:.8rem;color:var(--muted);font-family:var(--mono)}
-.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
-kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink)}
-</style>
-  <link rel="stylesheet" href="/sim/lib/theme.css">
+<link rel="stylesheet" href="/sim/lib/theme.css">
 <script src="/sim/lib/theme.js"></script>
-<script src="/sim/lib/touch.js"></script>
 <script src="/sim/lib/fmt.js"></script>
-<script src="/sim/lib/loop.js"></script>
-<script>
-/* LibLabTab · форматирование чисел ru-RU */
-var NF=(typeof window.LLTfix==='function')?window.LLTfix:function(x,n){
-  if(typeof x!=='number'||!isFinite(x))return '—';
-  n=(n==null?2:n);var p=Math.pow(10,n),r=Math.round(x*p)/p;if(r===0)r=0;
-  var t=Math.abs(r).toFixed(n).split('.').join(',');
-  return r<0?'−'+t:t;
-};
-var NS=(typeof window.LLTsigned==='function')?window.LLTsigned:function(x,n){
-  if(typeof x!=='number'||!isFinite(x))return '—';
-  n=(n==null?2:n);var p=Math.pow(10,n),r=Math.round(x*p)/p;if(r===0)r=0;
-  return (r>0?'+':'')+NF(x,n);
-};
-window.LLT_OPTS={slug:"life-game"};</script>
-<script src="/sim/lib/layout.js"></script>
-  <link rel="stylesheet" href="/sim/lib/mobile.css">
-  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
-  <link rel="stylesheet" href="/sim/lib/layout.css">
+<style>
+:root{box-sizing:border-box}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow:hidden}
+
+.app{display:grid;grid-template-columns:minmax(0,1fr) 322px;gap:12px;height:100%;padding:12px}
+.stagewrap{position:relative;min-width:0;border:1px solid var(--line2);border-radius:14px;
+  overflow:hidden;background:var(--canvas)}
+#field{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.hud{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;gap:5px;
+  pointer-events:none;max-width:calc(100% - 20px)}
+.hud span{font:600 .72rem var(--mono);background:var(--scrim);border:1px solid var(--line);
+  color:var(--ice);padding:4px 9px;border-radius:999px;backdrop-filter:blur(5px);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hud span.ok{color:var(--ok);border-color:rgba(63,201,174,.5)}
+.hud span.warn{color:var(--sand);border-color:rgba(217,185,140,.5)}
+.plotbox{position:absolute;left:10px;right:10px;bottom:10px;height:72px;
+  border:1px solid var(--line);border-radius:10px;background:var(--scrim);
+  backdrop-filter:blur(5px);overflow:hidden}
+#graph{display:block;width:100%;height:100%}
+.legend{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px;
+  pointer-events:none;font:600 .68rem var(--mono);color:var(--muted);text-align:right}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:6px;vertical-align:-1px}
+
+.side{min-width:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px;
+  scrollbar-color:var(--aqua) var(--canvas);scrollbar-width:thin}
+.side::-webkit-scrollbar{width:10px}
+.side::-webkit-scrollbar-track{background:var(--canvas);border-radius:8px}
+.side::-webkit-scrollbar-thumb{border-radius:8px;border:2px solid var(--canvas);
+  background:linear-gradient(var(--deep),var(--aqua))}
+.panel{border:1px solid var(--line2);border-radius:14px;background:var(--surface);padding:12px 13px}
+.panel>h2{font:700 .95rem var(--disp);margin:0 0 8px;padding-left:10px;border-left:4px solid var(--aqua)}
+details.panel>summary{display:flex;align-items:center;gap:9px;cursor:pointer;list-style:none;
+  font:700 .95rem var(--disp);color:var(--ink);min-height:34px}
+details.panel>summary::-webkit-details-marker{display:none}
+details.panel>summary::before{content:"▸";color:var(--sand);font:700 .9rem var(--mono)}
+details.panel[open]>summary::before{content:"▾"}
+details.panel>summary:focus-visible{outline:3px solid var(--aqua);outline-offset:3px;border-radius:8px}
+.count{margin-left:auto;font:600 .72rem var(--mono);color:var(--muted);
+  border:1px solid var(--line2);border-radius:999px;padding:2px 8px}
+
+.row{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+button{font:inherit;font-size:.86rem;font-family:var(--sans);min-height:44px;padding:9px 13px;
+  border-radius:10px;border:1px solid var(--line2);background:var(--overlay);color:var(--ink);
+  cursor:pointer;transition:.14s;touch-action:manipulation}
+button:hover{border-color:var(--aqua);color:var(--aqua)}
+button:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
+button.pri{background:linear-gradient(135deg,var(--aqua),var(--ok));color:var(--on);
+  border-color:var(--aqua);font-weight:700}
+button[aria-pressed="true"]{border-color:var(--aqua);color:var(--aqua);background:rgba(79,216,196,.12)}
+button.chip{border-radius:999px;font:600 .76rem var(--mono);min-height:36px;padding:6px 11px}
+
+label{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:.86rem;color:var(--ink);margin-top:10px}
+output{font:700 .8rem var(--mono);color:var(--sand);white-space:nowrap;
+  background:rgba(217,185,140,.14);border:1px solid rgba(217,185,140,.38);border-radius:999px;padding:3px 9px}
+select{font:inherit;font-size:16px;font-family:var(--mono);width:100%;padding:9px 10px;margin-top:6px;
+  border-radius:9px;border:1px solid var(--line2);background:var(--canvas);color:var(--ink)}
+select:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:40px;margin:2px 0 0;
+  background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:12px;border-radius:8px;border:1px solid var(--line2);
+  background:linear-gradient(90deg,var(--deep) 0%,var(--aqua) var(--fill,50%),
+    rgba(126,214,199,.16) var(--fill,50%),rgba(126,214,199,.16) 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;
+  margin-top:-8px;border-radius:50%;background:var(--sand);border:3px solid var(--canvas);
+  box-shadow:0 0 0 3px rgba(217,185,140,.26)}
+input[type=range]::-moz-range-track{height:12px;border-radius:8px;background:rgba(126,214,199,.16)}
+input[type=range]::-moz-range-progress{height:12px;border-radius:8px;background:linear-gradient(90deg,var(--deep),var(--aqua))}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--sand);border:3px solid var(--canvas)}
+input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:4px;border-radius:10px}
+.chk{display:flex;align-items:center;gap:10px;min-height:40px;font-size:.86rem;margin-top:4px;cursor:pointer}
+.chk input{width:21px;height:21px;accent-color:var(--aqua);flex:none}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.stats div{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:rgba(0,0,0,.24);min-width:0}
+.stats span{display:block;font:600 .66rem var(--mono);color:var(--muted);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stats b{font:700 .95rem var(--mono);color:var(--aqua)}
+.note{margin:9px 0 0;font-size:.8rem;color:var(--muted);line-height:1.55}
+.rules{margin-top:8px}
+.rrow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:6px}
+.rrow>span{font:600 .74rem var(--mono);color:var(--muted);min-width:66px}
+.rrow label{display:inline-flex;align-items:center;gap:3px;margin:0;font:600 .76rem var(--mono);
+  color:var(--muted);cursor:pointer;min-height:30px}
+.rrow input{width:17px;height:17px;margin:0}
+.rrow.b input{accent-color:var(--sand)}
+.rrow.s input{accent-color:var(--aqua)}
+#ruleStr{font:700 .92rem var(--mono);color:var(--sand);margin:9px 0 0}
+kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;padding:1px 5px;color:var(--ice)}
+.offscreen{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+@media (max-width:1000px){
+  body{overflow:auto}
+  .app{grid-template-columns:minmax(0,1fr);height:auto;padding:10px}
+  .stagewrap{height:min(62vh,520px)}
+  .side{overflow:visible;max-height:none}
+}
+</style>
 </head>
 <body>
-<main class="wrap">
-  <h1>Игра «Жизнь»</h1>
-  <p class="lead">Клеточный автомат Джона Конвея (1970). Правила: в мёртвой клетке с <b>тремя</b> живыми соседями зарождается жизнь; живая клетка выживает при <b>2 или 3</b> соседях, иначе умирает от одиночества или перенаселённости. Это записывается как <b>B3/S23</b>. Рисуйте клетки, ставьте фигуры, меняйте правила — и наблюдайте, как из двух строк закона рождается сложность.</p>
+<div class="app">
+  <div class="stagewrap" data-llt-stage-wrap>
+    <canvas id="field" data-llt-stage role="img"
+            aria-label="Поле клеточного автомата: рисуйте клетки и наблюдайте эволюцию"></canvas>
+    <div class="hud" id="hud"></div>
+    <div class="legend" aria-hidden="true">
+      <span>новорождённая<i style="background:#4FD8C4"></i></span>
+      <span>живёт давно<i style="background:#D9B98C"></i></span>
+      <span>долгожитель<i style="background:#ABA6DC"></i></span>
+    </div>
+    <div class="plotbox"><canvas id="graph" data-llt-plot aria-label="График численности по поколениям"></canvas></div>
+  </div>
 
-  <section class="card">
-    <div class="holder" id="holder">
-      <canvas data-llt-stage="1" id="field" aria-label="Поле клеточного автомата"></canvas>
-    </div>
-    <div class="bar">
-      <button class="pri" id="play">▶ Пуск</button>
-      <button id="stepBtn">Шаг</button>
-      <button id="rnd">Случайное поле</button>
-      <button id="clr">Очистить</button>
-      <button id="reset">Сброс</button>
-      <span style="flex:1"></span>
-      <button id="mDraw" aria-pressed="true">Рисовать</button>
-      <button id="mErase" aria-pressed="false">Стереть</button>
-    </div>
-    <div class="stats">
-      <span class="stat">поколение <b id="sGen">0</b></span>
-      <span class="stat">живых <b id="sPop">0</b></span>
-      <span class="stat">родилось <b id="sB">0</b></span>
-      <span class="stat">умерло <b id="sD">0</b></span>
-      <span class="stat">поле <b id="sDim">—</b></span>
-    </div>
-    <div id="status" class="status" aria-live="polite"></div>
-    <canvas data-llt-plot="1" id="graph" aria-label="График численности по поколениям"></canvas>
-    <div class="legend">
-      <span><i style="background:#4FD8C4"></i>новорождённая</span>
-      <span><i style="background:#D9B98C"></i>живёт давно</span>
-      <span><i style="background:#ABA6DC"></i>долгожитель</span>
-      <span><i style="background:rgba(79,216,196,.28)"></i>след погибшей</span>
-    </div>
-    <p class="note">Рисуйте левой кнопкой (или пальцем), стирайте правой кнопкой или в режиме «Стереть». Горячие клавиши: <kbd>Пробел</kbd> пуск/пауза, <kbd>S</kbd> шаг, <kbd>C</kbd> очистить, <kbd>R</kbd> случайное поле.</p>
-  </section>
+  <aside class="side" data-llt-ui aria-label="Настройки автомата">
+    <section class="panel">
+      <h2>Управление</h2>
+      <div class="row">
+        <button class="pri" id="play" data-llt="action" data-label="▶ Пуск">▶ Пуск</button>
+        <button id="stepBtn" data-llt="action">Шаг</button>
+        <button id="reset" data-llt="action">Сброс</button>
+      </div>
+      <div class="row">
+        <button id="rnd" data-llt="action">Случайное поле</button>
+        <button id="clr" data-llt="action">Очистить</button>
+      </div>
+      <div class="row">
+        <button id="mDraw" data-llt="action" aria-pressed="true">Рисовать</button>
+        <button id="mErase" data-llt="action" aria-pressed="false">Стереть</button>
+      </div>
 
-  <div class="ctl">
-    <section class="card grp" data-level="basic">
-      <h2>Фигуры</h2>
-      <label for="pat">Поставить фигуру
-        <select id="pat"><option value="">— рисую вручную —</option></select>
-      </label>
-      <p class="note" id="patInfo" style="margin-top:8px">Выберите фигуру и кликните по полю: она встанет центром под курсором. Повторный выбор «рисую вручную» возвращает кисть.</p>
-      <div class="bar"><button id="center">Поставить в центр</button></div>
+      <div data-llt="basic">
+        <label for="pat">Фигура под курсор</label>
+        <select id="pat" data-llt="basic" data-label="Фигура под курсор"><option value="">— рисую вручную —</option></select>
+        <label for="speed">Скорость <output id="o_speed"></output></label>
+        <input type="range" id="speed" min="1" max="60" step="1" value="12"
+               data-llt="basic" data-label="Скорость" data-unit="покол/с">
+      </div>
+
+      <div class="stats" data-llt-read>
+        <div><span>поколение</span><b id="sGen">0</b></div>
+        <div><span>живых</span><b id="sPop">0</b></div>
+        <div><span>родилось</span><b id="sB">0</b></div>
+        <div><span>умерло</span><b id="sD">0</b></div>
+        <div><span>поле</span><b id="sDim">—</b></div>
+        <div><span>правило</span><b id="sRule">B3/S23</b></div>
+      </div>
+      <p class="note" id="patInfo">Выберите фигуру и кликните по полю: она встанет центром под курсором.</p>
     </section>
 
-    <section class="card grp b" data-level="adv">
-      <h2>Правила B/S</h2>
-      <label for="preset">Пресет
-        <select id="preset"></select>
-      </label>
-      <div class="rules">
+    <section class="panel">
+      <h2>Быстрые примеры</h2>
+      <div class="row" id="quick"></div>
+      <p class="note">«Сброс» возвращает настройки и поле к исходным. «Очистить» стирает клетки, но оставляет настройки.</p>
+    </section>
+
+    <details class="panel">
+      <summary>Точные настройки <span class="count">7</span></summary>
+      <div data-llt="adv">
+        <label for="preset">Правило B/S</label>
+        <select id="preset" data-llt="adv" data-label="Правило B/S"></select>
+        <label for="cs">Размер клетки <output id="o_cs"></output></label>
+        <input type="range" id="cs" min="4" max="20" step="1" value="9"
+               data-llt="adv" data-label="Размер клетки" data-unit="px">
+        <label for="dens">Плотность случайного поля <output id="o_dens"></output></label>
+        <input type="range" id="dens" min="5" max="60" step="1" value="22"
+               data-llt="adv" data-label="Плотность случайного поля" data-unit="%">
+        <label class="chk"><input type="checkbox" id="wrap" checked data-llt="adv" data-label="Замкнутое поле (тор)"> Замкнутое поле (тор)</label>
+        <label class="chk"><input type="checkbox" id="ageCol" checked data-llt="adv" data-label="Цвет по возрасту"> Цвет по возрасту</label>
+        <label class="chk"><input type="checkbox" id="trails" checked data-llt="adv" data-label="Следы погибших"> Следы погибших</label>
+        <label class="chk"><input type="checkbox" id="gridOn" checked data-llt="adv" data-label="Показывать сетку"> Показывать сетку</label>
+      </div>
+      <div class="rules" data-llt="skip">
         <div class="rrow b" id="rowB"><span>Рождение B</span></div>
         <div class="rrow s" id="rowS"><span>Выживание S</span></div>
       </div>
       <p id="ruleStr">B3/S23</p>
-    </section>
-
-    <section class="card grp c" data-level="adv">
-      <h2>Поле и показ</h2>
-      <label for="speed">Скорость <output id="o_speed"></output></label>
-      <input type="range" id="speed" min="1" max="60" step="1" value="12">
-      <label for="cs">Размер клетки <output id="o_cs"></output></label>
-      <input type="range" id="cs" min="4" max="18" step="1" value="8">
-      <label for="dens">Плотность случайного поля <output id="o_dens"></output></label>
-      <input type="range" id="dens" min="5" max="60" step="1" value="22">
-      <label class="chk"><input type="checkbox" id="wrap" checked> Замкнутое поле (тор)</label>
-      <label class="chk"><input type="checkbox" id="ageCol" checked> Цвет по возрасту клетки</label>
-      <label class="chk"><input type="checkbox" id="trails" checked> Следы погибших клеток</label>
-      <label class="chk"><input type="checkbox" id="gridOn" checked> Показывать сетку</label>
-    </section>
-  </div>
-</main>
+      <p class="note">Точная правка B/S доступна здесь и в полноэкранном режиме. Ружьё Госпера на торе со временем стреляет в себя — для него выключите тор.</p>
+      <p class="note">Клавиши: <kbd>Пробел</kbd> пуск, <kbd>S</kbd> шаг, <kbd>C</kbd> очистить, <kbd>R</kbd> случайное поле.</p>
+      <div class="row"><button id="btnTest" data-llt="skip">✓ Самотест</button></div>
+    </details>
+  </aside>
+</div>
+<div class="offscreen" aria-hidden="true"><table id="testTbl"></table></div>
 
 <script>
 (function(){
-  
-/* LibLabTab · палитра до первого использования */
+'use strict';
 var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
 window.PAL = PAL;
-var $=function(id){return document.getElementById(id)};
-  var cv=$('field'), ctx=cv.getContext('2d'), gcv=$('graph'), gctx=gcv.getContext('2d');
-  var holder=$('holder');
-  var W=900,H=520,dpr=1,cs=8,cols=0,rows=0,ox=0,oy=0;
-  var cur,nxt,age,fade,gen=0,pop=0,born=0,died=0;
-  var running=false,speed=12,dens=22,wrap=true,ageCol=true,trails=true,gridOn=true;
-  var birth=new Uint8Array(9), survive=new Uint8Array(9);
-  var mode='draw', painting=false, lastCell=null, hover=null, stamp=null;
-  var hist=[], pops=[], raf=null, lastT=0, acc=0;
-  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+var NF = (typeof window.LLTfix === 'function') ? window.LLTfix : function(x,n){
+  if(typeof x !== 'number' || !isFinite(x)) return '—';
+  n = (n == null ? 2 : n);
+  var p = Math.pow(10,n), r = Math.round(x*p)/p; if(r === 0) r = 0;
+  var t = Math.abs(r).toFixed(n).split('.').join(',');
+  return r < 0 ? '−'+t : t;
+};
+var $ = function(id){ return document.getElementById(id); };
+var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- ФИГУРЫ (все проверены расчётом) ---------- */
-  var PATTERNS=[
-    {n:'Блок',c:'устойчивая',d:'4 клетки, не меняется никогда.',r:["XX","XX"]},
-    {n:'Улей',c:'устойчивая',d:'6 клеток, устойчива.',r:[".XX.","X..X",".XX."]},
-    {n:'Каравай',c:'устойчивая',d:'7 клеток, устойчива.',r:[".XX.","X..X",".X.X","..X."]},
-    {n:'Лодка',c:'устойчивая',d:'5 клеток, устойчива.',r:["XX.","X.X",".X."]},
-    {n:'Мигалка',c:'осциллятор',d:'3 клетки, период 2.',r:["XXX"]},
-    {n:'Жаба',c:'осциллятор',d:'6 клеток, период 2.',r:[".XXX","XXX."]},
-    {n:'Маяк',c:'осциллятор',d:'8 клеток, период 2.',r:["XX..","XX..","..XX","..XX"]},
-    {n:'Пульсар',c:'осциллятор',d:'48 клеток, период 3 — самая известная пульсирующая фигура.',r:[
-      "..OOO...OOO..",".............","O....O.O....O","O....O.O....O","O....O.O....O",
-      "..OOO...OOO..",".............","..OOO...OOO..","O....O.O....O","O....O.O....O",
-      "O....O.O....O",".............","..OOO...OOO.."]},
-    {n:'Планер',c:'корабль',d:'5 клеток, период 4, смещается по диагонали на 1 клетку — скорость c/4.',r:[".X.","..X","XXX"]},
-    {n:'Лёгкий космический корабль',c:'корабль',d:'9 клеток, период 4, летит по горизонтали на 2 клетки — скорость c/2.',r:[".X..X","X....","X...X","XXXX."]},
-    {n:'Планерное ружьё Госпера',c:'ружьё',d:'36 клеток, период 30: каждые 30 поколений выпускает новый планер. Первая фигура с неограниченным ростом.',r:[
-      "....................................",
-      ".........................X..........",
-      ".......................X.X..........",
-      ".............XX......XX............XX",
-      "............X...X....XX............XX",
-      ".XX........X.....X...XX..............",
-      ".XX........X...X.XX....X.X...........",
-      "...........X.....X.......X...........",
-      "............X...X....................",
-      ".............XX......................"]},
-    {n:'R-пентамино',c:'долгожитель',d:'5 клеток, бурно эволюционирует около 1100 поколений, оставляя 116 клеток.',r:[".XX","XX.",".X."]},
-    {n:'Жёлудь',c:'долгожитель',d:'7 клеток, эволюция около 5200 поколений, остаток 633 клетки.',r:[".X.....","...X...","XX..XXX"]},
-    {n:'Diehard',c:'долгожитель',d:'7 клеток, потомки живут ровно 130 поколений и полностью исчезают.',r:["......X.","XX......",".X...XXX"]}
-  ];
-  function parse(rows){
-    var pts=[],w=0;
-    for(var y=0;y<rows.length;y++){ w=Math.max(w,rows[y].length);
-      for(var x=0;x<rows[y].length;x++){ var ch=rows[y][x]; if(ch==='X'||ch==='O'||ch==='#') pts.push([x,y]); } }
-    return {pts:pts,w:w,h:rows.length};
-  }
-  PATTERNS.forEach(function(p){ var g=parse(p.r); p.pts=g.pts; p.w=g.w; p.h=g.h; });
+var cv = $('field'), ctx = cv.getContext('2d');
+var gcv = $('graph'), gctx = gcv.getContext('2d');
+var wrapEl = cv.parentElement, plotEl = gcv.parentElement;
 
-  /* ---------- ПРАВИЛА ---------- */
-  var PRESETS=[
-    {n:'Жизнь Конвея',b:[3],s:[2,3]},
-    {n:'HighLife',b:[3,6],s:[2,3]},
-    {n:'Семена (Seeds)',b:[2],s:[]},
-    {n:'Лабиринт (Maze)',b:[3],s:[1,2,3,4,5]},
-    {n:'День и ночь',b:[3,6,7,8],s:[3,4,6,7,8]},
-    {n:'Репликатор',b:[1,3,5,7],s:[1,3,5,7]}
-  ];
-  function buildRuleUI(){
-    var rb=$('rowB'), rs=$('rowS');
-    for(var i=0;i<=8;i++){
-      rb.insertAdjacentHTML('beforeend','<label><input type="checkbox" class="b" data-n="'+i+'">'+i+'</label>');
-      rs.insertAdjacentHTML('beforeend','<label><input type="checkbox" class="s" data-n="'+i+'">'+i+'</label>');
+var W = 900, H = 520, GW = 900, GH = 72, dpr = 1;
+var cs = 9, cols = 0, rows = 0, ox = 0, oy = 0;
+var cur, nxt, age, fade;
+var gen = 0, pop = 0, born = 0, died = 0;
+var running = false, speed = 12, dens = 22;
+var wrap = true, ageCol = true, trails = true, gridOn = true;
+var birth = new Uint8Array(9), survive = new Uint8Array(9);
+var mode = 'draw', painting = false, lastCell = null, hover = null, stamp = null;
+var hist = [], pops = [], lastT = 0, acc = 0, dirty = true, fadeLive = false;
+
+/* ---------- фигуры ---------- */
+var PATTERNS = [
+  {n:'Блок',c:'устойчивая',d:'4 клетки, не меняется никогда.',r:["XX","XX"]},
+  {n:'Улей',c:'устойчивая',d:'6 клеток, устойчива.',r:[".XX.","X..X",".XX."]},
+  {n:'Каравай',c:'устойчивая',d:'7 клеток, устойчива.',r:[".XX.","X..X",".X.X","..X."]},
+  {n:'Лодка',c:'устойчивая',d:'5 клеток, устойчива.',r:["XX.","X.X",".X."]},
+  {n:'Мигалка',c:'осциллятор',d:'3 клетки, период 2.',r:["XXX"]},
+  {n:'Жаба',c:'осциллятор',d:'6 клеток, период 2.',r:[".XXX","XXX."]},
+  {n:'Маяк',c:'осциллятор',d:'8 клеток, период 2.',r:["XX..","XX..","..XX","..XX"]},
+  {n:'Пульсар',c:'осциллятор',d:'48 клеток, период 3.',r:[
+    "..OOO...OOO..",".............","O....O.O....O","O....O.O....O","O....O.O....O",
+    "..OOO...OOO..",".............","..OOO...OOO..","O....O.O....O","O....O.O....O",
+    "O....O.O....O",".............","..OOO...OOO.."]},
+  {n:'Планер',c:'корабль',d:'5 клеток, период 4, смещается по диагонали на 1 клетку — скорость c/4.',r:[".X.","..X","XXX"]},
+  {n:'Лёгкий корабль',c:'корабль',d:'9 клеток, период 4, смещается на 2 клетки по горизонтали — скорость c/2.',r:[".X..X","X....","X...X","XXXX."]},
+  {n:'Ружьё Госпера',c:'ружьё',d:'36 клеток, период 30: каждые 30 поколений выпускает планер.',r:[
+    "....................................",
+    ".........................X..........",
+    ".......................X.X..........",
+    ".............XX......XX............XX",
+    "............X...X....XX............XX",
+    ".XX........X.....X...XX..............",
+    ".XX........X...X.XX....X.X...........",
+    "...........X.....X.......X...........",
+    "............X...X....................",
+    ".............XX......................"]},
+  {n:'R-пентамино',c:'долгожитель',d:'5 клеток: на бесконечной плоскости успокаивается за 1103 поколения, остаётся 116 клеток, включая 6 улетающих планеров.',r:[".XX","XX.",".X."]},
+  {n:'Жёлудь',c:'долгожитель',d:'7 клеток, эволюция 5206 поколений, остаток 633 клетки.',r:[".X.....","...X...","XX..XXX"]},
+  {n:'Diehard',c:'долгожитель',d:'7 клеток, потомки живут ровно 130 поколений и исчезают.',r:["......X.","XX......",".X...XXX"]}
+];
+function parse(rows){
+  var pts = [], w = 0;
+  for(var y = 0; y < rows.length; y++){
+    w = Math.max(w, rows[y].length);
+    for(var x = 0; x < rows[y].length; x++){
+      var ch = rows[y][x];
+      if(ch === 'X' || ch === 'O' || ch === '#') pts.push([x,y]);
     }
-    PRESETS.forEach(function(p,i){ $('preset').insertAdjacentHTML('beforeend','<option value="'+i+'">'+p.n+'</option>'); });
-    Array.prototype.forEach.call(document.querySelectorAll('.rrow input'),function(inp){
-      inp.addEventListener('change',function(){ readRules(); hist=[]; updateStatus(); });
+  }
+  return { pts:pts, w:w, h:rows.length };
+}
+PATTERNS.forEach(function(p){ var g = parse(p.r); p.pts = g.pts; p.w = g.w; p.h = g.h; });
+
+/* ---------- правила ---------- */
+var PRESETS = [
+  {n:'Жизнь Конвея · B3/S23',b:[3],s:[2,3]},
+  {n:'HighLife · B36/S23',b:[3,6],s:[2,3]},
+  {n:'Семена · B2/S',b:[2],s:[]},
+  {n:'Лабиринт · B3/S12345',b:[3],s:[1,2,3,4,5]},
+  {n:'День и ночь · B3678/S34678',b:[3,6,7,8],s:[3,4,6,7,8]},
+  {n:'Репликатор · B1357/S1357',b:[1,3,5,7],s:[1,3,5,7]}
+];
+function buildRuleUI(){
+  var rb = $('rowB'), rs = $('rowS');
+  for(var i = 0; i <= 8; i++){
+    rb.insertAdjacentHTML('beforeend','<label><input type="checkbox" class="b" data-n="'+i+'" aria-label="Рождение при '+i+' соседях">'+i+'</label>');
+    rs.insertAdjacentHTML('beforeend','<label><input type="checkbox" class="s" data-n="'+i+'" aria-label="Выживание при '+i+' соседях">'+i+'</label>');
+  }
+  PRESETS.forEach(function(p,i){ $('preset').insertAdjacentHTML('beforeend','<option value="'+i+'">'+p.n+'</option>'); });
+  Array.prototype.forEach.call(document.querySelectorAll('.rrow input'), function(inp){
+    inp.addEventListener('change', function(){ readRules(); hist = []; dirty = true; updateStatus(); });
+  });
+}
+function setRules(b,s){
+  birth.fill(0); survive.fill(0);
+  b.forEach(function(n){ birth[n] = 1; });
+  s.forEach(function(n){ survive[n] = 1; });
+  Array.prototype.forEach.call(document.querySelectorAll('input.b'), function(i){ i.checked = !!birth[+i.dataset.n]; });
+  Array.prototype.forEach.call(document.querySelectorAll('input.s'), function(i){ i.checked = !!survive[+i.dataset.n]; });
+  ruleStr();
+}
+function readRules(){
+  birth.fill(0); survive.fill(0);
+  Array.prototype.forEach.call(document.querySelectorAll('input.b'), function(i){ if(i.checked) birth[+i.dataset.n] = 1; });
+  Array.prototype.forEach.call(document.querySelectorAll('input.s'), function(i){ if(i.checked) survive[+i.dataset.n] = 1; });
+  ruleStr();
+}
+function ruleText(){
+  var b = '', s = '';
+  for(var i = 0; i <= 8; i++){ if(birth[i]) b += i; if(survive[i]) s += i; }
+  return 'B' + (b || '∅') + '/S' + (s || '∅');
+}
+function ruleStr(){ var t = ruleText(); $('ruleStr').textContent = t; $('sRule').textContent = t; }
+
+/* ---------- поле ---------- */
+var gridCv = document.createElement('canvas'), gxx = gridCv.getContext('2d');
+function drawGridCache(){
+  gridCv.width = Math.max(1, Math.round(W*dpr));
+  gridCv.height = Math.max(1, Math.round(H*dpr));
+  gxx.setTransform(dpr,0,0,dpr,0,0);
+  gxx.clearRect(0,0,W,H);
+  gxx.fillStyle = PAL.canvas || '#071012';
+  gxx.fillRect(0,0,W,H);
+  if(gridOn && cs >= 6){
+    gxx.strokeStyle = 'rgba(126,214,199,.07)'; gxx.lineWidth = 1; gxx.beginPath();
+    for(var x = 0; x <= cols; x++){ var px = ox + x*cs + .5; gxx.moveTo(px,oy); gxx.lineTo(px,oy+rows*cs); }
+    for(var y = 0; y <= rows; y++){ var py = oy + y*cs + .5; gxx.moveTo(ox,py); gxx.lineTo(ox+cols*cs,py); }
+    gxx.stroke();
+  }
+  gxx.strokeStyle = 'rgba(126,214,199,.22)'; gxx.lineWidth = 1;
+  gxx.strokeRect(ox+.5, oy+.5, cols*cs-1, rows*cs-1);
+}
+function rebuild(keep){
+  var nc = Math.max(8, Math.floor(W/cs)), nr = Math.max(8, Math.floor(H/cs));
+  var oc = cols, orr = rows, old = cur, oldAge = age;
+  cols = nc; rows = nr;
+  cur = new Uint8Array(cols*rows); nxt = new Uint8Array(cols*rows);
+  age = new Uint16Array(cols*rows); fade = new Float32Array(cols*rows);
+  if(keep && old){
+    for(var y = 0; y < Math.min(orr,rows); y++)
+      for(var x = 0; x < Math.min(oc,cols); x++){
+        cur[y*cols+x] = old[y*oc+x];
+        age[y*cols+x] = oldAge[y*oc+x];
+      }
+  }
+  ox = Math.floor((W - cols*cs)/2); oy = Math.floor((H - rows*cs)/2);
+  countPop(); drawGridCache(); hist = []; dirty = true;
+  $('sDim').textContent = cols + '×' + rows;
+}
+function resize(){
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+  var r = wrapEl.getBoundingClientRect();
+  W = Math.max(240, Math.round(r.width));
+  H = Math.max(200, Math.round(r.height));
+  cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  var q = plotEl.getBoundingClientRect();
+  GW = Math.max(120, Math.round(q.width));
+  GH = Math.max(40, Math.round(q.height));
+  gcv.width = Math.round(GW*dpr); gcv.height = Math.round(GH*dpr);
+  gctx.setTransform(dpr,0,0,dpr,0,0);
+
+  rebuild(true); render();
+}
+function countPop(){ pop = 0; for(var i = 0; i < cur.length; i++) pop += cur[i]; }
+function setCell(x,y,v){
+  if(wrap){ x = (x+cols)%cols; y = (y+rows)%rows; }
+  else if(x < 0 || y < 0 || x >= cols || y >= rows) return;
+  var i = y*cols+x;
+  if(v){ if(!cur[i]){ cur[i] = 1; age[i] = 1; pop++; } }
+  else { if(cur[i]){ cur[i] = 0; age[i] = 0; fade[i] = 1; fadeLive = true; pop--; } }
+  dirty = true;
+}
+function clearField(){
+  cur.fill(0); nxt.fill(0); age.fill(0); fade.fill(0);
+  gen = 0; pop = 0; born = 0; died = 0; hist = []; pops = [];
+  dirty = true; updateStatus(); render();
+}
+function randomField(){
+  clearField();
+  for(var i = 0; i < cur.length; i++) if(Math.random()*100 < dens){ cur[i] = 1; age[i] = 1; pop++; }
+  hist = []; dirty = true; updateStatus(); render();
+}
+function place(p,cx,cy){
+  var x0 = cx - Math.floor(p.w/2), y0 = cy - Math.floor(p.h/2);
+  p.pts.forEach(function(q){ setCell(x0+q[0], y0+q[1], 1); });
+  hist = []; updateStatus(); render();
+}
+
+/* ---------- эволюция ---------- */
+function step(){
+  var b = 0, d = 0, np = 0;
+  for(var y = 0; y < rows; y++){
+    for(var x = 0; x < cols; x++){
+      var n = 0;
+      for(var dy = -1; dy <= 1; dy++){
+        var yy = y+dy;
+        if(wrap) yy = (yy+rows)%rows; else if(yy < 0 || yy >= rows) continue;
+        for(var dx = -1; dx <= 1; dx++){
+          if(dx === 0 && dy === 0) continue;
+          var xx = x+dx;
+          if(wrap) xx = (xx+cols)%cols; else if(xx < 0 || xx >= cols) continue;
+          n += cur[yy*cols+xx];
+        }
+      }
+      var i = y*cols+x, a = cur[i], live = a ? survive[n] : birth[n];
+      nxt[i] = live;
+      if(live){ np++; age[i] = a ? Math.min(age[i]+1,60000) : 1; if(!a) b++; }
+      else { if(a){ d++; fade[i] = 1; fadeLive = true; } age[i] = 0; }
+    }
+  }
+  var t = cur; cur = nxt; nxt = t;
+  gen++; pop = np; born = b; died = d;
+  pops.push(pop); if(pops.length > 260) pops.shift();
+  hist.push(hash()); if(hist.length > 24) hist.shift();
+  dirty = true; updateStatus();
+}
+function hash(){
+  var h = 2166136261 >>> 0;
+  for(var i = 0; i < cur.length; i++){ h = (h ^ cur[i]) >>> 0; h = Math.imul(h,16777619) >>> 0; }
+  return h;
+}
+function cyclePeriod(){
+  if(!hist.length || pop === 0) return 0;
+  var last = hist[hist.length-1];
+  for(var k = 1; k < hist.length; k++) if(hist[hist.length-1-k] === last) return k;
+  return 0;
+}
+
+/* ---------- отрисовка ---------- */
+var palette = [];
+(function(){
+  function mix(a,b,t){
+    return [Math.round(a[0]+(b[0]-a[0])*t), Math.round(a[1]+(b[1]-a[1])*t), Math.round(a[2]+(b[2]-a[2])*t)];
+  }
+  var C = [79,216,196], A = [217,185,140], P = [171,166,220];
+  for(var i = 0; i < 64; i++){
+    var c = i < 8 ? mix(C,A,i/8) : (i < 32 ? A : mix(A,P,Math.min(1,(i-32)/24)));
+    palette.push('rgb('+c[0]+','+c[1]+','+c[2]+')');
+  }
+})();
+function render(){
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(gridCv,0,0,W,H);
+  var pad = cs >= 8 ? 1 : 0, s = cs - pad;
+  if(trails){
+    for(var i = 0; i < fade.length; i++){
+      if(fade[i] > 0.03 && !cur[i]){
+        ctx.fillStyle = 'rgba(79,216,196,' + (fade[i]*0.3).toFixed(3) + ')';
+        ctx.fillRect(ox+(i%cols)*cs, oy+Math.floor(i/cols)*cs, s, s);
+      }
+    }
+  }
+  for(var y = 0; y < rows; y++) for(var x = 0; x < cols; x++){
+    var j = y*cols+x;
+    if(cur[j]){
+      ctx.fillStyle = ageCol ? palette[Math.min(63,age[j])] : (PAL.aqua || '#4FD8C4');
+      ctx.fillRect(ox+x*cs, oy+y*cs, s, s);
+    }
+  }
+  if(stamp && hover && hover.inside){
+    var x0 = hover.x - Math.floor(stamp.w/2), y0 = hover.y - Math.floor(stamp.h/2);
+    ctx.fillStyle = 'rgba(217,185,140,.42)';
+    stamp.pts.forEach(function(q){
+      var x = x0+q[0], y = y0+q[1];
+      if(wrap){ x = (x+cols)%cols; y = (y+rows)%rows; }
+      if(x >= 0 && y >= 0 && x < cols && y < rows) ctx.fillRect(ox+x*cs, oy+y*cs, s, s);
     });
+  } else if(hover && hover.inside && mode !== 'stamp'){
+    ctx.strokeStyle = mode === 'erase' ? 'rgba(214,159,169,.9)' : 'rgba(79,216,196,.9)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(ox+hover.x*cs+.5, oy+hover.y*cs+.5, cs-1, cs-1);
   }
-  function setRules(b,s){
-    birth.fill(0); survive.fill(0);
-    b.forEach(function(n){birth[n]=1}); s.forEach(function(n){survive[n]=1});
-    Array.prototype.forEach.call(document.querySelectorAll('input.b'),function(i){i.checked=!!birth[+i.dataset.n]});
-    Array.prototype.forEach.call(document.querySelectorAll('input.s'),function(i){i.checked=!!survive[+i.dataset.n]});
-    ruleStr();
+  drawGraph();
+  $('sGen').textContent = NF(gen,0);
+  $('sPop').textContent = NF(pop,0);
+  $('sB').textContent = NF(born,0);
+  $('sD').textContent = NF(died,0);
+  dirty = false;
+}
+function drawGraph(){
+  gctx.clearRect(0,0,GW,GH);
+  gctx.font = '11px JetBrains Mono, monospace';
+  if(pops.length < 2){
+    gctx.fillStyle = 'rgba(143,168,166,.75)';
+    gctx.fillText('график численности появится после первых поколений', 10, GH/2+4);
+    return;
   }
-  function readRules(){
-    birth.fill(0); survive.fill(0);
-    Array.prototype.forEach.call(document.querySelectorAll('input.b'),function(i){ if(i.checked) birth[+i.dataset.n]=1; });
-    Array.prototype.forEach.call(document.querySelectorAll('input.s'),function(i){ if(i.checked) survive[+i.dataset.n]=1; });
-    ruleStr();
+  var mx = Math.max.apply(null,pops) || 1;
+  gctx.strokeStyle = 'rgba(126,214,199,.16)'; gctx.lineWidth = 1;
+  gctx.beginPath(); gctx.moveTo(0,GH-1.5); gctx.lineTo(GW,GH-1.5); gctx.stroke();
+  gctx.beginPath();
+  for(var i = 0; i < pops.length; i++){
+    var x = i/(pops.length-1)*(GW-2)+1, y = GH-4-(pops[i]/mx)*(GH-18);
+    i ? gctx.lineTo(x,y) : gctx.moveTo(x,y);
   }
-  function ruleStr(){
-    var b='',s='';
-    for(var i=0;i<=8;i++){ if(birth[i])b+=i; if(survive[i])s+=i; }
-    $('ruleStr').textContent='B'+(b||'∅')+'/S'+(s||'∅');
-  }
+  gctx.strokeStyle = PAL.aqua || '#4FD8C4'; gctx.lineWidth = 1.8; gctx.stroke();
+  gctx.lineTo(GW-1,GH-2); gctx.lineTo(1,GH-2); gctx.closePath();
+  gctx.fillStyle = 'rgba(79,216,196,.14)'; gctx.fill();
+  gctx.fillStyle = 'rgba(143,168,166,.95)';
+  gctx.fillText('численность · максимум ' + NF(mx,0), 8, 14);
+}
+function updateStatus(){
+  var chips = [];
+  var per = cyclePeriod();
+  if(pop === 0) chips.push({ t:'Поле пусто — нарисуйте клетки или поставьте фигуру', c:'warn' });
+  else if(per === 1) chips.push({ t:'Устойчивая конфигурация · поколение ' + NF(gen,0), c:'ok' });
+  else if(per > 1) chips.push({ t:'Цикл периода ' + per + ' · поколение ' + NF(gen,0), c:'ok' });
+  else chips.push({ t:'Эволюция идёт · ' + ruleText() });
+  if(stamp) chips.push({ t:'Фигура: ' + stamp.n });
+  else chips.push({ t:mode === 'erase' ? 'Кисть: стирание' : 'Кисть: рисование' });
+  if(!wrap) chips.push({ t:'Края разомкнуты' });
+  $('hud').innerHTML = chips.map(function(o){
+    return '<span class="' + (o.c||'') + '">' + o.t + '</span>';
+  }).join('');
+}
 
-  /* ---------- ПОЛЕ ---------- */
-  function rebuild(keep){
-    var nc=Math.max(8,Math.floor(W/cs)), nr=Math.max(8,Math.floor(H/cs));
-    var oc=cols, or_=rows, old=cur, oldAge=age;
-    cols=nc; rows=nr;
-    cur=new Uint8Array(cols*rows); nxt=new Uint8Array(cols*rows);
-    age=new Uint16Array(cols*rows); fade=new Float32Array(cols*rows);
-    if(keep&&old){
-      for(var y=0;y<Math.min(or_,rows);y++) for(var x=0;x<Math.min(oc,cols);x++){
-        cur[y*cols+x]=old[y*oc+x]; age[y*cols+x]=oldAge[y*oc+x];
-      }
+/* ---------- цикл ---------- */
+function loop(t){
+  requestAnimationFrame(loop);
+  var dt = Math.min(.1,(t-lastT)/1000 || 0); lastT = t;
+  if(running){
+    acc += dt;
+    var iv = 1/speed, guard = 0;
+    while(acc >= iv && guard < 12){ step(); acc -= iv; guard++; }
+    if(acc > iv*12) acc = 0;
+  }
+  if(fadeLive){
+    var k = Math.exp(-dt*3.2), live = false;
+    for(var i = 0; i < fade.length; i++){
+      if(fade[i] > 0){ fade[i] *= k; if(fade[i] > 0.03) live = true; else fade[i] = 0; }
     }
-    ox=Math.floor((W-cols*cs)/2); oy=Math.floor((H-rows*cs)/2);
-    countPop(); drawGridCache(); hist=[];
-    $('sDim').textContent=cols+'×'+rows;
+    fadeLive = live; dirty = true;
   }
-  var gridCv=document.createElement('canvas'), gxx=gridCv.getContext('2d');
-  function drawGridCache(){
-    gridCv.width=Math.max(1,W*dpr); gridCv.height=Math.max(1,H*dpr);
-    gxx.setTransform(dpr,0,0,dpr,0,0);
-    gxx.clearRect(0,0,W,H);
-    gxx.fillStyle=PAL.canvas; gxx.fillRect(0,0,W,H);
-    if(gridOn&&cs>=6){
-      gxx.strokeStyle='rgba(126,214,199,.07)'; gxx.lineWidth=1; gxx.beginPath();
-      for(var x=0;x<=cols;x++){ var px=ox+x*cs+.5; gxx.moveTo(px,oy); gxx.lineTo(px,oy+rows*cs); }
-      for(var y=0;y<=rows;y++){ var py=oy+y*cs+.5; gxx.moveTo(ox,py); gxx.lineTo(ox+cols*cs,py); }
-      gxx.stroke();
-    }
-    gxx.strokeStyle='rgba(126,214,199,.22)'; gxx.lineWidth=1;
-    gxx.strokeRect(ox+.5,oy+.5,cols*cs-1,rows*cs-1);
-  }
-  function resize(){
-    W=Math.max(300,Math.round(holder.clientWidth)); H=Math.max(220,Math.round(W*0.56));
-    dpr=Math.min(2,window.devicePixelRatio||1);
-    cv.width=W*dpr; cv.height=H*dpr; cv.style.height=H+'px';
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    gcv.width=W*dpr; gcv.height=56*dpr; gctx.setTransform(dpr,0,0,dpr,0,0);
-    rebuild(true); render();
-  }
-  function countPop(){ pop=0; for(var i=0;i<cur.length;i++) pop+=cur[i]; }
-  function idx(x,y){ return y*cols+x; }
-  function setCell(x,y,v){
-    if(wrap){ x=(x+cols)%cols; y=(y+rows)%rows; }
-    else if(x<0||y<0||x>=cols||y>=rows) return;
-    var i=idx(x,y);
-    if(v){ if(!cur[i]){cur[i]=1;age[i]=1;pop++;} }
-    else { if(cur[i]){cur[i]=0;age[i]=0;fade[i]=1;pop--;} }
-  }
-  function clearField(){ cur.fill(0); nxt.fill(0); age.fill(0); fade.fill(0); gen=0;pop=0;born=0;died=0;hist=[];pops=[];updateStatus();render(); }
-  function randomField(){
-    clearField();
-    for(var i=0;i<cur.length;i++) if(Math.random()*100<dens){ cur[i]=1; age[i]=1; pop++; }
-    hist=[]; updateStatus(); render();
-  }
-  function place(p,cx,cy){
-    var x0=cx-Math.floor(p.w/2), y0=cy-Math.floor(p.h/2);
-    p.pts.forEach(function(q){ setCell(x0+q[0],y0+q[1],1); });
-    hist=[]; updateStatus(); render();
-  }
+  if(dirty) render();
+}
+function setRunning(v){
+  running = v;
+  $('play').textContent = v ? '❚❚ Пауза' : '▶ Пуск';
+  $('play').dataset.label = $('play').textContent;
+  $('play').classList.toggle('pri', !v);
+  dirty = true;
+}
 
-  /* ---------- ШАГ ЭВОЛЮЦИИ ---------- */
-  function step(){
-    var b=0,d=0,np=0;
-    for(var y=0;y<rows;y++){
-      for(var x=0;x<cols;x++){
-        var n=0;
-        for(var dy=-1;dy<=1;dy++){
-          var yy=y+dy;
-          if(wrap) yy=(yy+rows)%rows; else if(yy<0||yy>=rows) continue;
-          for(var dx=-1;dx<=1;dx++){
-            if(dx===0&&dy===0) continue;
-            var xx=x+dx;
-            if(wrap) xx=(xx+cols)%cols; else if(xx<0||xx>=cols) continue;
-            n+=cur[yy*cols+xx];
-          }
-        }
-        var i=y*cols+x, a=cur[i], live=a?survive[n]:birth[n];
-        nxt[i]=live;
-        if(live){ np++; age[i]=a?Math.min(age[i]+1,60000):1; if(!a)b++; }
-        else { if(a){ d++; fade[i]=1; } age[i]=0; }
-      }
-    }
-    var t=cur; cur=nxt; nxt=t;
-    gen++; pop=np; born=b; died=d;
-    pops.push(pop); if(pops.length>260) pops.shift();
-    var h=hash(); hist.push(h); if(hist.length>24) hist.shift();
-    updateStatus();
+/* ---------- ввод ---------- */
+function cellAt(e){
+  var r = cv.getBoundingClientRect();
+  var px = (e.clientX-r.left)*(W/r.width), py = (e.clientY-r.top)*(H/r.height);
+  var x = Math.floor((px-ox)/cs), y = Math.floor((py-oy)/cs);
+  return { x:x, y:y, inside:x >= 0 && y >= 0 && x < cols && y < rows };
+}
+function paintLine(a,b,v){
+  var dx = b.x-a.x, dy = b.y-a.y, n = Math.max(Math.abs(dx),Math.abs(dy));
+  for(var i = 0; i <= n; i++){
+    var x = Math.round(a.x+dx*(n?i/n:0)), y = Math.round(a.y+dy*(n?i/n:0));
+    setCell(x,y,v);
   }
-  function hash(){ var h=2166136261>>>0; for(var i=0;i<cur.length;i++){ h=(h^cur[i])>>>0; h=Math.imul(h,16777619)>>>0; } return h; }
-  function cyclePeriod(){
-    if(!hist.length||pop===0) return 0;
-    var last=hist[hist.length-1];
-    for(var k=1;k<hist.length;k++) if(hist[hist.length-1-k]===last) return k;
-    return 0;
+}
+cv.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+cv.addEventListener('pointerdown', function(e){
+  var c = cellAt(e); hover = c;
+  if(!c.inside) return;
+  e.preventDefault();
+  try{ cv.setPointerCapture(e.pointerId); }catch(_){}
+  if(stamp){ place(stamp,c.x,c.y); return; }
+  painting = true; lastCell = c;
+  setCell(c.x,c.y,(e.button === 2 || mode === 'erase') ? 0 : 1);
+  hist = []; updateStatus(); render();
+});
+cv.addEventListener('pointermove', function(e){
+  var c = cellAt(e); hover = c;
+  if(painting && c.inside){
+    paintLine(lastCell || c, c, (e.buttons === 2 || mode === 'erase') ? 0 : 1);
+    lastCell = c; hist = []; updateStatus();
   }
+  dirty = true;
+});
+function stopPaint(){ painting = false; lastCell = null; }
+cv.addEventListener('pointerup', stopPaint);
+cv.addEventListener('pointercancel', stopPaint);
+window.addEventListener('pointerup', stopPaint);
+cv.addEventListener('pointerleave', function(){ hover = null; dirty = true; });
+cv.addEventListener('touchmove', function(e){ if(painting || stamp) e.preventDefault(); }, { passive:false });
 
-  /* ---------- ОТРИСОВКА ---------- */
-  var palette=[];
-  (function(){
-    function mix(a,b,t){ return [Math.round(a[0]+(b[0]-a[0])*t),Math.round(a[1]+(b[1]-a[1])*t),Math.round(a[2]+(b[2]-a[2])*t)]; }
-    var C=[79,216,196],A=[217,185,140],P=[171,166,220];
-    for(var i=0;i<64;i++){
-      var c = i<8 ? mix(C,A,i/8) : (i<32 ? A : mix(A,P,Math.min(1,(i-32)/24)));
-      palette.push('rgb('+c[0]+','+c[1]+','+c[2]+')');
-    }
-  })();
-  function render(){
-    ctx.clearRect(0,0,W,H);
-    ctx.drawImage(gridCv,0,0,W,H);
-    var pad=cs>=8?1:0, s=cs-pad;
-    if(trails){
-      for(var i=0;i<fade.length;i++){
-        if(fade[i]>0.03&&!cur[i]){
-          ctx.fillStyle='rgba(79,216,196,'+(fade[i]*0.3).toFixed(3)+')';
-          ctx.fillRect(ox+(i%cols)*cs,oy+Math.floor(i/cols)*cs,s,s);
-        }
-      }
-    }
-    for(var y=0;y<rows;y++) for(var x=0;x<cols;x++){
-      var i=y*cols+x;
-      if(cur[i]){
-        ctx.fillStyle = ageCol ? palette[Math.min(63,age[i])] : PAL.aqua;
-        ctx.fillRect(ox+x*cs,oy+y*cs,s,s);
-      }
-    }
-    if(stamp&&hover&&hover.inside){
-      var x0=hover.x-Math.floor(stamp.w/2), y0=hover.y-Math.floor(stamp.h/2);
-      ctx.fillStyle='rgba(217,185,140,.42)';
-      stamp.pts.forEach(function(q){
-        var x=x0+q[0],y=y0+q[1];
-        if(wrap){x=(x+cols)%cols;y=(y+rows)%rows;}
-        if(x>=0&&y>=0&&x<cols&&y<rows) ctx.fillRect(ox+x*cs,oy+y*cs,s,s);
-      });
-    } else if(hover&&hover.inside&&mode!=='stamp'){
-      ctx.strokeStyle=mode==='erase'?'rgba(214,159,169,.9)':'rgba(79,216,196,.9)';
-      ctx.lineWidth=1.5; ctx.strokeRect(ox+hover.x*cs+.5,oy+hover.y*cs+.5,cs-1,cs-1);
-    }
-    drawGraph();
-    $('sGen').textContent=gen; $('sPop').textContent=pop; $('sB').textContent=born; $('sD').textContent=died;
-  }
-  function drawGraph(){
-    var w=W,h=56;
-    gctx.clearRect(0,0,w,h);
-    if(pops.length<2){ gctx.fillStyle='rgba(143,168,166,.7)'; gctx.font='11px JetBrains Mono, monospace';
-      gctx.fillText('график численности появится после первых поколений',10,32); return; }
-    var mx=Math.max.apply(null,pops)||1;
-    gctx.strokeStyle='rgba(126,214,199,.16)'; gctx.lineWidth=1;
-    gctx.beginPath(); gctx.moveTo(0,h-1.5); gctx.lineTo(w,h-1.5); gctx.stroke();
-    gctx.beginPath();
-    for(var i=0;i<pops.length;i++){
-      var x=i/(pops.length-1)*(w-2)+1, y=h-3-(pops[i]/mx)*(h-10);
-      i?gctx.lineTo(x,y):gctx.moveTo(x,y);
-    }
-    gctx.strokeStyle=PAL.aqua; gctx.lineWidth=1.8; gctx.stroke();
-    gctx.lineTo(w-1,h-2); gctx.lineTo(1,h-2); gctx.closePath();
-    gctx.fillStyle='rgba(79,216,196,.14)'; gctx.fill();
-    gctx.fillStyle='rgba(143,168,166,.9)'; gctx.font='11px JetBrains Mono, monospace';
-    gctx.fillText('макс '+mx,8,14);
-  }
-  function updateStatus(){
-    var st=$('status'); st.className='status';
-    if(pop===0){ st.classList.add('warn'); st.textContent='Поле пусто: все клетки погибли. Нарисуйте фигуры или нажмите «Случайное поле».'; return; }
-    var per=cyclePeriod();
-    if(per===1){ st.classList.add('ok'); st.textContent='Устойчивая конфигурация: состояние больше не меняется (поколение '+gen+').'; }
-    else if(per>1){ st.classList.add('ok'); st.textContent='Периодическая конфигурация: цикл периода '+per+' (поколение '+gen+').'; }
-    else st.textContent='Эволюция идёт: поколение '+gen+', живых '+pop+', правило '+$('ruleStr').textContent+'.';
-  }
+function syncMode(){
+  $('mDraw').setAttribute('aria-pressed', String(mode === 'draw' && !stamp));
+  $('mErase').setAttribute('aria-pressed', String(mode === 'erase' && !stamp));
+  cv.style.cursor = stamp ? 'copy' : 'crosshair';
+  updateStatus(); dirty = true;
+}
+function paintRange(el){
+  var mn = +el.min, mx = +el.max, v = +el.value;
+  var f = mx > mn ? (v-mn)/(mx-mn)*100 : 0;
+  el.style.setProperty('--fill', Math.max(0,Math.min(100,f)).toFixed(2)+'%');
+}
+function syncOuts(){
+  $('o_speed').textContent = NF(speed,0) + ' покол/с';
+  $('o_cs').textContent = NF(cs,0) + ' px';
+  $('o_dens').textContent = NF(dens,0) + ' %';
+  ['speed','cs','dens'].forEach(function(id){ paintRange($(id)); });
+}
 
-  /* ---------- ЦИКЛ ---------- */
-  function loop(t){
-    raf=requestAnimationFrame(loop);
-    var dt=Math.min(.1,(t-lastT)/1000||0); lastT=t;
-    if(running){
-      acc+=dt; var iv=1/speed, guard=0;
-      while(acc>=iv&&guard<10){ step(); acc-=iv; guard++; }
-      if(acc>iv*10) acc=0;
-    }
-    var k=Math.exp(-dt*3.2);
-    for(var i=0;i<fade.length;i++) if(fade[i]>0) fade[i]*=k;
-    render();
+$('play').addEventListener('click', function(){ setRunning(!running); });
+$('stepBtn').addEventListener('click', function(){ setRunning(false); step(); render(); });
+$('clr').addEventListener('click', function(){ setRunning(false); clearField(); });
+$('rnd').addEventListener('click', function(){ randomField(); });
+$('reset').addEventListener('click', function(){
+  setRunning(false);
+  cs = 9; speed = 12; dens = 22;
+  wrap = true; ageCol = true; trails = true; gridOn = true;
+  $('cs').value = 9; $('speed').value = 12; $('dens').value = 22;
+  $('wrap').checked = true; $('ageCol').checked = true; $('trails').checked = true; $('gridOn').checked = true;
+  setRules([3],[2,3]); $('preset').value = '0';
+  stamp = null; mode = 'draw'; $('pat').value = '';
+  $('patInfo').textContent = 'Выберите фигуру и кликните по полю: она встанет центром под курсором.';
+  syncMode(); syncOuts(); resize(); randomField();
+  if(!reduce) setRunning(true);
+});
+$('mDraw').addEventListener('click', function(){ mode = 'draw'; stamp = null; $('pat').value = ''; syncMode(); });
+$('mErase').addEventListener('click', function(){ mode = 'erase'; stamp = null; $('pat').value = ''; syncMode(); });
+$('pat').addEventListener('change', function(e){
+  var i = e.target.value;
+  if(i === ''){ stamp = null; mode = 'draw'; $('patInfo').textContent = 'Кисть: рисуйте клетки по полю.'; }
+  else {
+    stamp = PATTERNS[+i]; mode = 'stamp';
+    $('patInfo').textContent = stamp.n + ' · ' + stamp.c + ' · ' + stamp.d + ' Кликните по полю, чтобы поставить.';
   }
-  function setRunning(v){
-    running=v; $('play').textContent=v?'❚❚ Пауза':'▶ Пуск'; $('play').classList.toggle('pri',!v);
-  }
+  syncMode(); dirty = true;
+});
+$('preset').addEventListener('change', function(e){
+  var p = PRESETS[+e.target.value];
+  setRules(p.b,p.s); hist = []; dirty = true; updateStatus();
+});
+$('speed').addEventListener('input', function(e){ speed = +e.target.value; syncOuts(); });
+$('cs').addEventListener('input', function(e){ cs = +e.target.value; syncOuts(); rebuild(true); render(); });
+$('dens').addEventListener('input', function(e){ dens = +e.target.value; syncOuts(); });
+$('wrap').addEventListener('change', function(e){ wrap = e.target.checked; hist = []; dirty = true; updateStatus(); });
+$('ageCol').addEventListener('change', function(e){ ageCol = e.target.checked; dirty = true; });
+$('trails').addEventListener('change', function(e){ trails = e.target.checked; if(!trails) fade.fill(0); dirty = true; });
+$('gridOn').addEventListener('change', function(e){ gridOn = e.target.checked; drawGridCache(); dirty = true; });
 
-  /* ---------- ВВОД ---------- */
-  function cellAt(e){
-    var r=cv.getBoundingClientRect();
-    var px=(e.clientX-r.left)*(W/r.width), py=(e.clientY-r.top)*(H/r.height);
-    var x=Math.floor((px-ox)/cs), y=Math.floor((py-oy)/cs);
-    return {x:x,y:y,inside:x>=0&&y>=0&&x<cols&&y<rows};
-  }
-  function paintLine(a,b,v){
-    var dx=b.x-a.x, dy=b.y-a.y, n=Math.max(Math.abs(dx),Math.abs(dy));
-    for(var i=0;i<=n;i++){
-      var x=Math.round(a.x+dx*(n?i/n:0)), y=Math.round(a.y+dy*(n?i/n:0));
-      setCell(x,y,v);
-    }
-  }
-  cv.addEventListener('contextmenu',function(e){e.preventDefault()});
-  cv.addEventListener('pointerdown',function(e){
-    var c=cellAt(e); hover=c;
-    if(!c.inside) return;
-    e.preventDefault();
-    if(cv.setPointerCapture){ try{cv.setPointerCapture(e.pointerId)}catch(_){} }
-    if(stamp){ place(stamp,c.x,c.y); return; }
-    painting=true; lastCell=c;
-    setCell(c.x,c.y,(e.button===2||mode==='erase')?0:1);
-    hist=[]; updateStatus(); render();
-  });
-  cv.addEventListener('pointermove',function(e){
-    var c=cellAt(e); hover=c;
-    if(painting&&c.inside){
-      paintLine(lastCell||c,c,(e.buttons===2||mode==='erase')?0:1);
-      lastCell=c; hist=[]; updateStatus();
-    }
-    if(!running) render();
-  });
-  function stop(){ painting=false; lastCell=null; }
-  cv.addEventListener('pointerup',stop); cv.addEventListener('pointercancel',stop);
-  window.addEventListener('pointerup',stop);
-  cv.addEventListener('pointerleave',function(){ hover=null; if(!running) render(); });
-  cv.addEventListener('touchmove',function(e){ if(painting||stamp) e.preventDefault(); },{passive:false});
-
-  $('play').addEventListener('click',function(){ setRunning(!running); });
-  $('stepBtn').addEventListener('click',function(){ setRunning(false); step(); render(); });
-  $('clr').addEventListener('click',function(){ setRunning(false); clearField(); });
-  $('reset').addEventListener('click',function(){
-    setRunning(false);
-    cs=8; speed=12; dens=22; wrap=true; ageCol=true; trails=true; gridOn=true;
-    $('cs').value=8; $('speed').value=12; $('dens').value=22;
-    $('wrap').checked=true; $('ageCol').checked=true; $('trails').checked=true; $('gridOn').checked=true;
-    $('o_cs').textContent='8 px'; $('o_speed').textContent='12 покол/с'; $('o_dens').textContent='22 %';
-    setRules([3],[2,3]); $('preset').value='0';
-    stamp=null; mode='draw'; $('pat').value=''; syncMode();
-    resize(); clearField(); randomField();
+var QUICK = [
+  ['Планер',8],['Пульсар',7],['Ружьё Госпера',10],['Diehard',13],['R-пентамино',11],['Жёлудь',12]
+];
+QUICK.forEach(function(q){
+  var b = document.createElement('button');
+  b.className = 'chip'; b.type = 'button';
+  b.textContent = q[0]; b.dataset.llt = 'preset';
+  b.addEventListener('click', function(){
+    setRunning(false); clearField();
+    if(q[1] === 10){ wrap = false; $('wrap').checked = false; }
+    place(PATTERNS[q[1]], Math.floor(cols/2), Math.floor(rows/2));
+    stamp = null; mode = 'draw'; $('pat').value = ''; syncMode();
     if(!reduce) setRunning(true);
   });
-  $('rnd').addEventListener('click',function(){ randomField(); });
-  $('mDraw').addEventListener('click',function(){ mode='draw'; stamp=null; $('pat').value=''; syncMode(); });
-  $('mErase').addEventListener('click',function(){ mode='erase'; stamp=null; $('pat').value=''; syncMode(); });
-  function syncMode(){
-    $('mDraw').setAttribute('aria-pressed',String(mode==='draw'&&!stamp));
-    $('mErase').setAttribute('aria-pressed',String(mode==='erase'&&!stamp));
-    cv.style.cursor=stamp?'copy':'crosshair';
-  }
-  $('pat').addEventListener('change',function(e){
-    var i=e.target.value;
-    if(i===''){ stamp=null; mode='draw'; $('patInfo').textContent='Кисть: рисуйте клетки по полю.'; }
-    else { stamp=PATTERNS[+i]; mode='stamp';
-      $('patInfo').textContent=stamp.n+' · '+stamp.c+' · '+stamp.d+' Кликните по полю, чтобы поставить.'; }
-    syncMode(); render();
-  });
-  $('center').addEventListener('click',function(){
-    var p=stamp||PATTERNS[8];
-    place(p,Math.floor(cols/2),Math.floor(rows/2));
-  });
-  $('preset').addEventListener('change',function(e){ var p=PRESETS[+e.target.value]; setRules(p.b,p.s); hist=[]; updateStatus(); });
-  $('speed').addEventListener('input',function(e){ speed=+e.target.value; $('o_speed').textContent=speed+' покол/с'; });
-  $('cs').addEventListener('input',function(e){ cs=+e.target.value; $('o_cs').textContent=cs+' px'; rebuild(true); render(); });
-  $('dens').addEventListener('input',function(e){ dens=+e.target.value; $('o_dens').textContent=dens+' %'; });
-  $('wrap').addEventListener('change',function(e){ wrap=e.target.checked; hist=[]; updateStatus(); });
-  $('ageCol').addEventListener('change',function(e){ ageCol=e.target.checked; render(); });
-  $('trails').addEventListener('change',function(e){ trails=e.target.checked; if(!trails) fade.fill(0); render(); });
-  $('gridOn').addEventListener('change',function(e){ gridOn=e.target.checked; drawGridCache(); render(); });
-  window.addEventListener('keydown',function(e){
-    var t=e.target.tagName;
-    if(t==='INPUT'||t==='SELECT'||t==='TEXTAREA') return;
-    if(e.code==='Space'){ e.preventDefault(); setRunning(!running); }
-    else if(e.key==='s'||e.key==='S'||e.key==='ы'){ setRunning(false); step(); render(); }
-    else if(e.key==='c'||e.key==='C'||e.key==='с'){ setRunning(false); clearField(); }
-    else if(e.key==='r'||e.key==='R'||e.key==='к'){ randomField(); }
-  });
-  var rt=null;
-  window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(resize,150); });
+  $('quick').appendChild(b);
+});
 
-  /* ---------- СТАРТ ---------- */
-  buildRuleUI(); setRules([3],[2,3]);
-  PATTERNS.forEach(function(p,i){ $('pat').insertAdjacentHTML('beforeend','<option value="'+i+'">'+p.n+' — '+p.c+'</option>'); });
-  $('o_speed').textContent=speed+' покол/с'; $('o_cs').textContent=cs+' px'; $('o_dens').textContent=dens+' %';
-  resize(); syncMode(); randomField();
-  if(!reduce) setRunning(true);
-  lastT=performance.now(); raf=requestAnimationFrame(loop);
-})();
-</script>
-<script>
-/* LibLabTab · перекраска при смене темы */
-(function(){
-  function refresh(){
-    if(window.LLTtheme) window.LLTtheme.readPal();
-    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
-    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
-    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
-    if(typeof render==="function"){ try{ render(); }catch(e){} }
-    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+window.addEventListener('keydown', function(e){
+  var t = e.target.tagName;
+  if(t === 'INPUT' || t === 'SELECT' || t === 'TEXTAREA') return;
+  if(e.code === 'Space'){ e.preventDefault(); setRunning(!running); }
+  else if(e.key === 's' || e.key === 'S' || e.key === 'ы'){ setRunning(false); step(); render(); }
+  else if(e.key === 'c' || e.key === 'C' || e.key === 'с'){ setRunning(false); clearField(); }
+  else if(e.key === 'r' || e.key === 'R' || e.key === 'к'){ randomField(); }
+});
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden){ lastT = performance.now(); acc = 0; }
+});
+window.addEventListener('llt:theme', function(){
+  if(window.LLTtheme) window.LLTtheme.readPal();
+  drawGridCache(); dirty = true;
+});
+if(window.ResizeObserver){
+  var ro = new ResizeObserver(function(){ resize(); });
+  ro.observe(wrapEl); ro.observe(plotEl);
+}
+var rt = null;
+window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(resize,120); });
+
+/* ---------- самотест: эталонные факты автомата ---------- */
+function simPattern(rows, gens, size, margin){
+  var g = parse(rows), n = size;
+  var a = new Uint8Array(n*n), b = new Uint8Array(n*n);
+  var mx = margin, my = margin;
+  g.pts.forEach(function(p){ a[(my+p[1])*n + (mx+p[0])] = 1; });
+  var pops = [], snaps = {};
+  function count(arr){ var s = 0; for(var i = 0; i < arr.length; i++) s += arr[i]; return s; }
+  pops.push(count(a)); snaps[0] = a.slice();
+  for(var t = 0; t < gens; t++){
+    for(var y = 0; y < n; y++) for(var x = 0; x < n; x++){
+      var c = 0;
+      for(var dy = -1; dy <= 1; dy++) for(var dx = -1; dx <= 1; dx++){
+        if(!dx && !dy) continue;
+        var yy = y+dy, xx = x+dx;
+        if(yy < 0 || xx < 0 || yy >= n || xx >= n) continue;
+        c += a[yy*n+xx];
+      }
+      var i = y*n+x;
+      b[i] = a[i] ? ((c === 2 || c === 3) ? 1 : 0) : (c === 3 ? 1 : 0);
+    }
+    var tmp = a; a = b; b = tmp;
+    pops.push(count(a));
+    if(snaps[t+1] === undefined) snaps[t+1] = a.slice();
   }
-  window.addEventListener("llt:theme",refresh);
+  return { pops:pops, snaps:snaps, n:n, origin:[mx,my] };
+}
+function shiftedEqual(A,B,n,dx,dy){
+  for(var y = 0; y < n; y++) for(var x = 0; x < n; x++){
+    var sx = x-dx, sy = y-dy;
+    var v = (sx >= 0 && sy >= 0 && sx < n && sy < n) ? A[sy*n+sx] : 0;
+    if(v !== B[y*n+x]) return false;
+  }
+  return true;
+}
+function selfTest(){
+  var rows = [];
+  function add(name, got, want, ok){ rows.push([name,String(got),String(want),ok]); }
+
+  var block = simPattern(PATTERNS[0].r, 10, 24, 8);
+  add('Блок: не меняется 10 поколений', block.pops[10], 4,
+      block.pops[10] === 4 && shiftedEqual(block.snaps[0],block.snaps[10],24,0,0));
+
+  var blink = simPattern(PATTERNS[4].r, 4, 24, 8);
+  add('Мигалка: период 2', blink.pops[2], 3,
+      shiftedEqual(blink.snaps[0],blink.snaps[2],24,0,0) && !shiftedEqual(blink.snaps[0],blink.snaps[1],24,0,0));
+
+  var puls = simPattern(PATTERNS[7].r, 6, 40, 12);
+  add('Пульсар: период 3, 48 клеток', puls.pops[3], 48,
+      puls.pops[0] === 48 && puls.pops[3] === 48 && shiftedEqual(puls.snaps[0],puls.snaps[3],40,0,0));
+
+  var gl = simPattern(PATTERNS[8].r, 4, 40, 12);
+  var glOk = gl.pops[4] === 5 && (shiftedEqual(gl.snaps[0],gl.snaps[4],40,1,1) ||
+    shiftedEqual(gl.snaps[0],gl.snaps[4],40,-1,1) || shiftedEqual(gl.snaps[0],gl.snaps[4],40,1,-1) ||
+    shiftedEqual(gl.snaps[0],gl.snaps[4],40,-1,-1));
+  add('Планер: период 4, сдвиг (1,1)', gl.pops[4], 5, glOk);
+
+  var lw = simPattern(PATTERNS[9].r, 4, 48, 16);
+  var lwOk = lw.pops[4] === 9 && (shiftedEqual(lw.snaps[0],lw.snaps[4],48,2,0) ||
+    shiftedEqual(lw.snaps[0],lw.snaps[4],48,-2,0));
+  add('Лёгкий корабль: период 4, сдвиг 2', lw.pops[4], 9, lwOk);
+
+  var dh = simPattern(PATTERNS[13].r, 131, 96, 40);
+  add('Diehard: исчезает на 130-м', dh.pops[130], 0, dh.pops[129] > 0 && dh.pops[130] === 0);
+
+  var gun = simPattern(PATTERNS[10].r, 60, 120, 12);
+  add('Ружьё Госпера: рост населения', gun.pops[0] + ' → ' + gun.pops[60], 'больше 36',
+      gun.pops[0] === 36 && gun.pops[30] > 36 && gun.pops[60] > gun.pops[30]);
+
+  var ok = rows.filter(function(r){ return r[3]; }).length;
+  $('testTbl').innerHTML = '<thead><tr><th>Проверка</th><th>Модель</th><th>Эталон</th><th>Итог</th></tr></thead><tbody>' +
+    rows.map(function(r){
+      return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+(r[3]?'✓':'✗')+'</td></tr>';
+    }).join('') + '</tbody><tfoot><tr><td colspan="4">Пройдено '+ok+' из '+rows.length+'</td></tr></tfoot>';
+  return { ok:ok, total:rows.length };
+}
+$('btnTest').addEventListener('click', function(){
+  var r = selfTest();
+  var chips = $('hud');
+  var s = document.createElement('span');
+  s.className = r.ok === r.total ? 'ok' : 'warn';
+  s.textContent = 'Самотест: ' + r.ok + ' из ' + r.total;
+  chips.appendChild(s);
+  setTimeout(function(){ updateStatus(); }, 4000);
+});
+try{ window.__selfTest = selfTest; }catch(e){}
+
+/* ---------- старт ---------- */
+buildRuleUI(); setRules([3],[2,3]);
+PATTERNS.forEach(function(p,i){
+  $('pat').insertAdjacentHTML('beforeend','<option value="'+i+'">'+p.n+' — '+p.c+'</option>');
+});
+syncOuts(); syncMode(); resize(); randomField();
+if(!reduce) setRunning(true);
+try{ selfTest(); }catch(e){}
+lastT = performance.now();
+requestAnimationFrame(loop);
 })();
 </script>
 <script src="/sim/lib/selftest.js"></script>

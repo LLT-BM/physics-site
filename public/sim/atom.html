@@ -3,278 +3,1032 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Современная модель атома</title>
+<title>Модель атома — оболочки, орбитали, ядро и нуклон</title>
 <link rel="canonical" href="https://liblabtab.ru/models/atom-model/">
 <link rel="stylesheet" href="/fonts/fonts.css">
 <script src="/sim/guard.js"></script>
-<style>
-
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
-
-*{box-sizing:border-box}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:980px;margin:0 auto;padding:20px 16px 40px}
-h1{font:600 clamp(26px,5vw,38px)/1.15 "Iowan Old Style",Georgia,"Times New Roman",serif;margin:0 0 6px;letter-spacing:-.01em}
-.sub{color:var(--mut);margin:0 0 18px;max-width:62ch}
-.tabs,.orbs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-button{font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;cursor:pointer}
-button:hover{border-color:var(--acc)}
-button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
-.stage{position:relative;border:1px solid var(--bd);border-radius:12px;background:radial-gradient(ellipse at center,var(--card),var(--bg) 75%);overflow:hidden}
-canvas{display:block;width:100%;height:clamp(320px,60vh,560px);touch-action:none;cursor:grab}
-canvas:active{cursor:grabbing}
-.scale{position:absolute;left:12px;bottom:10px;font-size:14px;color:var(--mut)}
-.hint{position:absolute;right:12px;bottom:10px;font-size:13px;color:var(--mut)}
-.row{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:12px 0 4px;color:var(--mut);font-size:14px}
-.legend{display:flex;gap:14px;flex-wrap:wrap}
-.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
-.info{margin-top:14px;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-.info div{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px 16px}
-.info h3{margin:0 0 6px;font-size:16px}
-.info p{margin:0;color:var(--mut);font-size:15px}
-.note{color:var(--mut);font-size:13px;margin-top:16px}
-@media (prefers-reduced-motion:reduce){canvas{cursor:default}}
-</style>
-  <link rel="stylesheet" href="/sim/lib/theme.css">
+<link rel="stylesheet" href="/sim/lib/theme.css">
 <script src="/sim/lib/theme.js"></script>
-<script src="/sim/lib/touch.js"></script>
 <script src="/sim/lib/fmt.js"></script>
-<script src="/sim/lib/loop.js"></script>
-<script>
-/* LibLabTab · форматирование чисел ru-RU */
-var NF=(typeof window.LLTfix==='function')?window.LLTfix:function(x,n){
-  if(typeof x!=='number'||!isFinite(x))return '—';
-  n=(n==null?2:n);var p=Math.pow(10,n),r=Math.round(x*p)/p;if(r===0)r=0;
-  var t=Math.abs(r).toFixed(n).split('.').join(',');
-  return r<0?'−'+t:t;
-};
-var NS=(typeof window.LLTsigned==='function')?window.LLTsigned:function(x,n){
-  if(typeof x!=='number'||!isFinite(x))return '—';
-  n=(n==null?2:n);var p=Math.pow(10,n),r=Math.round(x*p)/p;if(r===0)r=0;
-  return (r>0?'+':'')+NF(x,n);
-};
-window.LLT_OPTS={slug:"atom-model"};</script>
-<script src="/sim/lib/layout.js"></script>
-  <link rel="stylesheet" href="/sim/lib/mobile.css">
-  <style data-llt-ios>input,select,textarea{font-size:16px}</style>
-  <link rel="stylesheet" href="/sim/lib/layout.css">
+<style>
+:root{box-sizing:border-box}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow:hidden}
+
+.app{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:12px;height:100%;padding:12px}
+.stagewrap{position:relative;min-width:0;border:1px solid var(--line2);border-radius:14px;
+  overflow:hidden;background:radial-gradient(ellipse at 50% 45%,var(--surface),var(--canvas) 78%)}
+#cv{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#cv:active{cursor:grabbing}
+.hud{position:absolute;left:10px;top:10px;right:10px;display:flex;flex-direction:column;
+  align-items:flex-start;gap:5px;pointer-events:none}
+.hud span{font:600 .72rem var(--mono);background:var(--scrim);border:1px solid var(--line);
+  color:var(--ice);padding:4px 9px;border-radius:999px;backdrop-filter:blur(5px);
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hud span.hi{color:var(--sand);border-color:rgba(217,185,140,.5)}
+.hud span.ok{color:var(--ok);border-color:rgba(63,201,174,.5)}
+.legend{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:4px;
+  pointer-events:none;font:600 .68rem var(--mono);color:var(--muted);text-align:right;
+  background:var(--scrim);border:1px solid var(--line);border-radius:10px;padding:7px 9px;
+  backdrop-filter:blur(5px)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:6px;vertical-align:-1px}
+.scalebar{position:absolute;left:10px;bottom:10px;font:600 .7rem var(--mono);color:var(--muted);
+  background:var(--scrim);border:1px solid var(--line);border-radius:10px;padding:6px 9px;
+  backdrop-filter:blur(5px);pointer-events:none;max-width:52%}
+
+.side{min-width:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px;
+  scrollbar-color:var(--aqua) var(--canvas);scrollbar-width:thin}
+.side::-webkit-scrollbar{width:10px}
+.side::-webkit-scrollbar-track{background:var(--canvas);border-radius:8px}
+.side::-webkit-scrollbar-thumb{border-radius:8px;border:2px solid var(--canvas);
+  background:linear-gradient(var(--deep),var(--aqua))}
+.panel{border:1px solid var(--line2);border-radius:14px;background:var(--surface);padding:12px 13px}
+.panel>h2{font:700 .95rem var(--disp);margin:0 0 8px;padding-left:10px;border-left:4px solid var(--aqua)}
+details.panel>summary{display:flex;align-items:center;gap:9px;cursor:pointer;list-style:none;
+  font:700 .95rem var(--disp);color:var(--ink);min-height:34px}
+details.panel>summary::-webkit-details-marker{display:none}
+details.panel>summary::before{content:"▸";color:var(--sand);font:700 .9rem var(--mono)}
+details.panel[open]>summary::before{content:"▾"}
+details.panel>summary:focus-visible{outline:3px solid var(--aqua);outline-offset:3px;border-radius:8px}
+.count{margin-left:auto;font:600 .72rem var(--mono);color:var(--muted);
+  border:1px solid var(--line2);border-radius:999px;padding:2px 8px}
+
+.row{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+button{font:inherit;font-size:.85rem;font-family:var(--sans);min-height:44px;padding:9px 12px;
+  border-radius:10px;border:1px solid var(--line2);background:var(--overlay);color:var(--ink);
+  cursor:pointer;transition:.14s;touch-action:manipulation}
+button:hover{border-color:var(--aqua);color:var(--aqua)}
+button:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
+button.pri{background:linear-gradient(135deg,var(--aqua),var(--ok));color:var(--on);
+  border-color:var(--aqua);font-weight:700}
+button[aria-pressed="true"]{border-color:var(--aqua);color:var(--aqua);background:rgba(79,216,196,.12)}
+button.chip{border-radius:999px;font:600 .76rem var(--mono);min-height:36px;padding:6px 11px}
+
+label{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:.86rem;color:var(--ink);margin-top:10px}
+output{font:700 .8rem var(--mono);color:var(--sand);white-space:nowrap;
+  background:rgba(217,185,140,.14);border:1px solid rgba(217,185,140,.38);border-radius:999px;padding:3px 9px}
+select,input[type=search]{font:inherit;font-size:16px;font-family:var(--mono);width:100%;
+  padding:9px 10px;margin-top:6px;border-radius:9px;border:1px solid var(--line2);
+  background:var(--canvas);color:var(--ink)}
+select:focus-visible,input:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:40px;margin:2px 0 0;
+  background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:12px;border-radius:8px;border:1px solid var(--line2);
+  background:linear-gradient(90deg,var(--deep) 0%,var(--aqua) var(--fill,50%),
+    rgba(126,214,199,.16) var(--fill,50%),rgba(126,214,199,.16) 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;
+  margin-top:-8px;border-radius:50%;background:var(--sand);border:3px solid var(--canvas);
+  box-shadow:0 0 0 3px rgba(217,185,140,.26)}
+input[type=range]::-moz-range-track{height:12px;border-radius:8px;background:rgba(126,214,199,.16)}
+input[type=range]::-moz-range-progress{height:12px;border-radius:8px;background:linear-gradient(90deg,var(--deep),var(--aqua))}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--sand);border:3px solid var(--canvas)}
+input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:4px;border-radius:10px}
+.chk{display:flex;align-items:center;gap:10px;min-height:40px;font-size:.86rem;margin-top:4px;cursor:pointer}
+.chk input{width:21px;height:21px;accent-color:var(--aqua);flex:none}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.stats div{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:rgba(0,0,0,.24);min-width:0}
+.stats span{display:block;font:600 .66rem var(--mono);color:var(--muted);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stats b{font:700 .95rem var(--mono);color:var(--aqua)}
+.cfg{font:700 .8rem var(--mono);color:var(--sand);margin:10px 0 0;word-break:break-word;line-height:1.6}
+.note{margin:9px 0 0;font-size:.8rem;color:var(--muted);line-height:1.55}
+
+.pt{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:2px;margin-top:8px}
+.pt button{min-height:0;padding:0;aspect-ratio:1;border-radius:5px;font:700 .58rem var(--mono);
+  display:grid;place-items:center;line-height:1;border:1px solid var(--line);background:var(--overlay)}
+.pt button:hover{border-color:var(--aqua);color:var(--aqua)}
+.pt button[data-on="1"]{background:var(--aqua);color:var(--on);border-color:var(--aqua)}
+.pt button.f{border-color:rgba(171,166,220,.4)}
+.pt .gap{visibility:hidden}
+.ptnote{font:600 .68rem var(--mono);color:var(--muted);margin:7px 0 0}
+kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;padding:1px 5px;color:var(--ice)}
+.offscreen{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+@media (max-width:1000px){
+  body{overflow:auto}
+  .app{grid-template-columns:minmax(0,1fr);height:auto;padding:10px}
+  .stagewrap{height:min(62vh,540px)}
+  .side{overflow:visible;max-height:none}
+  .pt button{font-size:.5rem}
+}
+</style>
 </head>
 <body>
-<main>
-<h1>Атом: как его видит современная физика</h1>
-<p class="sub">Три уровня одной картины: электронные облака, ядро из нуклонов и кварк‑глюонная структура протона. Вращайте модель мышью или пальцем.</p>
+<div class="app">
+  <div class="stagewrap" data-llt-stage-wrap>
+    <canvas id="cv" data-llt-stage role="img"
+      aria-label="Трёхмерная модель атома: электронные облака, ядро и структура нуклона"></canvas>
+    <div class="hud" id="hud"></div>
+    <div class="scalebar" id="scalebar"></div>
+    <div class="legend" id="legend" aria-hidden="true"></div>
+  </div>
 
-<div class="tabs" role="group" aria-label="Масштаб">
-<button data-mode="atom" aria-pressed="true">Атом</button>
-<button data-mode="nuc" aria-pressed="false">Ядро</button>
-<button data-mode="nct" aria-pressed="false">Протон</button>
+  <aside class="side" data-llt-ui aria-label="Настройки модели атома">
+    <section class="panel">
+      <h2>Что смотрим</h2>
+      <div class="row">
+        <button id="mAtom" class="pri" data-llt="action" aria-pressed="true">Атом</button>
+        <button id="mSub" data-llt="action" aria-pressed="false">Подоболочка</button>
+        <button id="mOrb" data-llt="action" aria-pressed="false">Орбиталь</button>
+      </div>
+      <div class="row">
+        <button id="mNuc" data-llt="action" aria-pressed="false">Ядро</button>
+        <button id="mNct" data-llt="action" aria-pressed="false">Нуклон</button>
+        <button id="reset" data-llt="action">Сброс</button>
+      </div>
+
+      <div data-llt="basic">
+        <label for="el">Элемент</label>
+        <select id="el" data-llt="basic" data-label="Элемент"></select>
+        <label for="sub">Подоболочка</label>
+        <select id="sub" data-llt="basic" data-label="Подоболочка"></select>
+        <label for="orb">Орбиталь</label>
+        <select id="orb" data-llt="basic" data-label="Орбиталь"></select>
+        <label class="chk"><input type="checkbox" id="auto" checked data-llt="basic" data-label="Автовращение"> Автовращение</label>
+      </div>
+
+      <div class="stats" data-llt-read>
+        <div><span>заряд ядра Z</span><b id="vZ">1</b></div>
+        <div><span>массовое число A</span><b id="vA">1</b></div>
+        <div><span>электронов</span><b id="vE">1</b></div>
+        <div><span>оболочек</span><b id="vS">1</b></div>
+        <div><span>Z_eff</span><b id="vZeff">1,00</b></div>
+        <div><span>пик r, Å</span><b id="vR">0,53</b></div>
+        <div><span>точек облака</span><b id="vP">—</b></div>
+        <div><span>нуклонов</span><b id="vN">1</b></div>
+      </div>
+      <p class="cfg" id="cfg"></p>
+      <p class="note" id="modeNote"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Быстрые примеры</h2>
+      <div class="row" id="quick"></div>
+      <p class="note">Тяните сцену мышью или пальцем, колесо меняет масштаб. Клавиши: <kbd>Пробел</kbd> вращение, <kbd>R</kbd> сброс, <kbd>←</kbd><kbd>→</kbd> элемент.</p>
+    </section>
+
+    <details class="panel">
+      <summary>Таблица Менделеева <span class="count">118</span></summary>
+      <div class="pt" id="pt"></div>
+      <p class="ptnote">Нижние два ряда — лантаноиды и актиноиды. Клик выбирает элемент.</p>
+    </details>
+
+    <details class="panel">
+      <summary>Точные настройки <span class="count">7</span></summary>
+      <div data-llt="adv">
+        <label for="pts">Точек в облаке <output id="o_pts"></output></label>
+        <input type="range" id="pts" min="1500" max="30000" step="500" value="12000"
+               data-llt="adv" data-label="Точек в облаке" data-unit="шт">
+        <label for="zoom">Масштаб <output id="o_zoom"></output></label>
+        <input type="range" id="zoom" min="0.5" max="3" step="0.02" value="1"
+               data-llt="adv" data-label="Масштаб" data-unit="×">
+        <label for="spin">Скорость вращения <output id="o_spin"></output></label>
+        <input type="range" id="spin" min="0" max="1.2" step="0.02" value="0.35"
+               data-llt="adv" data-label="Скорость вращения" data-unit="рад/с">
+        <label class="chk"><input type="checkbox" id="cut" data-llt="adv" data-label="Разрез: половина облака"> Разрез: половина облака</label>
+        <label class="chk"><input type="checkbox" id="even" checked data-llt="adv" data-label="Выровнять радиусы оболочек"> Выровнять радиусы оболочек</label>
+        <label class="chk"><input type="checkbox" id="phase" data-llt="adv" data-label="Раскраска по фазе ψ"> Раскраска по фазе ψ</label>
+        <label class="chk"><input type="checkbox" id="axes" data-llt="adv" data-label="Показывать оси x y z"> Показывать оси x y z</label>
+      </div>
+      <p class="note">«Выровнять радиусы» — схема: каждая оболочка растягивается до своего пояса, чтобы внутренние не сливались в точку. В истинном масштабе K-оболочка золота в 200 раз меньше внешней.</p>
+      <div class="row"><button id="btnTest" data-llt="skip">✓ Самотест</button></div>
+    </details>
+  </aside>
 </div>
-<div class="orbs" id="orbs" role="group" aria-label="Орбиталь"></div>
-
-<div class="stage">
-<canvas data-llt-stage="1" id="cv" aria-label="Интерактивная модель атома"></canvas>
-<div class="scale" id="scale"></div>
-<div class="hint">перетащите, чтобы повернуть</div>
-</div>
-
-<div class="row">
-<div class="legend" id="legend"></div>
-<label><input type="checkbox" id="auto" checked> автовращение</label>
-<button id="reset" type="button">Сброс</button>
-</div>
-
-<div class="info" id="info"></div>
-<p class="note">Облака электронов построены по волновым функциям водородоподобного атома (метод Монте‑Карло). Ядро и протон — образные иллюстрации: у них нет траекторий, как у шариков.</p>
-</main>
+<div class="offscreen" aria-hidden="true"><table id="testTbl"></table></div>
 
 <script>
-const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-let W=0,H=0,mode='atom',orb='1s',yaw=.6,pitch=.4,auto=true,drag=false,lx=0,ly=0,ext=10,pts=null;
-const POS=PAL.aqua,NEG=PAL.sand;
-
-function fit(){const d=Math.min(devicePixelRatio||1,2),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0)}
-addEventListener('resize',fit);
-
-/* Орбитали: радиальная плотность r²R², угловая плотность |Y|², знак фазы */
-const ORB={
-'1s':{rad:r=>r*r*Math.exp(-2*r),rmax:14,ang:c=>1,am:1,ph:(r,c)=>1,
- t:'Основное состояние водорода: сферическое облако без узлов. Наиболее вероятное расстояние до ядра — боровский радиус, 0,53 Å.'},
-'2s':{rad:r=>r*r*(2-r)**2*Math.exp(-r),rmax:34,ang:c=>1,am:1,ph:(r,c)=>r<2?1:-1,
- t:'Сфера с одной узловой поверхностью, на которой вероятность найти электрон равна нулю. Внутренняя и внешняя части имеют противоположные фазы.'},
-'2p':{rad:r=>r**4*Math.exp(-r),rmax:34,ang:c=>c*c,am:1,ph:(r,c)=>c>=0?1:-1,
- t:'Две доли («гантель») с противоположными фазами. Узловая плоскость проходит через ядро — электрон в ней не бывает.'},
-'3p':{rad:r=>r**4*(1-r/6)**2*Math.exp(-2*r/3),rmax:46,ang:c=>c*c,am:1,ph:(r,c)=>(r<6?1:-1)*(c>=0?1:-1),
- t:'Гантель с дополнительной сферической узловой поверхностью: две внутренние и две внешние доли.'},
-'3d':{rad:r=>r**6*Math.exp(-2*r/3),rmax:42,ang:c=>(3*c*c-1)**2,am:4,ph:(r,c)=>3*c*c-1>=0?1:-1,
- t:'Две доли вдоль оси и «бублик» вокруг ядра противоположной фазы; узловые поверхности — два конуса.'}
-};
-function build(k){
- const o=ORB[k];let fm=0;
- for(let i=0;i<=400;i++)fm=Math.max(fm,o.rad(o.rmax*i/400));fm*=1.05;
- const N=6000,P=new Float32Array(N*4),rs=[];let n=0;
- while(n<N){
-  const r=Math.random()*o.rmax;if(Math.random()*fm>o.rad(r))continue;
-  const c=2*Math.random()-1;if(Math.random()*o.am>o.ang(c))continue;
-  const s=Math.sqrt(1-c*c),f=6.2832*Math.random();
-  P[n*4]=r*s*Math.cos(f);P[n*4+1]=r*s*Math.sin(f);P[n*4+2]=r*c;P[n*4+3]=o.ph(r,c);rs.push(r);n++;
- }
- rs.sort((a,b)=>a-b);ext=rs[Math.floor(N*.97)]*1.1;pts=P;
-}
-
-/* Поворот: z — вертикальная ось; возвращает [x, y экрана, глубина] */
-function rot(x,y,z){
- const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
- const x1=x*cy-y*sy,y1=x*sy+y*cy;
- return [x1,-(z*cp+y1*sp),y1*cp-z*sp];
-}
-
-function drawAtom(){
- const sc=Math.min(W,H)*.46/ext,cx=W/2,cy=H/2,P=pts;
- ctx.globalAlpha=.6;
- for(const sg of [1,-1]){
-  ctx.fillStyle=sg>0?POS:NEG;
-  for(let i=0;i<P.length;i+=4){
-   if(P[i+3]!==sg)continue;
-   const q=rot(P[i],P[i+1],P[i+2]),s=1.3+Math.max(-.5,Math.min(.9,-q[2]/ext*.9));
-   ctx.fillRect(cx+q[0]*sc-s/2,cy+q[1]*sc-s/2,s,s);
-  }
- }
- ctx.globalAlpha=1;
- ctx.fillStyle=PAL.rose;ctx.shadowColor=PAL.rose;ctx.shadowBlur=12;
- ctx.beginPath();ctx.arc(cx,cy,3,0,6.283);ctx.fill();ctx.shadowBlur=0;
-}
-
-/* Ядро: углерод‑12 (6 p + 6 n) */
-const NU=[];
 (function(){
- 
-/* LibLabTab · палитра до первого использования */
+'use strict';
 var PAL = (window.LLTtheme && window.LLTtheme.pal) || window.PAL || {};
 window.PAL = PAL;
-for(let i=0;i<12;i++){let v;do{v=[Math.random()*2-1,Math.random()*2-1,Math.random()*2-1]}while(v[0]**2+v[1]**2+v[2]**2>1);
-  NU.push({p:v.map(a=>a*.62),z:i%2,ph:Math.random()*6.28})}
- for(let it=0;it<300;it++)for(const a of NU){
-  for(const b of NU){if(a===b)continue;const d=[0,1,2].map(k=>a.p[k]-b.p[k]),l=Math.hypot(...d)||.01;
-   if(l<.58)for(let k=0;k<3;k++)a.p[k]+=d[k]/l*(.58-l)*.25}
-  const m=Math.hypot(...a.p);if(m>.72)for(let k=0;k<3;k++)a.p[k]*=.72/m;
- }
-})();
+function C(k,f){ return PAL[k] || f; }
+var NF = (typeof window.LLTfix === 'function') ? window.LLTfix : function(x,n){
+  if(typeof x !== 'number' || !isFinite(x)) return '—';
+  n = (n == null ? 2 : n);
+  var p = Math.pow(10,n), r = Math.round(x*p)/p; if(r === 0) r = 0;
+  var t = Math.abs(r).toFixed(n).split('.').join(',');
+  return r < 0 ? '−'+t : t;
+};
+var $ = function(id){ return document.getElementById(id); };
+var TAU = Math.PI*2, A0 = 0.529177;  /* боровский радиус, Å */
+var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+var narrow = window.matchMedia && matchMedia('(max-width: 700px)').matches;
+
+/* ═══════════ данные: 118 элементов ═══════════ */
+var RAW = 'H|Водород|1.008;He|Гелий|4.0026;Li|Литий|6.94;Be|Бериллий|9.0122;B|Бор|10.81;'+
+'C|Углерод|12.011;N|Азот|14.007;O|Кислород|15.999;F|Фтор|18.998;Ne|Неон|20.180;'+
+'Na|Натрий|22.990;Mg|Магний|24.305;Al|Алюминий|26.982;Si|Кремний|28.085;P|Фосфор|30.974;'+
+'S|Сера|32.06;Cl|Хлор|35.45;Ar|Аргон|39.95;K|Калий|39.098;Ca|Кальций|40.078;'+
+'Sc|Скандий|44.956;Ti|Титан|47.867;V|Ванадий|50.942;Cr|Хром|51.996;Mn|Марганец|54.938;'+
+'Fe|Железо|55.845;Co|Кобальт|58.933;Ni|Никель|58.693;Cu|Медь|63.546;Zn|Цинк|65.38;'+
+'Ga|Галлий|69.723;Ge|Германий|72.630;As|Мышьяк|74.922;Se|Селен|78.971;Br|Бром|79.904;'+
+'Kr|Криптон|83.798;Rb|Рубидий|85.468;Sr|Стронций|87.62;Y|Иттрий|88.906;Zr|Цирконий|91.224;'+
+'Nb|Ниобий|92.906;Mo|Молибден|95.95;Tc|Технеций|98;Ru|Рутений|101.07;Rh|Родий|102.91;'+
+'Pd|Палладий|106.42;Ag|Серебро|107.87;Cd|Кадмий|112.41;In|Индий|114.82;Sn|Олово|118.71;'+
+'Sb|Сурьма|121.76;Te|Теллур|127.60;I|Иод|126.90;Xe|Ксенон|131.29;Cs|Цезий|132.91;'+
+'Ba|Барий|137.33;La|Лантан|138.91;Ce|Церий|140.12;Pr|Празеодим|140.91;Nd|Неодим|144.24;'+
+'Pm|Прометий|145;Sm|Самарий|150.36;Eu|Европий|151.96;Gd|Гадолиний|157.25;Tb|Тербий|158.93;'+
+'Dy|Диспрозий|162.50;Ho|Гольмий|164.93;Er|Эрбий|167.26;Tm|Тулий|168.93;Yb|Иттербий|173.05;'+
+'Lu|Лютеций|174.97;Hf|Гафний|178.49;Ta|Тантал|180.95;W|Вольфрам|183.84;Re|Рений|186.21;'+
+'Os|Осмий|190.23;Ir|Иридий|192.22;Pt|Платина|195.08;Au|Золото|196.97;Hg|Ртуть|200.59;'+
+'Tl|Таллий|204.38;Pb|Свинец|207.2;Bi|Висмут|208.98;Po|Полоний|209;At|Астат|210;'+
+'Rn|Радон|222;Fr|Франций|223;Ra|Радий|226;Ac|Актиний|227;Th|Торий|232.04;'+
+'Pa|Протактиний|231.04;U|Уран|238.03;Np|Нептуний|237;Pu|Плутоний|244;Am|Америций|243;'+
+'Cm|Кюрий|247;Bk|Берклий|247;Cf|Калифорний|251;Es|Эйнштейний|252;Fm|Фермий|257;'+
+'Md|Менделевий|258;No|Нобелий|259;Lr|Лоуренсий|266;Rf|Резерфордий|267;Db|Дубний|268;'+
+'Sg|Сиборгий|269;Bh|Борий|270;Hs|Хассий|277;Mt|Мейтнерий|278;Ds|Дармштадтий|281;'+
+'Rg|Рентгений|282;Cn|Коперниций|285;Nh|Нихоний|286;Fl|Флеровий|289;Mc|Московий|290;'+
+'Lv|Ливерморий|293;Ts|Теннессин|294;Og|Оганесон|294';
+var EL = RAW.split(';').map(function(s,i){
+  var p = s.split('|');
+  return { z:i+1, sym:p[0], name:p[1], mass:parseFloat(p[2]) };
+});
+
+/* правило Маделунга: порядок заполнения и ёмкости */
+var ORDER = ['1s','2s','2p','3s','3p','4s','3d','4p','5s','4d','5p','6s','4f','5d','6p','7s','5f','6d','7p'];
+var CAP = { s:2, p:6, d:10, f:14 };
+var LNAME = ['s','p','d','f'];
+function parseSub(k){ return { n:+k[0], l:LNAME.indexOf(k[1]), key:k }; }
+
+/* экспериментальные отклонения от правила Маделунга */
+var ANOM = {
+  24:'3d5 4s1', 29:'3d10 4s1', 41:'4d4 5s1', 42:'4d5 5s1', 44:'4d7 5s1',
+  45:'4d8 5s1', 46:'4d10', 47:'4d10 5s1', 57:'5d1 6s2', 58:'4f1 5d1 6s2',
+  64:'4f7 5d1 6s2', 78:'4f14 5d9 6s1', 79:'4f14 5d10 6s1', 89:'6d1 7s2',
+  90:'6d2 7s2', 91:'5f2 6d1 7s2', 92:'5f3 6d1 7s2', 93:'5f4 6d1 7s2',
+  96:'5f7 6d1 7s2', 103:'5f14 7s2 7p1'
+};
+var CORE = { 2:'1s2', 10:'2s2 2p6', 18:'3s2 3p6', 36:'4s2 3d10 4p6',
+  54:'5s2 4d10 5p6', 86:'6s2 4f14 5d10 6p6' };
+function coreOf(z){
+  var best = 0;
+  [2,10,18,36,54,86].forEach(function(c){ if(c < z && c > best) best = c; });
+  return best;
+}
+function madelung(z){
+  var left = z, out = [];
+  for(var i = 0; i < ORDER.length && left > 0; i++){
+    var sb = parseSub(ORDER[i]), take = Math.min(CAP[LNAME[sb.l]], left);
+    out.push({ n:sb.n, l:sb.l, key:sb.key, count:take });
+    left -= take;
+  }
+  return out;
+}
+var CFG = {};
+function config(z){
+  if(CFG[z]) return CFG[z];
+  var list;
+  if(ANOM[z]){
+    var c = coreOf(z);
+    list = c ? config(c).map(function(o){ return { n:o.n, l:o.l, key:o.key, count:o.count }; }) : [];
+    ANOM[z].split(' ').forEach(function(tok){
+      var m = tok.match(/^(\d)([spdf])(\d+)$/);
+      if(!m) return;
+      var n = +m[1], l = LNAME.indexOf(m[2]), cnt = +m[3], key = n+m[2];
+      var hit = list.filter(function(o){ return o.key === key; })[0];
+      if(hit) hit.count = cnt; else list.push({ n:n, l:l, key:key, count:cnt });
+    });
+    var sum = list.reduce(function(a,o){ return a+o.count; }, 0);
+    if(sum !== z) list = madelung(z);
+  } else list = madelung(z);
+  list.sort(function(a,b){ return a.n - b.n || a.l - b.l; });
+  CFG[z] = list;
+  return list;
+}
+function cfgText(z){
+  var c = coreOf(z);
+  var base = c ? '[' + EL[c-1].sym + '] ' : '';
+  var from = c ? config(c).map(function(o){ return o.key; }) : [];
+  var tail = config(z).filter(function(o){ return from.indexOf(o.key) < 0 || o.count !== (config(c).filter(function(q){ return q.key===o.key; })[0]||{}).count; });
+  if(!tail.length) tail = config(z);
+  return base + tail.map(function(o){ return o.key + sup(o.count); }).join(' ');
+}
+function sup(n){
+  var S = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+  return String(n).split('').map(function(d){ return S[+d]; }).join('');
+}
+var SHELL = ['K','L','M','N','O','P','Q'];
+function shells(z){
+  var a = [0,0,0,0,0,0,0];
+  config(z).forEach(function(o){ a[o.n-1] += o.count; });
+  return a;
+}
+function shellText(z){
+  var a = shells(z), out = [];
+  for(var i = 0; i < 7; i++) if(a[i]) out.push(SHELL[i] + '=' + a[i]);
+  return out.join(' · ');
+}
+
+/* экранирование по Слейтеру */
+function slater(z, target){
+  var list = config(z), S = 0;
+  var tg = target.l <= 1 ? target.n : target.n;
+  list.forEach(function(o){
+    var same = (o.n === target.n && ((o.l <= 1) === (target.l <= 1)) && (target.l <= 1 || o.l === target.l));
+    var cnt = o.count - (same && o.key === target.key ? 1 : 0);
+    if(cnt <= 0) return;
+    if(target.l <= 1){
+      if(same) S += 0.35*cnt;
+      else if(o.n === tg-1) S += 0.85*cnt;
+      else if(o.n <= tg-2) S += 1.00*cnt;
+    } else {
+      if(same) S += 0.35*cnt;
+      else if(o.n < tg || (o.n === tg && o.l < target.l)) S += 1.00*cnt;
+    }
+  });
+  if(target.n === 1 && target.l === 0) S = 0.30*(config(z)[0].count - 1);
+  return Math.max(0.65, z - S);
+}
+
+/* ═══════════ радиальная часть: полиномы Лагерра ═══════════ */
+function laguerre(k, a, x){
+  if(k === 0) return 1;
+  var l0 = 1, l1 = 1 + a - x;
+  if(k === 1) return l1;
+  for(var i = 1; i < k; i++){
+    var l2 = ((2*i + 1 + a - x)*l1 - (i + a)*l0)/(i + 1);
+    l0 = l1; l1 = l2;
+  }
+  return l1;
+}
+function radial(n, l, ze, r){
+  var rho = 2*ze*r/n;
+  if(rho > 700) return 0;
+  var L = laguerre(n-l-1, 2*l+1, rho);
+  var R = Math.pow(rho, l)*L*Math.exp(-rho/2);
+  return r*r*R*R;
+}
+
+/* ═══════════ угловые плотности реальных гармоник ═══════════ */
+var SHAPES = {
+  0: ['s'],
+  1: ['p_z','p_x','p_y'],
+  2: ['d_z²','d_xz','d_yz','d_xy','d_x²−y²'],
+  3: ['f_z³','f_xz²','f_yz²','f_z(x²−y²)','f_xyz','f_x(x²−3y²)','f_y(3x²−y²)']
+};
+function angDen(name, c, s, cf, sf){
+  var c2 = c*c, s2 = s*s;
+  switch(name){
+    case 's': return 1;
+    case 'p_z': return c2;
+    case 'p_x': return s2*cf*cf;
+    case 'p_y': return s2*sf*sf;
+    case 'd_z²': { var t = 3*c2-1; return t*t; }
+    case 'd_xz': return c2*s2*cf*cf;
+    case 'd_yz': return c2*s2*sf*sf;
+    case 'd_xy': { var u = 2*sf*cf; return s2*s2*u*u; }
+    case 'd_x²−y²': { var v = cf*cf-sf*sf; return s2*s2*v*v; }
+    case 'f_z³': { var w = c*(5*c2-3); return w*w; }
+    case 'f_xz²': { var a1 = (5*c2-1)*s*cf; return a1*a1; }
+    case 'f_yz²': { var a2 = (5*c2-1)*s*sf; return a2*a2; }
+    case 'f_z(x²−y²)': { var a3 = c*s2*(cf*cf-sf*sf); return a3*a3; }
+    case 'f_xyz': { var a4 = c*s2*2*sf*cf; return a4*a4; }
+    case 'f_x(x²−3y²)': { var a5 = s*s2*(4*cf*cf-3)*cf; return a5*a5; }
+    case 'f_y(3x²−y²)': { var a6 = s*s2*(3-4*sf*sf)*sf; return a6*a6; }
+  }
+  return 1;
+}
+function angPhase(name, c, s, cf, sf){
+  switch(name){
+    case 's': return 1;
+    case 'p_z': return c >= 0 ? 1 : -1;
+    case 'p_x': return cf >= 0 ? 1 : -1;
+    case 'p_y': return sf >= 0 ? 1 : -1;
+    case 'd_z²': return 3*c*c-1 >= 0 ? 1 : -1;
+    case 'd_xz': return c*cf >= 0 ? 1 : -1;
+    case 'd_yz': return c*sf >= 0 ? 1 : -1;
+    case 'd_xy': return sf*cf >= 0 ? 1 : -1;
+    case 'd_x²−y²': return cf*cf-sf*sf >= 0 ? 1 : -1;
+    case 'f_z³': return c*(5*c*c-3) >= 0 ? 1 : -1;
+    case 'f_xz²': return cf*(5*c*c-1) >= 0 ? 1 : -1;
+    case 'f_yz²': return sf*(5*c*c-1) >= 0 ? 1 : -1;
+    case 'f_z(x²−y²)': return c*(cf*cf-sf*sf) >= 0 ? 1 : -1;
+    case 'f_xyz': return c*sf*cf >= 0 ? 1 : -1;
+    case 'f_x(x²−3y²)': return cf*(4*cf*cf-3) >= 0 ? 1 : -1;
+    case 'f_y(3x²−y²)': return sf*(3-4*sf*sf) >= 0 ? 1 : -1;
+  }
+  return 1;
+}
+var AMAX = {};
+function angMax(name){
+  if(AMAX[name]) return AMAX[name];
+  var m = 0;
+  for(var i = 0; i <= 120; i++){
+    var c = -1 + 2*i/120, s = Math.sqrt(Math.max(0,1-c*c));
+    for(var j = 0; j < 90; j++){
+      var f = TAU*j/90;
+      m = Math.max(m, angDen(name, c, s, Math.cos(f), Math.sin(f)));
+    }
+  }
+  AMAX[name] = m || 1;
+  return AMAX[name];
+}
+
+/* ═══════════ облака точек ═══════════ */
+var cv = $('cv'), ctx = cv.getContext('2d');
+var W = 900, H = 560, dpr = 1;
+var yaw = 0.6, pitch = 0.42, zoom = 1, spin = 0.35, auto = !reduce, drag = false, lx = 0, ly = 0;
+var mode = 'atom', zi = 0, subKey = '1s', orbKey = '1s:s', budget = narrow ? 5000 : 12000;
+var cut = false, even = true, phaseCol = false, axes = false;
+var clouds = [], nucleus = [], ext = 1, rPeakA0 = 1, zeSel = 1, dirty = true, lastT = 0;
+var SHELL_COL = ['aqua','ice','sand','brass','lilac','rose','ok'];
+var SHELL_FALL = ['#4FD8C4','#9FE8DC','#D9B98C','#C9A96E','#ABA6DC','#D69FA9','#3FC9AE'];
+
+function radialProfile(n, l, ze){
+  var rhoMax = 4*n + 4*Math.sqrt(n) + 26;
+  var rmax = rhoMax*n/(2*ze), best = 0, rpeak = 0, N = 900;
+  for(var i = 1; i <= N; i++){
+    var r = rmax*i/N, v = radial(n,l,ze,r);
+    if(v > best){ best = v; rpeak = r; }
+  }
+  return { rmax:rmax, fmax:best*1.04 || 1, rpeak:rpeak || rmax*0.3 };
+}
+function sampleCloud(n, l, shape, ze, count){
+  var pr = radialProfile(n,l,ze), am = angMax(shape);
+  var P = new Float32Array(count*4), got = 0, guard = 0, lim = count*400;
+  while(got < count && guard++ < lim){
+    var r = Math.random()*pr.rmax;
+    if(Math.random()*pr.fmax > radial(n,l,ze,r)) continue;
+    var c = 2*Math.random()-1, f = Math.random()*TAU;
+    var s = Math.sqrt(Math.max(0,1-c*c)), cf = Math.cos(f), sf = Math.sin(f);
+    if(Math.random()*am > angDen(shape,c,s,cf,sf)) continue;
+    P[got*4]   = r*s*cf;
+    P[got*4+1] = r*s*sf;
+    P[got*4+2] = r*c;
+    P[got*4+3] = angPhase(shape,c,s,cf,sf);
+    got++;
+  }
+  return { pts:P, n:got, rmax:pr.rmax, rpeak:pr.rpeak, n_q:n, l:l, ze:ze, shape:shape };
+}
+function rebuild(){
+  var el = EL[zi], z = el.z;
+  clouds = []; ext = 1;
+  if(mode === 'atom'){
+    var list = config(z), total = list.reduce(function(a,o){ return a+o.count; }, 0);
+    var nmax = list.reduce(function(a,o){ return Math.max(a,o.n); }, 1);
+    list.forEach(function(o){
+      var cnt = Math.max(90, Math.round(budget*o.count/total));
+      var ze = slater(z, o);
+      var cl = sampleCloud(o.n, o.l, SHAPES[o.l][0], ze, cnt);
+      cl.shell = o.n; cl.key = o.key; cl.even = even; cl.nmax = nmax;
+      clouds.push(cl);
+    });
+    var last = list[list.length-1];
+    zeSel = slater(z, last);
+    var pr = radialProfile(last.n, last.l, zeSel);
+    rPeakA0 = pr.rpeak;
+    ext = 1.25;
+  } else if(mode === 'sub'){
+    var sb = parseSub(subKey), ze2 = slater(z, sb);
+    var cl2 = sampleCloud(sb.n, sb.l, SHAPES[sb.l][0], ze2, budget);
+    cl2.shell = sb.n; cl2.key = subKey; cl2.even = false;
+    clouds = [cl2];
+    zeSel = ze2; rPeakA0 = cl2.rpeak; ext = cl2.rmax*0.62;
+  } else if(mode === 'orb'){
+    var pp = orbKey.split(':'), n3 = +pp[0], shape = pp[1];
+    var l3 = shape[0] === 's' ? 0 : shape[0] === 'p' ? 1 : shape[0] === 'd' ? 2 : 3;
+    var cl3 = sampleCloud(n3, l3, shape, 1, budget);
+    cl3.shell = n3; cl3.key = n3+LNAME[l3]; cl3.even = false;
+    clouds = [cl3];
+    zeSel = 1; rPeakA0 = cl3.rpeak; ext = cl3.rmax*0.62;
+  } else if(mode === 'nuc'){
+    buildNucleus(el);
+    zeSel = 1; rPeakA0 = 0; ext = 1.15;
+  } else {
+    zeSel = 1; rPeakA0 = 0; ext = 1.1;
+  }
+  dirty = true;
+  paint();
+}
+function buildNucleus(el){
+  var A = Math.max(1, Math.round(el.mass)), Z = el.z, N = Math.max(0, A - Z);
+  if(A > 300){ A = 300; }
+  var rn = 0.62*Math.pow(A, -1/3), minD = 2*rn;
+  var pts = [], guard = 0;
+  while(pts.length < A && guard++ < A*900){
+    var v = [Math.random()*2-1, Math.random()*2-1, Math.random()*2-1];
+    if(v[0]*v[0]+v[1]*v[1]+v[2]*v[2] > 1) continue;
+    var ok = true;
+    for(var i = 0; i < pts.length; i++){
+      var d = Math.hypot(v[0]-pts[i][0], v[1]-pts[i][1], v[2]-pts[i][2]);
+      if(d < minD*0.92){ ok = false; break; }
+    }
+    if(ok) pts.push(v);
+  }
+  while(pts.length < A){
+    var t = Math.random()*TAU, u = 2*Math.random()-1, rr = Math.cbrt(Math.random());
+    var ss = Math.sqrt(1-u*u);
+    pts.push([rr*ss*Math.cos(t), rr*ss*Math.sin(t), rr*u]);
+  }
+  var iters = A > 120 ? 14 : 34;
+  for(var it = 0; it < iters; it++){
+    for(var a = 0; a < pts.length; a++){
+      for(var b = a+1; b < pts.length; b++){
+        var dx = pts[a][0]-pts[b][0], dy = pts[a][1]-pts[b][1], dz = pts[a][2]-pts[b][2];
+        var L = Math.hypot(dx,dy,dz) || 1e-6;
+        if(L < minD){
+          var push = (minD-L)*0.25/L;
+          pts[a][0] += dx*push; pts[a][1] += dy*push; pts[a][2] += dz*push;
+          pts[b][0] -= dx*push; pts[b][1] -= dy*push; pts[b][2] -= dz*push;
+        }
+      }
+      var m = Math.hypot(pts[a][0],pts[a][1],pts[a][2]);
+      if(m > 1){ pts[a][0] /= m; pts[a][1] /= m; pts[a][2] /= m; }
+    }
+  }
+  var tags = [];
+  for(var k = 0; k < A; k++) tags.push(k < Z ? 1 : 0);
+  for(var s2 = tags.length-1; s2 > 0; s2--){
+    var j = Math.floor(Math.random()*(s2+1)), tmp = tags[s2]; tags[s2] = tags[j]; tags[j] = tmp;
+  }
+  nucleus = pts.map(function(p,i){
+    return { p:p, z:tags[i], ph:Math.random()*TAU, r:rn };
+  });
+}
+
+/* ═══════════ проекция и отрисовка ═══════════ */
+function rot(x,y,z){
+  var cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+  var x1 = x*cy - y*sy, y1 = x*sy + y*cy;
+  return [x1, -(z*cp + y1*sp), y1*cp - z*sp];
+}
+function fit(){
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+  var r = cv.parentElement.getBoundingClientRect();
+  W = Math.max(240, Math.round(r.width));
+  H = Math.max(220, Math.round(r.height));
+  cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  dirty = true;
+}
 function ball(x,y,r,c1,c2,al){
- const g=ctx.createRadialGradient(x-r*.35,y-r*.35,r*.1,x,y,r);g.addColorStop(0,c1);g.addColorStop(1,c2);
- ctx.globalAlpha=al;ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,6.283);ctx.fill();ctx.globalAlpha=1;
+  var g = ctx.createRadialGradient(x-r*.35, y-r*.35, r*.08, x, y, r);
+  g.addColorStop(0,c1); g.addColorStop(1,c2);
+  ctx.globalAlpha = al; ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill(); ctx.globalAlpha = 1;
+}
+function drawAxes(sc,cx,cy){
+  var L = [[1,0,0,'x','rose'],[0,1,0,'y','ok'],[0,0,1,'z','lilac']];
+  ctx.lineWidth = 1.4; ctx.font = '600 11px JetBrains Mono, monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  L.forEach(function(a){
+    var q = rot(a[0]*ext*0.95, a[1]*ext*0.95, a[2]*ext*0.95);
+    ctx.strokeStyle = C(a[4],'#888'); ctx.globalAlpha = .55;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+q[0]*sc, cy+q[1]*sc); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.fillStyle = C(a[4],'#888');
+    ctx.fillText(a[3], cx+q[0]*sc*1.06, cy+q[1]*sc*1.06);
+  });
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+}
+function drawAtom(){
+  var sc = Math.min(W,H)*0.44/ext*zoom, cx = W/2, cy = H/2;
+  if(axes) drawAxes(sc,cx,cy);
+  var nmax = clouds.reduce(function(a,c){ return Math.max(a,c.n_q); }, 1);
+  clouds.forEach(function(cl){
+    var P = cl.pts, n = cl.n;
+    var mapR, col;
+    if(cl.even){
+      var belt = 0.20 + 0.80*(cl.n_q-1)/Math.max(1,nmax-1);
+      mapR = function(r){ return belt*Math.pow(Math.min(1.9, r/cl.rpeak), 0.55); };
+    } else {
+      mapR = function(r){ return r; };
+    }
+    for(var i = 0; i < n; i++){
+      var x = P[i*4], y = P[i*4+1], z = P[i*4+2], ph = P[i*4+3];
+      if(cut && x < 0) continue;
+      var r = Math.hypot(x,y,z) || 1e-9, k = mapR(r)/r;
+      var q = rot(x*k, y*k, z*k);
+      var depth = Math.max(-0.5, Math.min(0.95, -q[2]/ext*0.9));
+      var s = 1.25 + depth;
+      if(phaseCol) col = ph > 0 ? C('aqua','#4FD8C4') : C('sand','#D9B98C');
+      else col = C(SHELL_COL[(cl.shell-1)%7], SHELL_FALL[(cl.shell-1)%7]);
+      ctx.globalAlpha = 0.34 + 0.34*(depth+0.5);
+      ctx.fillStyle = col;
+      ctx.fillRect(cx+q[0]*sc-s/2, cy+q[1]*sc-s/2, s, s);
+    }
+  });
+  ctx.globalAlpha = 1;
+  var nr = Math.max(2.4, Math.min(W,H)*0.006);
+  ctx.fillStyle = C('rose','#D69FA9');
+  ctx.shadowColor = C('rose','#D69FA9'); ctx.shadowBlur = 14;
+  ctx.beginPath(); ctx.arc(cx,cy,nr,0,TAU); ctx.fill(); ctx.shadowBlur = 0;
 }
 function drawNuc(t){
- const sc=Math.min(W,H)*.42,cx=W/2,cy=H/2;
- const L=NU.map(n=>{const q=rot(n.p[0]+.03*Math.sin(t*3+n.ph),n.p[1]+.03*Math.cos(t*2.6+n.ph),n.p[2]+.03*Math.sin(t*3.3+n.ph*2));return{q,z:n.z}});
- L.sort((a,b)=>b.q[2]-a.q[2]);
- for(const n of L){const r=sc*.3*(1-n.q[2]*.08);
-  n.z?ball(cx+n.q[0]*sc,cy+n.q[1]*sc,r,PAL.sand,PAL.brass,.93):ball(cx+n.q[0]*sc,cy+n.q[1]*sc,r,PAL.ink,PAL.muted,.93)}
+  var sc = Math.min(W,H)*0.40/1.15*zoom, cx = W/2, cy = H/2;
+  if(axes) drawAxes(sc,cx,cy);
+  var L = nucleus.map(function(nu){
+    var jig = auto ? 0.018 : 0;
+    var q = rot(nu.p[0]+jig*Math.sin(t*3+nu.ph), nu.p[1]+jig*Math.cos(t*2.6+nu.ph), nu.p[2]+jig*Math.sin(t*3.3+nu.ph*2));
+    return { q:q, z:nu.z, r:nu.r };
+  });
+  L.sort(function(a,b){ return b.q[2]-a.q[2]; });
+  L.forEach(function(nu){
+    var r = Math.max(2.2, sc*nu.r*(1-nu.q[2]*0.08));
+    if(nu.z) ball(cx+nu.q[0]*sc, cy+nu.q[1]*sc, r, C('sand','#D9B98C'), C('brass','#C9A96E'), .95);
+    else ball(cx+nu.q[0]*sc, cy+nu.q[1]*sc, r, C('ice','#9FE8DC'), C('deep','#2E9E96'), .9);
+  });
 }
-
-/* Протон: uud, глюоны, «море» виртуальных пар */
-const hs=n=>{const s=Math.sin(n*12.9898)*43758.5453;return s-Math.floor(s)};
-const QK=[{l:'u',f:[1.1,1.7,1.3],p:[0,1,2]},{l:'u',f:[1.4,.9,1.9],p:[2,4,1]},{l:'d',f:[.8,1.5,1.2],p:[4,0,3]}];
-const CC=[PAL.rose,PAL.ok,PAL.lilac];
+var hs = function(n){ var s = Math.sin(n*12.9898)*43758.5453; return s-Math.floor(s); };
+var QK = [{l:'u',f:[1.1,1.7,1.3],p:[0,1,2]},{l:'u',f:[1.4,.9,1.9],p:[2,4,1]},{l:'d',f:[.8,1.5,1.2],p:[4,0,3]}];
 function drawNct(t){
- const sc=Math.min(W,H)*.4,cx=W/2,cy=H/2;
- const g=ctx.createRadialGradient(cx,cy,sc*.2,cx,cy,sc*1.1);
- g.addColorStop(0,'rgba(239,159,39,.16)');g.addColorStop(.8,'rgba(239,159,39,.08)');g.addColorStop(1,'rgba(239,159,39,0)');
- ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,sc*1.1,0,6.283);ctx.fill();
- ctx.strokeStyle='rgba(150,150,140,.45)';ctx.setLineDash([4,5]);ctx.beginPath();ctx.arc(cx,cy,sc,0,6.283);ctx.stroke();ctx.setLineDash([]);
- for(let i=0;i<40;i++){
-  const life=t*.6+hs(i*7.1),cyc=Math.floor(life),a=Math.sin((life-cyc)*Math.PI);
-  const v=[hs(i*3+cyc*17)*2-1,hs(i*5+cyc*13)*2-1,hs(i*11+cyc*19)*2-1];if(Math.hypot(...v)>1)continue;
-  const q=rot(v[0]*.9,v[1]*.9,v[2]*.9),d=.04+.05*a;
-  ctx.globalAlpha=a*.7;ctx.fillStyle=CC[i%3];ctx.fillRect(cx+q[0]*sc-1.5,cy+q[1]*sc-1.5,3,3);
-  ctx.fillStyle=PAL.muted;ctx.fillRect(cx+(q[0]+d)*sc-1.5,cy+q[1]*sc-1.5,3,3);ctx.globalAlpha=1;
- }
- const Q=QK.map((k,i)=>{const p=k.f.map((f,j)=>.5*Math.sin(f*t+k.p[j]));return{k,i,q:rot(p[0],p[1],p[2])}});
- const S=Q.map(o=>[cx+o.q[0]*sc,cy+o.q[1]*sc]);
- ctx.lineWidth=1.6;
- for(let a=0;a<3;a++)for(let b=a+1;b<3;b++){
-  const A=S[a],B=S[b],dx=B[0]-A[0],dy=B[1]-A[1],l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;
-  ctx.strokeStyle='rgba(239,159,39,.75)';ctx.beginPath();
-  for(let s=0;s<=28;s++){const u=s/28,w=Math.sin(u*Math.PI)*7*Math.sin(u*22-t*9);
-   const x=A[0]+dx*u+nx*w,y=A[1]+dy*u+ny*w;s?ctx.lineTo(x,y):ctx.moveTo(x,y)}
-  ctx.stroke();
- }
- Q.sort((a,b)=>b.q[2]-a.q[2]);
- for(const o of Q){
-  const c=CC[(Math.floor(t*1.2)+o.i)%3],x=cx+o.q[0]*sc,y=cy+o.q[1]*sc,r=sc*.15*(1-o.q[2]*.15);
-  ball(x,y,r,'#fff',c,1);
-  ctx.fillStyle='#fff';ctx.font='600 '+Math.round(r*.9)+'px Georgia,serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(o.k.l,x,y+1);
- }
-}
-
-/* Текст и интерфейс */
-const INFO={
-atom:{scale:'≈ 10⁻¹⁰ м (1 Å). Ядро здесь в 100 000 раз меньше — красная точка не в масштабе.',
- leg:`<span><i style="background:${POS}"></i>фаза +</span><span><i style="background:${NEG}"></i>фаза −</span><span><i style="background:var(--rose)"></i>ядро</span>`,
- cards:[['Нет орбит, есть облака','Электрон не летает по траектории. Его состояние задаёт волновая функция ψ, а плотность точек показывает вероятность |ψ|² обнаружить электрон в данном месте.'],
- ['Цвет — знак фазы','Узловые поверхности, где ψ меняет знак, — прямое следствие волновой природы электрона. Именно фазы определяют, как атомы образуют химические связи.'],
- ['Электрон — точка','Структуры у электрона не нашли вплоть до масштаба порядка 10⁻¹⁹ м. Он считается элементарной частицей, в отличие от ядра.']]},
-nuc:{scale:'≈ 10⁻¹⁵–10⁻¹⁴ м (1–10 фм). Показан углерод‑12: 6 протонов и 6 нейтронов.',
- leg:'<span><i style="background:var(--sand)"></i>протон</span><span><i style="background:var(--muted)"></i>нейтрон</span>',
- cards:[['Остаточная сила','Нуклоны держит остаточное сильное взаимодействие — «хвост» связи между кварками, подобно тому как молекулы притягиваются остатком электрических сил атомов.'],
- ['Не твёрдые шарики','Нуклоны в ядре перекрываются и непрерывно движутся. Ядро имеет оболочечную структуру, а в лёгких ядрах возможны α‑кластеры — как в состоянии Хойла углерода‑12.'],
- ['Почти вся масса атома','В ядре сосредоточено более 99,9 % массы атома при объёме порядка 10⁻¹⁵ от атомного.']]},
-nct:{scale:'≈ 10⁻¹⁵ м: радиус протона около 0,84 фм. Кварки точечны (< 10⁻¹⁸ м).',
- leg:'<span><i style="background:var(--rose)"></i><i style="background:var(--ok)"></i><i style="background:var(--lilac)"></i>цветовой заряд</span><span><i style="background:var(--sand)"></i>глюоны</span>',
- cards:[['Состав uud','Три валентных кварка: два u (заряд +⅔) и один d (−⅓) дают заряд +1. Цвета — не оттенки, а три вида заряда сильного взаимодействия; кварки обмениваются ими через глюоны.'],
- ['Конфайнмент','Кварк нельзя извлечь из протона: при растяжении глюонной «струны» энергия рождает новые пары кварк—антикварк. Глюоны сами несут цвет и взаимодействуют друг с другом.'],
- ['Откуда масса','Массы трёх кварков (даёт механизм Хиггса) — лишь около 1 % массы протона. Остальное — энергия движения кварков и глюонного поля, E = mc². Внутри ещё и «море» виртуальных пар.']]}
-};
-function render(){
- const d=INFO[mode];
- document.getElementById('scale').textContent=d.scale;
- document.getElementById('legend').innerHTML=d.leg;
- let c=d.cards.slice();
- if(mode==='atom')c.unshift(['Орбиталь '+orb,ORB[orb].t]);
- document.getElementById('info').innerHTML=c.map(x=>`<div><h3>${x[0]}</h3><p>${x[1]}</p></div>`).join('');
- document.getElementById('orbs').style.display=mode==='atom'?'flex':'none';
- document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===mode));
- document.querySelectorAll('#orbs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.o===orb));
-}
-const ob=document.getElementById('orbs');
-Object.keys(ORB).forEach(k=>{const b=document.createElement('button');b.textContent=k;b.dataset.o=k;
- b.onclick=()=>{orb=k;build(k);render()};ob.appendChild(b)});
-document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;render()});
-document.getElementById('auto').onchange=e=>auto=e.target.checked;
-document.getElementById('reset').onclick=()=>{
-  mode='atom'; orb='1s'; yaw=.6; pitch=.4; auto=true;
-  document.getElementById('auto').checked=true;
-  build(orb); render();
-};
-cv.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;cv.setPointerCapture(e.pointerId)});
-cv.addEventListener('pointermove',e=>{if(!drag)return;yaw+=(e.clientX-lx)*.008;pitch=Math.max(-1.4,Math.min(1.4,pitch+(e.clientY-ly)*.008));lx=e.clientX;ly=e.clientY});
-cv.addEventListener('pointerup',()=>drag=false);
-cv.addEventListener('pointercancel',()=>drag=false);
-
-let last=0;
-function frame(ms){
- const t=ms/1000,dt=Math.min(t-last,.05);last=t;
- if(auto&&!drag)yaw+=dt*.35;
- ctx.clearRect(0,0,W,H);
- if(mode==='atom')drawAtom();else if(mode==='nuc')drawNuc(t);else drawNct(t);
- requestAnimationFrame(frame);
-}
-fit();build(orb);render();requestAnimationFrame(frame);
-</script>
-<script>
-/* LibLabTab · перекраска при смене темы */
-(function(){
-  function refresh(){
-    if(window.LLTtheme) window.LLTtheme.readPal();
-    if(typeof readPal==="function"){ try{ readPal(); }catch(e){} }
-    if(typeof resize==="function"){ try{ resize(); }catch(e){} }
-    if(typeof drawGridCache==="function"){ try{ drawGridCache(); }catch(e){} }
-    if(typeof render==="function"){ try{ render(); }catch(e){} }
-    if(typeof draw==="function"){ try{ draw(); }catch(e){} }
+  var sc = Math.min(W,H)*0.38*zoom, cx = W/2, cy = H/2;
+  var CCOL = [C('rose','#D69FA9'), C('ok','#3FC9AE'), C('lilac','#ABA6DC')];
+  var g = ctx.createRadialGradient(cx,cy,sc*.2,cx,cy,sc*1.12);
+  g.addColorStop(0,'rgba(217,185,140,.18)'); g.addColorStop(.8,'rgba(217,185,140,.07)');
+  g.addColorStop(1,'rgba(217,185,140,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx,cy,sc*1.12,0,TAU); ctx.fill();
+  ctx.strokeStyle = C('line2','rgba(126,214,199,.3)'); ctx.setLineDash([4,5]);
+  ctx.beginPath(); ctx.arc(cx,cy,sc,0,TAU); ctx.stroke(); ctx.setLineDash([]);
+  for(var i = 0; i < 44; i++){
+    var life = t*.6 + hs(i*7.1), cyc = Math.floor(life), a = Math.sin((life-cyc)*Math.PI);
+    var v = [hs(i*3+cyc*17)*2-1, hs(i*5+cyc*13)*2-1, hs(i*11+cyc*19)*2-1];
+    if(Math.hypot(v[0],v[1],v[2]) > 1) continue;
+    var q = rot(v[0]*.9, v[1]*.9, v[2]*.9), d = .04+.05*a;
+    ctx.globalAlpha = a*.7; ctx.fillStyle = CCOL[i%3];
+    ctx.fillRect(cx+q[0]*sc-1.6, cy+q[1]*sc-1.6, 3.2, 3.2);
+    ctx.fillStyle = C('muted','#8FA8A6');
+    ctx.fillRect(cx+(q[0]+d)*sc-1.6, cy+q[1]*sc-1.6, 3.2, 3.2);
+    ctx.globalAlpha = 1;
   }
-  window.addEventListener("llt:theme",refresh);
+  var Q = QK.map(function(k,i){
+    var p = k.f.map(function(f,j){ return .5*Math.sin(f*t+k.p[j]); });
+    return { k:k, i:i, q:rot(p[0],p[1],p[2]) };
+  });
+  var S = Q.map(function(o){ return [cx+o.q[0]*sc, cy+o.q[1]*sc]; });
+  ctx.lineWidth = 1.7;
+  var exch = Math.floor(t*1.2)%3;
+  for(var a2 = 0; a2 < 3; a2++) for(var b2 = a2+1; b2 < 3; b2++){
+    var A = S[a2], B = S[b2], dx = B[0]-A[0], dy = B[1]-A[1], L = Math.hypot(dx,dy)||1;
+    var nx = -dy/L, ny = dx/L;
+    var hot = (a2 === exch || b2 === exch);
+    ctx.strokeStyle = hot ? C('sand','#D9B98C') : 'rgba(217,185,140,.45)';
+    ctx.lineWidth = hot ? 2.4 : 1.4;
+    ctx.beginPath();
+    for(var s2 = 0; s2 <= 30; s2++){
+      var u = s2/30, w = Math.sin(u*Math.PI)*7*Math.sin(u*22-t*9);
+      var x = A[0]+dx*u+nx*w, y = A[1]+dy*u+ny*w;
+      s2 ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+    }
+    ctx.stroke();
+  }
+  ctx.lineWidth = 1.7;
+  Q.sort(function(a,b){ return b.q[2]-a.q[2]; });
+  Q.forEach(function(o){
+    var c = CCOL[(o.i + exch)%3];
+    var x = cx+o.q[0]*sc, y = cy+o.q[1]*sc, r = sc*.15*(1-o.q[2]*.15);
+    ball(x,y,r,'#ffffff',c,1);
+    ctx.fillStyle = C('canvas','#071012');
+    ctx.font = '700 '+Math.round(r*.95)+'px JetBrains Mono, monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(o.k.l, x, y+1);
+  });
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+}
+
+/* ═══════════ интерфейс ═══════════ */
+function legendHTML(){
+  if(mode === 'nuc') return '<span>протон<i style="background:'+C('sand','#D9B98C')+'"></i></span>'+
+    '<span>нейтрон<i style="background:'+C('deep','#2E9E96')+'"></i></span>';
+  if(mode === 'nct') return '<span>цветовой заряд<i style="background:'+C('rose','#D69FA9')+'"></i>'+
+    '<i style="background:'+C('ok','#3FC9AE')+'"></i><i style="background:'+C('lilac','#ABA6DC')+'"></i></span>'+
+    '<span>глюоны<i style="background:'+C('sand','#D9B98C')+'"></i></span>';
+  if(phaseCol || mode !== 'atom') return '<span>фаза +<i style="background:'+C('aqua','#4FD8C4')+'"></i></span>'+
+    '<span>фаза −<i style="background:'+C('sand','#D9B98C')+'"></i></span>';
+  var a = shells(EL[zi].z), out = '';
+  for(var i = 0; i < 7; i++) if(a[i])
+    out += '<span>'+SHELL[i]+' · n='+(i+1)+'<i style="background:'+C(SHELL_COL[i],SHELL_FALL[i])+'"></i></span>';
+  return out;
+}
+var NOTES = {
+  atom:'Плотность точек — вероятность |ψ|² найти электрон. Каждая подоболочка считается со своим Z_eff по Слейтеру, поэтому внутренние оболочки сжаты, а внешние раздуты.',
+  sub:'Одна подоболочка выбранного элемента в истинном масштабе: радиальная плотность r²R² и угловая плотность |Y|². Цвет — знак фазы волновой функции.',
+  orb:'Водородоподобная орбиталь (Z = 1) в истинном масштабе. Узловые поверхности — там, где ψ меняет знак и вероятность равна нулю.',
+  nuc:'Ядро выбранного нуклида: Z протонов и A − Z нейтронов. Радиус R ≈ 1,2·A^⅓ фм. Шарики — образ: нуклоны перекрываются и движутся.',
+  nct:'Протон uud: два u-кварка (+⅔) и один d (−⅓). Цвет меняется при обмене глюоном — подсвеченная струна показывает обмен, сумма цветов остаётся бесцветной.'
+};
+function paint(){
+  var el = EL[zi], z = el.z, A = Math.round(el.mass);
+  var sh = shells(z), nsh = sh.filter(function(v){ return v > 0; }).length;
+  var npts = clouds.reduce(function(a,c){ return a+c.n; }, 0);
+  $('vZ').textContent = NF(z,0);
+  $('vA').textContent = NF(A,0);
+  $('vE').textContent = NF(z,0);
+  $('vS').textContent = NF(nsh,0);
+  $('vZeff').textContent = NF(zeSel,2);
+  $('vR').textContent = rPeakA0 ? NF(rPeakA0*A0,3) : '—';
+  $('vP').textContent = NF(npts,0);
+  $('vN').textContent = mode === 'nuc' ? NF(nucleus.length,0) : NF(A,0);
+  $('cfg').textContent = cfgText(z);
+  $('modeNote').textContent = NOTES[mode];
+  $('legend').innerHTML = legendHTML();
+
+  var chips = [];
+  chips.push({ t:el.sym + ' · ' + el.name + ' · Z = ' + z, c:'hi' });
+  if(mode === 'atom'){
+    chips.push({ t:shellText(z) });
+    chips.push({ t:even ? 'радиусы выровнены (схема)' : 'истинный масштаб', c:even ? '' : 'ok' });
+  } else if(mode === 'sub'){
+    chips.push({ t:'подоболочка ' + subKey + ' · Z_eff = ' + NF(zeSel,2) });
+    chips.push({ t:'пик плотности ' + NF(rPeakA0*A0,3) + ' Å', c:'ok' });
+  } else if(mode === 'orb'){
+    chips.push({ t:'орбиталь ' + orbKey.split(':')[1] + ' при n = ' + orbKey.split(':')[0] });
+    chips.push({ t:'пик плотности ' + NF(rPeakA0*A0,3) + ' Å', c:'ok' });
+  } else if(mode === 'nuc'){
+    chips.push({ t:'ядро: ' + z + ' p + ' + (A-z) + ' n · R ≈ ' + NF(1.2*Math.cbrt(A),2) + ' фм' });
+  } else {
+    chips.push({ t:'протон uud · радиус ≈ 0,84 фм' });
+  }
+  if(z > 103) chips.push({ t:'конфигурация предсказана, не измерена' });
+  $('hud').innerHTML = chips.map(function(o){
+    return '<span class="'+(o.c||'')+'">'+o.t+'</span>';
+  }).join('');
+
+  var sb = $('scalebar');
+  if(mode === 'atom') sb.textContent = even
+    ? 'атом ≈ 1 Å = 10⁻¹⁰ м · ядро в 10⁴–10⁵ раз меньше, точка не в масштабе'
+    : 'истинный масштаб · внешняя оболочка ≈ ' + NF(rPeakA0*A0,2) + ' Å';
+  else if(mode === 'sub' || mode === 'orb') sb.textContent = 'истинный масштаб · 1 Å = 10⁻¹⁰ м';
+  else if(mode === 'nuc') sb.textContent = '1 фм = 10⁻¹⁵ м · масштаб ядра';
+  else sb.textContent = '1 фм = 10⁻¹⁵ м · кварки точечны (< 10⁻¹⁹ м)';
+
+  ['mAtom','mSub','mOrb','mNuc','mNct'].forEach(function(id,i){
+    var on = ['atom','sub','orb','nuc','nct'][i] === mode;
+    $(id).setAttribute('aria-pressed', String(on));
+    $(id).classList.toggle('pri', on);
+  });
+  Array.prototype.forEach.call($('pt').querySelectorAll('button[data-z]'), function(b){
+    b.dataset.on = (+b.dataset.z === z) ? '1' : '0';
+  });
+}
+function paintRange(el){
+  var mn = +el.min, mx = +el.max, v = +el.value;
+  var f = mx > mn ? (v-mn)/(mx-mn)*100 : 0;
+  el.style.setProperty('--fill', Math.max(0,Math.min(100,f)).toFixed(2)+'%');
+}
+function syncOuts(){
+  $('o_pts').textContent = NF(budget,0) + ' шт';
+  $('o_zoom').textContent = NF(zoom,2) + '×';
+  $('o_spin').textContent = NF(spin,2) + ' рад/с';
+  ['pts','zoom','spin'].forEach(function(id){ paintRange($(id)); });
+}
+function setMode(m){ mode = m; rebuild(); }
+function setElement(i){
+  zi = Math.max(0, Math.min(EL.length-1, i));
+  $('el').value = String(zi);
+  var subs = config(EL[zi].z);
+  if(!subs.filter(function(o){ return o.key === subKey; }).length) subKey = subs[subs.length-1].key;
+  $('sub').value = subKey;
+  rebuild();
+}
+
+/* селекты */
+EL.forEach(function(e,i){
+  $('el').insertAdjacentHTML('beforeend','<option value="'+i+'">'+e.z+' · '+e.sym+' — '+e.name+'</option>');
+});
+ORDER.forEach(function(k){
+  $('sub').insertAdjacentHTML('beforeend','<option value="'+k+'">'+k+' · до '+CAP[k[1]]+' e⁻</option>');
+});
+(function(){
+  for(var n = 1; n <= 7; n++){
+    var g = document.createElement('optgroup');
+    g.label = 'Оболочка ' + SHELL[n-1] + ' (n = ' + n + ')';
+    for(var l = 0; l <= Math.min(n-1,3); l++){
+      SHAPES[l].forEach(function(sh){
+        var o = document.createElement('option');
+        o.value = n + ':' + sh;
+        o.textContent = n + sh.replace(/^[spdf]/, LNAME[l]) + '  (' + sh + ')';
+        g.appendChild(o);
+      });
+    }
+    $('orb').appendChild(g);
+  }
+})();
+
+/* таблица Менделеева */
+(function(){
+  var pos = {};
+  function put(z,c,r,f){ pos[z] = { c:c, r:r, f:!!f }; }
+  put(1,1,1); put(2,18,1);
+  for(var i = 0; i < 8; i++){
+    var z2 = 3+i; put(z2, i < 2 ? i+1 : i+11, 2);
+    var z3 = 11+i; put(z3, i < 2 ? i+1 : i+11, 3);
+  }
+  for(var j = 0; j < 18; j++){ put(19+j, j+1, 4); put(37+j, j+1, 5); }
+  put(55,1,6); put(56,2,6);
+  for(var k = 0; k < 15; k++) put(57+k, 3+k, 9, true);
+  for(var m = 0; m < 9; m++) put(72+m, 4+m, 6);
+  for(var p = 0; p < 6; p++) put(81+p, 13+p, 6);
+  put(87,1,7); put(88,2,7);
+  for(var q = 0; q < 15; q++) put(89+q, 3+q, 10, true);
+  for(var r2 = 0; r2 < 9; r2++) put(104+r2, 4+r2, 7);
+  for(var s2 = 0; s2 < 6; s2++) put(113+s2, 13+s2, 7);
+  var host = $('pt');
+  for(var row = 1; row <= 10; row++){
+    if(row === 8){
+      var sp = document.createElement('div');
+      sp.className = 'gap'; sp.style.gridColumn = '1 / -1'; sp.style.height = '6px';
+      host.appendChild(sp);
+      continue;
+    }
+    for(var col = 1; col <= 18; col++){
+      var found = 0;
+      for(var z in pos) if(pos[z].c === col && pos[z].r === row) found = +z;
+      if(!found){
+        var e2 = document.createElement('div');
+        e2.className = 'gap'; e2.style.gridColumn = col; e2.style.gridRow = row;
+        host.appendChild(e2);
+        continue;
+      }
+      var b = document.createElement('button');
+      b.type = 'button'; b.dataset.z = found;
+      b.dataset.llt = 'skip';
+      b.textContent = EL[found-1].sym;
+      b.title = found + ' · ' + EL[found-1].name;
+      b.setAttribute('aria-label', EL[found-1].name + ', Z = ' + found);
+      b.style.gridColumn = col; b.style.gridRow = row;
+      if(pos[found].f) b.classList.add('f');
+      b.addEventListener('click', function(){ setElement(+this.dataset.z - 1); });
+      host.appendChild(b);
+    }
+  }
+})();
+
+/* быстрые примеры */
+[[1,'Водород'],[2,'Гелий'],[6,'Углерод'],[26,'Железо'],[29,'Медь'],[79,'Золото'],[92,'Уран'],[118,'Оганесон']]
+.forEach(function(q){
+  var b = document.createElement('button');
+  b.className = 'chip'; b.type = 'button'; b.dataset.llt = 'preset';
+  b.textContent = q[1];
+  b.addEventListener('click', function(){ mode = 'atom'; setElement(q[0]-1); });
+  $('quick').appendChild(b);
+});
+(function(){
+  var b = document.createElement('button');
+  b.className = 'chip'; b.type = 'button'; b.dataset.llt = 'preset';
+  b.textContent = 'Все оболочки';
+  b.addEventListener('click', function(){ mode = 'atom'; setElement(117); });
+  $('quick').appendChild(b);
+})();
+
+/* обработчики */
+$('mAtom').addEventListener('click', function(){ setMode('atom'); });
+$('mSub').addEventListener('click', function(){ setMode('sub'); });
+$('mOrb').addEventListener('click', function(){ setMode('orb'); });
+$('mNuc').addEventListener('click', function(){ setMode('nuc'); });
+$('mNct').addEventListener('click', function(){ setMode('nct'); });
+$('el').addEventListener('change', function(e){ setElement(+e.target.value); });
+$('sub').addEventListener('change', function(e){ subKey = e.target.value; mode = 'sub'; rebuild(); });
+$('orb').addEventListener('change', function(e){ orbKey = e.target.value; mode = 'orb'; rebuild(); });
+$('auto').addEventListener('change', function(e){ auto = e.target.checked; dirty = true; });
+$('pts').addEventListener('input', function(e){ budget = +e.target.value; syncOuts(); rebuild(); });
+$('zoom').addEventListener('input', function(e){ zoom = +e.target.value; syncOuts(); dirty = true; });
+$('spin').addEventListener('input', function(e){ spin = +e.target.value; syncOuts(); });
+$('cut').addEventListener('change', function(e){ cut = e.target.checked; dirty = true; });
+$('even').addEventListener('change', function(e){ even = e.target.checked; rebuild(); });
+$('phase').addEventListener('change', function(e){ phaseCol = e.target.checked; rebuild(); });
+$('axes').addEventListener('change', function(e){ axes = e.target.checked; dirty = true; });
+$('reset').addEventListener('click', function(){
+  mode = 'atom'; zi = 0; subKey = '1s'; orbKey = '1s:s';
+  yaw = 0.6; pitch = 0.42; zoom = 1; spin = 0.35; auto = !reduce;
+  budget = narrow ? 5000 : 12000;
+  cut = false; even = true; phaseCol = false; axes = false;
+  $('el').value = '0'; $('sub').value = '1s'; $('orb').value = '1s:s';
+  $('auto').checked = auto; $('pts').value = budget; $('zoom').value = 1; $('spin').value = 0.35;
+  $('cut').checked = false; $('even').checked = true; $('phase').checked = false; $('axes').checked = false;
+  syncOuts(); rebuild();
+});
+
+cv.addEventListener('pointerdown', function(e){
+  drag = true; lx = e.clientX; ly = e.clientY;
+  try{ cv.setPointerCapture(e.pointerId); }catch(_){}
+  e.preventDefault();
+});
+cv.addEventListener('pointermove', function(e){
+  if(!drag) return;
+  yaw += (e.clientX-lx)*0.008;
+  pitch = Math.max(-1.45, Math.min(1.45, pitch + (e.clientY-ly)*0.008));
+  lx = e.clientX; ly = e.clientY; dirty = true;
+});
+function endDrag(){ drag = false; }
+cv.addEventListener('pointerup', endDrag);
+cv.addEventListener('pointercancel', endDrag);
+cv.addEventListener('lostpointercapture', endDrag);
+cv.addEventListener('wheel', function(e){
+  e.preventDefault();
+  zoom = Math.max(0.5, Math.min(3, zoom*(e.deltaY > 0 ? 0.92 : 1.08)));
+  $('zoom').value = zoom; syncOuts(); dirty = true;
+}, { passive:false });
+window.addEventListener('keydown', function(e){
+  var t = e.target.tagName;
+  if(t === 'INPUT' || t === 'SELECT' || t === 'TEXTAREA') return;
+  if(e.code === 'Space'){ e.preventDefault(); auto = !auto; $('auto').checked = auto; dirty = true; }
+  else if(e.key === 'r' || e.key === 'R' || e.key === 'к'){ $('reset').click(); }
+  else if(e.key === 'ArrowRight'){ e.preventDefault(); setElement(zi+1); }
+  else if(e.key === 'ArrowLeft'){ e.preventDefault(); setElement(zi-1); }
+});
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden){ lastT = performance.now(); dirty = true; }
+});
+window.addEventListener('llt:theme', function(){
+  if(window.LLTtheme) window.LLTtheme.readPal();
+  dirty = true; paint();
+});
+if(window.ResizeObserver) new ResizeObserver(fit).observe(cv.parentElement);
+window.addEventListener('resize', fit);
+
+/* ═══════════ самотест ═══════════ */
+function selfTest(){
+  var rows = [];
+  function add(name, got, want, ok){ rows.push([name,String(got),String(want),ok]); }
+
+  var bad = 0;
+  for(var z = 1; z <= 118; z++){
+    var sum = config(z).reduce(function(a,o){ return a+o.count; }, 0);
+    if(sum !== z) bad++;
+  }
+  add('Сумма электронов = Z у всех 118', bad === 0 ? 'все 118' : bad + ' ошибок', 'все 118', bad === 0);
+
+  var over = 0;
+  for(var z2 = 1; z2 <= 118; z2++)
+    config(z2).forEach(function(o){ if(o.count > CAP[LNAME[o.l]]) over++; });
+  add('Ёмкости s2 p6 d10 f14 соблюдены', over, 0, over === 0);
+
+  add('Оболочки железа K L M N', shells(26).slice(0,4).join(','), '2,8,14,2',
+      shells(26).slice(0,4).join(',') === '2,8,14,2');
+  add('Оболочки меди', shells(29).slice(0,4).join(','), '2,8,18,1',
+      shells(29).slice(0,4).join(',') === '2,8,18,1');
+  add('Оболочки золота', shells(79).slice(0,6).join(','), '2,8,18,32,18,1',
+      shells(79).slice(0,6).join(',') === '2,8,18,32,18,1');
+  add('Оболочки оганесона', shells(118).join(','), '2,8,18,32,32,18,8',
+      shells(118).join(',') === '2,8,18,32,32,18,8');
+
+  var cu = config(29).filter(function(o){ return o.key === '3d' || o.key === '4s'; })
+    .map(function(o){ return o.key + o.count; }).join(' ');
+  add('Аномалия меди 3d¹⁰4s¹', cu, '3d10 4s1', cu === '3d10 4s1');
+  var cr = config(24).filter(function(o){ return o.key === '3d' || o.key === '4s'; })
+    .map(function(o){ return o.key + o.count; }).join(' ');
+  add('Аномалия хрома 3d⁵4s¹', cr, '3d5 4s1', cr === '3d5 4s1');
+
+  add('4s заполняется раньше 3d', ORDER.indexOf('4s') < ORDER.indexOf('3d') ? 'да' : 'нет', 'да',
+      ORDER.indexOf('4s') < ORDER.indexOf('3d'));
+  add('Подоболочек до 7p', ORDER.length, 19, ORDER.length === 19);
+
+  var he = slater(2, { n:1, l:0, key:'1s' });
+  add('Z_eff 1s гелия по Слейтеру', NF(he,2), '1,70', Math.abs(he-1.70) < 0.005);
+
+  var pr = radialProfile(1,0,1);
+  add('Пик 1s водорода = a₀', NF(pr.rpeak,3), '1,000', Math.abs(pr.rpeak-1) < 0.02);
+  var pr2 = radialProfile(2,1,1);
+  add('Пик 2p водорода = 4a₀', NF(pr2.rpeak,2), '4,00', Math.abs(pr2.rpeak-4) < 0.08);
+
+  add('Максимум |Y|² для d_z²', NF(angMax('d_z²'),3), '4,000', Math.abs(angMax('d_z²')-4) < 0.02);
+  add('Максимум |Y|² для p_z', NF(angMax('p_z'),3), '1,000', Math.abs(angMax('p_z')-1) < 0.01);
+
+  var shapes = 0;
+  for(var n = 1; n <= 7; n++) for(var l = 0; l <= Math.min(n-1,3); l++) shapes += SHAPES[l].length;
+  add('Орбиталей в списке (n ≤ 7, l ≤ 3)', shapes, 78, shapes === 78);
+
+  var ok = rows.filter(function(r){ return r[3]; }).length;
+  $('testTbl').innerHTML = '<thead><tr><th>Проверка</th><th>Модель</th><th>Эталон</th><th>Итог</th></tr></thead><tbody>' +
+    rows.map(function(r){
+      return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+(r[3]?'✓':'✗')+'</td></tr>';
+    }).join('') + '</tbody><tfoot><tr><td colspan="4">Пройдено '+ok+' из '+rows.length+'</td></tr></tfoot>';
+  return { ok:ok, total:rows.length };
+}
+$('btnTest').addEventListener('click', function(){
+  var r = selfTest();
+  var s = document.createElement('span');
+  s.className = r.ok === r.total ? 'ok' : 'hi';
+  s.textContent = 'Самотест: ' + r.ok + ' из ' + r.total;
+  $('hud').appendChild(s);
+  setTimeout(paint, 4200);
+});
+try{ window.__selfTest = selfTest; }catch(e){}
+
+/* ═══════════ цикл ═══════════ */
+function frame(ts){
+  requestAnimationFrame(frame);
+  var t = ts/1000, dt = Math.min(.05, t-lastT || 0); lastT = t;
+  if(auto && !drag){ yaw += dt*spin; dirty = true; }
+  if(mode === 'nuc' || mode === 'nct') dirty = true;
+  if(!dirty) return;
+  ctx.clearRect(0,0,W,H);
+  if(mode === 'nuc') drawNuc(t);
+  else if(mode === 'nct') drawNct(t);
+  else drawAtom();
+  dirty = false;
+}
+
+fit(); syncOuts(); $('el').value = '0'; $('sub').value = '1s'; $('orb').value = '1s:s';
+$('auto').checked = auto; $('pts').value = budget;
+rebuild();
+try{ selfTest(); }catch(e){}
+lastT = performance.now();
+requestAnimationFrame(frame);
 })();
 </script>
 <script src="/sim/lib/selftest.js"></script>

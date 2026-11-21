@@ -1,0 +1,44 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  count?: number | string;
+  open?: boolean;
+  tone?: 'aqua' | 'sand' | 'lilac' | 'rose';
+  hint?: string;
+}
+const { id, title, count, open = false, tone = 'aqua', hint } = Astro.props;
+---
+<details class="disc" data-disc={id} data-tone={tone} open={open}>
+  <summary>
+    <span class="disc-mark" aria-hidden="true"></span>
+    <span class="disc-title">{title}</span>
+    {hint && <span class="disc-hint">{hint}</span>}
+    {count !== undefined && <span class="disc-count">{count}</span>}
+  </summary>
+  <div class="disc-body"><slot /></div>
+</details>
+
+<style>
+  .disc{border:1px solid var(--line);border-radius:14px;background:var(--surface);
+    overflow:hidden;box-shadow:var(--shadow)}
+  .disc+.disc{margin-top:10px}
+  .disc>summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;
+    padding:13px 15px;min-height:52px;background:var(--overlay);
+    font:700 .95rem var(--disp);color:var(--ink);user-select:none}
+  .disc>summary::-webkit-details-marker{display:none}
+  .disc>summary:focus-visible{outline:3px solid var(--aqua);outline-offset:-3px}
+  .disc-mark{flex:none;width:9px;height:9px;border-radius:3px;background:var(--aqua);
+    transition:transform .18s ease}
+  .disc[data-tone="sand"] .disc-mark{background:var(--sand)}
+  .disc[data-tone="lilac"] .disc-mark{background:var(--lilac)}
+  .disc[data-tone="rose"] .disc-mark{background:var(--rose)}
+  .disc[open]>summary .disc-mark{transform:rotate(45deg)}
+  .disc-title{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .disc-hint{font:400 .76rem var(--sans);color:var(--muted);margin-left:2px}
+  .disc-count{margin-left:auto;flex:none;font:600 .74rem var(--mono);color:var(--muted);
+    border:1px solid var(--line2);border-radius:999px;padding:3px 9px}
+  .disc-body{padding:14px 15px 16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+  .disc-body:empty{display:none}
+  @media (prefers-reduced-motion:reduce){.disc-mark{transition:none}}
+</style>
