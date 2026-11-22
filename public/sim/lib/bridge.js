@@ -158,6 +158,8 @@ function embedStyle(){
   document.body.classList.add('llt-embedded');
 }
 
+window.__lltRescan = function(){ if(MARKED) hello(); };
+
 function boot(){
   if(!MARKED){ send({ type:'legacy' }); return; }
   embedStyle();

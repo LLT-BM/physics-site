@@ -51,6 +51,7 @@ details.panel>summary::-webkit-details-marker{display:none}
 details.panel>summary::before{content:"▸";color:var(--sand);font:700 .9rem var(--mono)}
 details.panel[open]>summary::before{content:"▾"}
 details.panel>summary:focus-visible{outline:3px solid var(--aqua);outline-offset:3px;border-radius:8px}
+details.panel[open]>summary{margin-bottom:8px}
 .count{margin-left:auto;font:600 .72rem var(--mono);color:var(--muted);
   border:1px solid var(--line2);border-radius:999px;padding:2px 8px}
 
@@ -69,7 +70,7 @@ label{display:flex;justify-content:space-between;align-items:center;gap:8px;
   font-size:.86rem;color:var(--ink);margin-top:10px}
 output{font:700 .8rem var(--mono);color:var(--sand);white-space:nowrap;
   background:rgba(217,185,140,.14);border:1px solid rgba(217,185,140,.38);border-radius:999px;padding:3px 9px}
-select,input[type=search]{font:inherit;font-size:16px;font-family:var(--mono);width:100%;
+select{font:inherit;font-size:16px;font-family:var(--mono);width:100%;
   padding:9px 10px;margin-top:6px;border-radius:9px;border:1px solid var(--line2);
   background:var(--canvas);color:var(--ink)}
 select:focus-visible,input:focus-visible{outline:3px solid var(--aqua);outline-offset:2px}
@@ -95,6 +96,8 @@ input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:4px
 .stats b{font:700 .95rem var(--mono);color:var(--aqua)}
 .cfg{font:700 .8rem var(--mono);color:var(--sand);margin:10px 0 0;word-break:break-word;line-height:1.6}
 .note{margin:9px 0 0;font-size:.8rem;color:var(--muted);line-height:1.55}
+.link{margin:9px 0 0;font:600 .74rem var(--mono);color:var(--ice);
+  border:1px dashed var(--line2);border-radius:9px;padding:7px 9px;line-height:1.5}
 
 .pt{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:2px;margin-top:8px}
 .pt button{min-height:0;padding:0;aspect-ratio:1;border-radius:5px;font:700 .58rem var(--mono);
@@ -150,6 +153,8 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
         <label class="chk"><input type="checkbox" id="auto" checked data-llt="basic" data-label="Автовращение"> Автовращение</label>
       </div>
 
+      <p class="link" id="linkNote"></p>
+
       <div class="stats" data-llt-read>
         <div><span>заряд ядра Z</span><b id="vZ">1</b></div>
         <div><span>массовое число A</span><b id="vA">1</b></div>
@@ -164,11 +169,11 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
       <p class="note" id="modeNote"></p>
     </section>
 
-    <section class="panel">
-      <h2>Быстрые примеры</h2>
+    <details class="panel" open>
+      <summary>Готовые примеры <span class="count">9</span></summary>
       <div class="row" id="quick"></div>
       <p class="note">Тяните сцену мышью или пальцем, колесо меняет масштаб. Клавиши: <kbd>Пробел</kbd> вращение, <kbd>R</kbd> сброс, <kbd>←</kbd><kbd>→</kbd> элемент.</p>
-    </section>
+    </details>
 
     <details class="panel">
       <summary>Таблица Менделеева <span class="count">118</span></summary>
@@ -176,7 +181,7 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
       <p class="ptnote">Нижние два ряда — лантаноиды и актиноиды. Клик выбирает элемент.</p>
     </details>
 
-    <details class="panel">
+    <details class="panel" open>
       <summary>Точные настройки <span class="count">7</span></summary>
       <div data-llt="adv">
         <label for="pts">Точек в облаке <output id="o_pts"></output></label>
@@ -193,7 +198,7 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
         <label class="chk"><input type="checkbox" id="phase" data-llt="adv" data-label="Раскраска по фазе ψ"> Раскраска по фазе ψ</label>
         <label class="chk"><input type="checkbox" id="axes" data-llt="adv" data-label="Показывать оси x y z"> Показывать оси x y z</label>
       </div>
-      <p class="note">«Выровнять радиусы» — схема: каждая оболочка растягивается до своего пояса, чтобы внутренние не сливались в точку. В истинном масштабе K-оболочка золота в 200 раз меньше внешней.</p>
+      <p class="note">«Выровнять радиусы» — схема: каждая оболочка растягивается до своего пояса, чтобы внутренние не сливались в точку. В истинном масштабе K-оболочка золота примерно в 200 раз меньше внешней.</p>
       <div class="row"><button id="btnTest" data-llt="skip">✓ Самотест</button></div>
     </details>
   </aside>
@@ -214,11 +219,11 @@ var NF = (typeof window.LLTfix === 'function') ? window.LLTfix : function(x,n){
   return r < 0 ? '−'+t : t;
 };
 var $ = function(id){ return document.getElementById(id); };
-/* LibLabTab · запись HTML только при изменении */
 function setHTML(el, html){ if(!el) return; if(el.__html === html) return; el.__html = html; el.innerHTML = html; }
-var TAU = Math.PI*2, A0 = 0.529177;  /* боровский радиус, Å */
+var TAU = Math.PI*2, A0 = 0.529177;
 var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 var narrow = window.matchMedia && matchMedia('(max-width: 700px)').matches;
+function clamp(v,a,b){ return v<a?a:v>b?b:v; }
 
 /* ═══════════ данные: 118 элементов ═══════════ */
 var RAW = 'H|Водород|1.008;He|Гелий|4.0026;Li|Литий|6.94;Be|Бериллий|9.0122;B|Бор|10.81;'+
@@ -250,13 +255,12 @@ var EL = RAW.split(';').map(function(s,i){
   return { z:i+1, sym:p[0], name:p[1], mass:parseFloat(p[2]) };
 });
 
-/* правило Маделунга: порядок заполнения и ёмкости */
 var ORDER = ['1s','2s','2p','3s','3p','4s','3d','4p','5s','4d','5p','6s','4f','5d','6p','7s','5f','6d','7p'];
 var CAP = { s:2, p:6, d:10, f:14 };
 var LNAME = ['s','p','d','f'];
 function parseSub(k){ return { n:+k[0], l:LNAME.indexOf(k[1]), key:k }; }
+function lOfShape(sh){ return sh[0]==='s'?0:sh[0]==='p'?1:sh[0]==='d'?2:3; }
 
-/* экспериментальные отклонения от правила Маделунга */
 var ANOM = {
   24:'3d5 4s1', 29:'3d10 4s1', 41:'4d4 5s1', 42:'4d5 5s1', 44:'4d7 5s1',
   45:'4d8 5s1', 46:'4d10', 47:'4d10 5s1', 57:'5d1 6s2', 58:'4f1 5d1 6s2',
@@ -264,8 +268,6 @@ var ANOM = {
   90:'6d2 7s2', 91:'5f2 6d1 7s2', 92:'5f3 6d1 7s2', 93:'5f4 6d1 7s2',
   96:'5f7 6d1 7s2', 103:'5f14 7s2 7p1'
 };
-var CORE = { 2:'1s2', 10:'2s2 2p6', 18:'3s2 3p6', 36:'4s2 3d10 4p6',
-  54:'5s2 4d10 5p6', 86:'6s2 4f14 5d10 6p6' };
 function coreOf(z){
   var best = 0;
   [2,10,18,36,54,86].forEach(function(c){ if(c < z && c > best) best = c; });
@@ -301,17 +303,21 @@ function config(z){
   CFG[z] = list;
   return list;
 }
+function sup(n){
+  var S = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+  return String(n).split('').map(function(d){ return S[+d]; }).join('');
+}
 function cfgText(z){
   var c = coreOf(z);
   var base = c ? '[' + EL[c-1].sym + '] ' : '';
   var from = c ? config(c).map(function(o){ return o.key; }) : [];
-  var tail = config(z).filter(function(o){ return from.indexOf(o.key) < 0 || o.count !== (config(c).filter(function(q){ return q.key===o.key; })[0]||{}).count; });
+  var tail = config(z).filter(function(o){
+    if(from.indexOf(o.key) < 0) return true;
+    var prev = config(c).filter(function(q){ return q.key === o.key; })[0];
+    return !prev || prev.count !== o.count;
+  });
   if(!tail.length) tail = config(z);
   return base + tail.map(function(o){ return o.key + sup(o.count); }).join(' ');
-}
-function sup(n){
-  var S = '⁰¹²³⁴⁵⁶⁷⁸⁹';
-  return String(n).split('').map(function(d){ return S[+d]; }).join('');
 }
 var SHELL = ['K','L','M','N','O','P','Q'];
 function shells(z){
@@ -324,29 +330,34 @@ function shellText(z){
   for(var i = 0; i < 7; i++) if(a[i]) out.push(SHELL[i] + '=' + a[i]);
   return out.join(' · ');
 }
-
-/* экранирование по Слейтеру */
+function occupied(z,key){
+  var hit = config(z).filter(function(o){ return o.key === key; })[0];
+  return hit ? hit.count : 0;
+}
+function lastOccupied(z){
+  var l = config(z);
+  return l[l.length-1].key;
+}
 function slater(z, target){
   var list = config(z), S = 0;
-  var tg = target.l <= 1 ? target.n : target.n;
   list.forEach(function(o){
     var same = (o.n === target.n && ((o.l <= 1) === (target.l <= 1)) && (target.l <= 1 || o.l === target.l));
     var cnt = o.count - (same && o.key === target.key ? 1 : 0);
     if(cnt <= 0) return;
     if(target.l <= 1){
       if(same) S += 0.35*cnt;
-      else if(o.n === tg-1) S += 0.85*cnt;
-      else if(o.n <= tg-2) S += 1.00*cnt;
+      else if(o.n === target.n-1) S += 0.85*cnt;
+      else if(o.n <= target.n-2) S += 1.00*cnt;
     } else {
       if(same) S += 0.35*cnt;
-      else if(o.n < tg || (o.n === tg && o.l < target.l)) S += 1.00*cnt;
+      else if(o.n < target.n || (o.n === target.n && o.l < target.l)) S += 1.00*cnt;
     }
   });
   if(target.n === 1 && target.l === 0) S = 0.30*(config(z)[0].count - 1);
   return Math.max(0.65, z - S);
 }
 
-/* ═══════════ радиальная часть: полиномы Лагерра ═══════════ */
+/* ═══════════ радиальная часть ═══════════ */
 function laguerre(k, a, x){
   if(k === 0) return 1;
   var l0 = 1, l1 = 1 + a - x;
@@ -365,7 +376,7 @@ function radial(n, l, ze, r){
   return r*r*R*R;
 }
 
-/* ═══════════ угловые плотности реальных гармоник ═══════════ */
+/* ═══════════ угловые плотности ═══════════ */
 var SHAPES = {
   0: ['s'],
   1: ['p_z','p_x','p_y'],
@@ -430,7 +441,7 @@ function angMax(name){
   return AMAX[name];
 }
 
-/* ═══════════ облака точек ═══════════ */
+/* ═══════════ состояние ═══════════ */
 var cv = $('cv'), ctx = cv.getContext('2d');
 var W = 900, H = 560, dpr = 1;
 var yaw = 0.6, pitch = 0.42, zoom = 1, spin = 0.35, auto = !reduce, drag = false, lx = 0, ly = 0;
@@ -479,10 +490,9 @@ function rebuild(){
       cl.shell = o.n; cl.key = o.key; cl.even = even; cl.nmax = nmax;
       clouds.push(cl);
     });
-    var last = list[list.length-1];
+    var last = parseSub(lastOccupied(z));
     zeSel = slater(z, last);
-    var pr = radialProfile(last.n, last.l, zeSel);
-    rPeakA0 = pr.rpeak;
+    rPeakA0 = radialProfile(last.n, last.l, zeSel).rpeak;
     ext = 1.25;
   } else if(mode === 'sub'){
     var sb = parseSub(subKey), ze2 = slater(z, sb);
@@ -491,8 +501,7 @@ function rebuild(){
     clouds = [cl2];
     zeSel = ze2; rPeakA0 = cl2.rpeak; ext = cl2.rmax*0.62;
   } else if(mode === 'orb'){
-    var pp = orbKey.split(':'), n3 = +pp[0], shape = pp[1];
-    var l3 = shape[0] === 's' ? 0 : shape[0] === 'p' ? 1 : shape[0] === 'd' ? 2 : 3;
+    var pp = orbKey.split(':'), n3 = +pp[0], shape = pp[1], l3 = lOfShape(shape);
     var cl3 = sampleCloud(n3, l3, shape, 1, budget);
     cl3.shell = n3; cl3.key = n3+LNAME[l3]; cl3.even = false;
     clouds = [cl3];
@@ -507,8 +516,9 @@ function rebuild(){
   paint();
 }
 function buildNucleus(el){
-  var A = Math.max(1, Math.round(el.mass)), Z = el.z, N = Math.max(0, A - Z);
-  if(A > 300){ A = 300; }
+  var A = Math.max(1, Math.round(el.mass)), Z = el.z;
+  if(A > 300) A = 300;
+  Z = Math.min(Z, A);
   var rn = 0.62*Math.pow(A, -1/3), minD = 2*rn;
   var pts = [], guard = 0;
   while(pts.length < A && guard++ < A*900){
@@ -516,8 +526,7 @@ function buildNucleus(el){
     if(v[0]*v[0]+v[1]*v[1]+v[2]*v[2] > 1) continue;
     var ok = true;
     for(var i = 0; i < pts.length; i++){
-      var d = Math.hypot(v[0]-pts[i][0], v[1]-pts[i][1], v[2]-pts[i][2]);
-      if(d < minD*0.92){ ok = false; break; }
+      if(Math.hypot(v[0]-pts[i][0], v[1]-pts[i][1], v[2]-pts[i][2]) < minD*0.92){ ok = false; break; }
     }
     if(ok) pts.push(v);
   }
@@ -547,9 +556,7 @@ function buildNucleus(el){
   for(var s2 = tags.length-1; s2 > 0; s2--){
     var j = Math.floor(Math.random()*(s2+1)), tmp = tags[s2]; tags[s2] = tags[j]; tags[j] = tmp;
   }
-  nucleus = pts.map(function(p,i){
-    return { p:p, z:tags[i], ph:Math.random()*TAU, r:rn };
-  });
+  nucleus = pts.map(function(p,i){ return { p:p, z:tags[i], ph:Math.random()*TAU, r:rn }; });
 }
 
 /* ═══════════ проекция и отрисовка ═══════════ */
@@ -591,14 +598,11 @@ function drawAtom(){
   if(axes) drawAxes(sc,cx,cy);
   var nmax = clouds.reduce(function(a,c){ return Math.max(a,c.n_q); }, 1);
   clouds.forEach(function(cl){
-    var P = cl.pts, n = cl.n;
-    var mapR, col;
+    var P = cl.pts, n = cl.n, mapR;
     if(cl.even){
       var belt = 0.20 + 0.80*(cl.n_q-1)/Math.max(1,nmax-1);
       mapR = function(r){ return belt*Math.pow(Math.min(1.9, r/cl.rpeak), 0.55); };
-    } else {
-      mapR = function(r){ return r; };
-    }
+    } else mapR = function(r){ return r; };
     for(var i = 0; i < n; i++){
       var x = P[i*4], y = P[i*4+1], z = P[i*4+2], ph = P[i*4+3];
       if(cut && x < 0) continue;
@@ -606,8 +610,9 @@ function drawAtom(){
       var q = rot(x*k, y*k, z*k);
       var depth = Math.max(-0.5, Math.min(0.95, -q[2]/ext*0.9));
       var s = 1.25 + depth;
-      if(phaseCol) col = ph > 0 ? C('aqua','#4FD8C4') : C('sand','#D9B98C');
-      else col = C(SHELL_COL[(cl.shell-1)%7], SHELL_FALL[(cl.shell-1)%7]);
+      var col = phaseCol
+        ? (ph > 0 ? C('aqua','#4FD8C4') : C('sand','#D9B98C'))
+        : C(SHELL_COL[(cl.shell-1)%7], SHELL_FALL[(cl.shell-1)%7]);
       ctx.globalAlpha = 0.34 + 0.34*(depth+0.5);
       ctx.fillStyle = col;
       ctx.fillRect(cx+q[0]*sc-s/2, cy+q[1]*sc-s/2, s, s);
@@ -661,12 +666,10 @@ function drawNct(t){
     return { k:k, i:i, q:rot(p[0],p[1],p[2]) };
   });
   var S = Q.map(function(o){ return [cx+o.q[0]*sc, cy+o.q[1]*sc]; });
-  ctx.lineWidth = 1.7;
   var exch = Math.floor(t*1.2)%3;
   for(var a2 = 0; a2 < 3; a2++) for(var b2 = a2+1; b2 < 3; b2++){
     var A = S[a2], B = S[b2], dx = B[0]-A[0], dy = B[1]-A[1], L = Math.hypot(dx,dy)||1;
-    var nx = -dy/L, ny = dx/L;
-    var hot = (a2 === exch || b2 === exch);
+    var nx = -dy/L, ny = dx/L, hot = (a2 === exch || b2 === exch);
     ctx.strokeStyle = hot ? C('sand','#D9B98C') : 'rgba(217,185,140,.45)';
     ctx.lineWidth = hot ? 2.4 : 1.4;
     ctx.beginPath();
@@ -691,7 +694,99 @@ function drawNct(t){
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
 }
 
-/* ═══════════ интерфейс ═══════════ */
+/* ═══════════ связанные простые настройки ═══════════ */
+function notifyBridge(){
+  clearTimeout(notifyBridge._t);
+  notifyBridge._t = setTimeout(function(){
+    if(typeof window.__lltRescan === 'function') window.__lltRescan();
+  }, 40);
+}
+function fillElements(){
+  var sel = $('el');
+  sel.innerHTML = '';
+  EL.forEach(function(e,i){
+    var o = document.createElement('option');
+    o.value = String(i);
+    o.textContent = e.z + ' · ' + e.sym + ' — ' + e.name;
+    sel.appendChild(o);
+  });
+}
+function fillSubshells(){
+  var sel = $('sub'), z = EL[zi].z;
+  sel.innerHTML = '';
+  ORDER.forEach(function(k){
+    var cnt = occupied(z,k);
+    var o = document.createElement('option');
+    o.value = k;
+    o.textContent = k + (cnt ? ' · ' + cnt + ' e⁻' : ' · пусто');
+    sel.appendChild(o);
+  });
+}
+function fillOrbitals(){
+  var sel = $('orb');
+  sel.innerHTML = '';
+  for(var n = 1; n <= 7; n++){
+    var g = document.createElement('optgroup');
+    g.label = 'Оболочка ' + SHELL[n-1] + ' (n = ' + n + ')';
+    for(var l = 0; l <= Math.min(n-1,3); l++){
+      SHAPES[l].forEach(function(sh){
+        var o = document.createElement('option');
+        o.value = n + ':' + sh;
+        o.textContent = n + LNAME[l] + ' · ' + sh;
+        g.appendChild(o);
+      });
+    }
+    sel.appendChild(g);
+  }
+}
+/* Одна связка: элемент ↔ подоболочка ↔ орбиталь. Меняешь одно — следуют остальные. */
+function syncTrio(notify){
+  var z = EL[zi].z;
+  if(ORDER.indexOf(subKey) < 0) subKey = lastOccupied(z);
+  var sb = parseSub(subKey);
+  var pp = orbKey.split(':'), on = +pp[0] || 1, os = pp[1] || 's';
+  if(on !== sb.n || lOfShape(os) !== sb.l) orbKey = sb.n + ':' + SHAPES[sb.l][0];
+  $('el').value = String(zi);
+  fillSubshells();
+  $('sub').value = subKey;
+  $('orb').value = orbKey;
+  var cnt = occupied(z, subKey);
+  $('linkNote').textContent = EL[zi].sym + ' → ' + subKey +
+    (cnt ? ' (' + cnt + ' e⁻)' : ' (пусто у этого элемента)') +
+    ' → орбиталь ' + orbKey.split(':')[1] + ' при n = ' + sb.n;
+  if(notify) notifyBridge();
+}
+function setElement(i, keepSub){
+  zi = clamp(i, 0, EL.length-1);
+  var z = EL[zi].z;
+  if(!keepSub || !occupied(z, subKey)) subKey = lastOccupied(z);
+  syncTrio(true);
+  rebuild();
+}
+function setSubshell(key, switchMode){
+  subKey = key;
+  var sb = parseSub(subKey);
+  orbKey = sb.n + ':' + SHAPES[sb.l][0];
+  if(switchMode) mode = 'sub';
+  syncTrio(true);
+  rebuild();
+}
+function setOrbital(key){
+  orbKey = key;
+  var pp = key.split(':'), n = +pp[0], l = lOfShape(pp[1]);
+  subKey = n + LNAME[l];
+  mode = 'orb';
+  syncTrio(true);
+  rebuild();
+}
+function setMode(m){
+  mode = m;
+  if(m === 'sub' || m === 'orb') syncTrio(true);
+  else syncTrio(true);
+  rebuild();
+}
+
+/* ═══════════ показания ═══════════ */
 function legendHTML(){
   if(mode === 'nuc') return '<span>протон<i style="background:'+C('sand','#D9B98C')+'"></i></span>'+
     '<span>нейтрон<i style="background:'+C('deep','#2E9E96')+'"></i></span>';
@@ -740,7 +835,7 @@ function paint(){
     chips.push({ t:'орбиталь ' + orbKey.split(':')[1] + ' при n = ' + orbKey.split(':')[0] });
     chips.push({ t:'пик плотности ' + NF(rPeakA0*A0,3) + ' Å', c:'ok' });
   } else if(mode === 'nuc'){
-    chips.push({ t:'ядро: ' + z + ' p + ' + (A-z) + ' n · R ≈ ' + NF(1.2*Math.cbrt(A),2) + ' фм' });
+    chips.push({ t:'ядро: ' + z + ' p + ' + Math.max(0,A-z) + ' n · R ≈ ' + NF(1.2*Math.cbrt(A),2) + ' фм' });
   } else {
     chips.push({ t:'протон uud · радиус ≈ 0,84 фм' });
   }
@@ -749,13 +844,12 @@ function paint(){
     return '<span class="'+(o.c||'')+'">'+o.t+'</span>';
   }).join(''));
 
-  var sb = $('scalebar');
-  if(mode === 'atom') sb.textContent = even
-    ? 'атом ≈ 1 Å = 10⁻¹⁰ м · ядро в 10⁴–10⁵ раз меньше, точка не в масштабе'
-    : 'истинный масштаб · внешняя оболочка ≈ ' + NF(rPeakA0*A0,2) + ' Å';
-  else if(mode === 'sub' || mode === 'orb') sb.textContent = 'истинный масштаб · 1 Å = 10⁻¹⁰ м';
-  else if(mode === 'nuc') sb.textContent = '1 фм = 10⁻¹⁵ м · масштаб ядра';
-  else sb.textContent = '1 фм = 10⁻¹⁵ м · кварки точечны (< 10⁻¹⁹ м)';
+  $('scalebar').textContent = (mode === 'atom')
+    ? (even ? 'атом ≈ 1 Å = 10⁻¹⁰ м · ядро в 10⁴–10⁵ раз меньше, точка не в масштабе'
+            : 'истинный масштаб · внешняя оболочка ≈ ' + NF(rPeakA0*A0,2) + ' Å')
+    : (mode === 'sub' || mode === 'orb') ? 'истинный масштаб · 1 Å = 10⁻¹⁰ м'
+    : (mode === 'nuc') ? '1 фм = 10⁻¹⁵ м · масштаб ядра'
+    : '1 фм = 10⁻¹⁵ м · кварки точечны (< 10⁻¹⁹ м)';
 
   ['mAtom','mSub','mOrb','mNuc','mNct'].forEach(function(id,i){
     var on = ['atom','sub','orb','nuc','nct'][i] === mode;
@@ -780,47 +874,15 @@ function syncOuts(){
   $('o_spin').textContent = NF(spin,2) + ' рад/с';
   ['pts','zoom','spin'].forEach(function(id){ paintRange($(id)); });
 }
-function setMode(m){ mode = m; rebuild(); }
-function setElement(i){
-  zi = Math.max(0, Math.min(EL.length-1, i));
-  $('el').value = String(zi);
-  var subs = config(EL[zi].z);
-  if(!subs.filter(function(o){ return o.key === subKey; }).length) subKey = subs[subs.length-1].key;
-  $('sub').value = subKey;
-  rebuild();
-}
 
-/* селекты */
-EL.forEach(function(e,i){
-  $('el').insertAdjacentHTML('beforeend','<option value="'+i+'">'+e.z+' · '+e.sym+' — '+e.name+'</option>');
-});
-ORDER.forEach(function(k){
-  $('sub').insertAdjacentHTML('beforeend','<option value="'+k+'">'+k+' · до '+CAP[k[1]]+' e⁻</option>');
-});
-(function(){
-  for(var n = 1; n <= 7; n++){
-    var g = document.createElement('optgroup');
-    g.label = 'Оболочка ' + SHELL[n-1] + ' (n = ' + n + ')';
-    for(var l = 0; l <= Math.min(n-1,3); l++){
-      SHAPES[l].forEach(function(sh){
-        var o = document.createElement('option');
-        o.value = n + ':' + sh;
-        o.textContent = n + sh.replace(/^[spdf]/, LNAME[l]) + '  (' + sh + ')';
-        g.appendChild(o);
-      });
-    }
-    $('orb').appendChild(g);
-  }
-})();
-
-/* таблица Менделеева */
+/* ═══════════ таблица Менделеева ═══════════ */
 (function(){
   var pos = {};
   function put(z,c,r,f){ pos[z] = { c:c, r:r, f:!!f }; }
   put(1,1,1); put(2,18,1);
   for(var i = 0; i < 8; i++){
-    var z2 = 3+i; put(z2, i < 2 ? i+1 : i+11, 2);
-    var z3 = 11+i; put(z3, i < 2 ? i+1 : i+11, 3);
+    put(3+i, i < 2 ? i+1 : i+11, 2);
+    put(11+i, i < 2 ? i+1 : i+11, 3);
   }
   for(var j = 0; j < 18; j++){ put(19+j, j+1, 4); put(37+j, j+1, 5); }
   put(55,1,6); put(56,2,6);
@@ -849,45 +911,44 @@ ORDER.forEach(function(k){
         continue;
       }
       var b = document.createElement('button');
-      b.type = 'button'; b.dataset.z = found;
-      b.dataset.llt = 'skip';
+      b.type = 'button'; b.dataset.z = found; b.dataset.llt = 'skip';
       b.textContent = EL[found-1].sym;
       b.title = found + ' · ' + EL[found-1].name;
       b.setAttribute('aria-label', EL[found-1].name + ', Z = ' + found);
       b.style.gridColumn = col; b.style.gridRow = row;
       if(pos[found].f) b.classList.add('f');
-      b.addEventListener('click', function(){ setElement(+this.dataset.z - 1); });
+      b.addEventListener('click', function(){ setElement(+this.dataset.z - 1, true); });
       host.appendChild(b);
     }
   }
 })();
 
-/* быстрые примеры */
+/* ═══════════ быстрые примеры ═══════════ */
 [[1,'Водород'],[2,'Гелий'],[6,'Углерод'],[26,'Железо'],[29,'Медь'],[79,'Золото'],[92,'Уран'],[118,'Оганесон']]
 .forEach(function(q){
   var b = document.createElement('button');
   b.className = 'chip'; b.type = 'button'; b.dataset.llt = 'preset';
   b.textContent = q[1];
-  b.addEventListener('click', function(){ mode = 'atom'; setElement(q[0]-1); });
+  b.addEventListener('click', function(){ mode = 'atom'; setElement(q[0]-1, false); });
   $('quick').appendChild(b);
 });
 (function(){
   var b = document.createElement('button');
   b.className = 'chip'; b.type = 'button'; b.dataset.llt = 'preset';
   b.textContent = 'Все оболочки';
-  b.addEventListener('click', function(){ mode = 'atom'; setElement(117); });
+  b.addEventListener('click', function(){ mode = 'atom'; setElement(117, false); });
   $('quick').appendChild(b);
 })();
 
-/* обработчики */
+/* ═══════════ обработчики ═══════════ */
 $('mAtom').addEventListener('click', function(){ setMode('atom'); });
 $('mSub').addEventListener('click', function(){ setMode('sub'); });
 $('mOrb').addEventListener('click', function(){ setMode('orb'); });
 $('mNuc').addEventListener('click', function(){ setMode('nuc'); });
 $('mNct').addEventListener('click', function(){ setMode('nct'); });
-$('el').addEventListener('change', function(e){ setElement(+e.target.value); });
-$('sub').addEventListener('change', function(e){ subKey = e.target.value; mode = 'sub'; rebuild(); });
-$('orb').addEventListener('change', function(e){ orbKey = e.target.value; mode = 'orb'; rebuild(); });
+$('el').addEventListener('change', function(e){ setElement(+e.target.value, true); });
+$('sub').addEventListener('change', function(e){ setSubshell(e.target.value, true); });
+$('orb').addEventListener('change', function(e){ setOrbital(e.target.value); });
 $('auto').addEventListener('change', function(e){ auto = e.target.checked; dirty = true; });
 $('pts').addEventListener('input', function(e){ budget = +e.target.value; syncOuts(); rebuild(); });
 $('zoom').addEventListener('input', function(e){ zoom = +e.target.value; syncOuts(); dirty = true; });
@@ -901,10 +962,10 @@ $('reset').addEventListener('click', function(){
   yaw = 0.6; pitch = 0.42; zoom = 1; spin = 0.35; auto = !reduce;
   budget = narrow ? 5000 : 12000;
   cut = false; even = true; phaseCol = false; axes = false;
-  $('el').value = '0'; $('sub').value = '1s'; $('orb').value = '1s:s';
   $('auto').checked = auto; $('pts').value = budget; $('zoom').value = 1; $('spin').value = 0.35;
   $('cut').checked = false; $('even').checked = true; $('phase').checked = false; $('axes').checked = false;
-  syncOuts(); rebuild();
+  window.__ptZ = null;
+  syncOuts(); syncTrio(true); rebuild();
 });
 
 cv.addEventListener('pointerdown', function(e){
@@ -932,8 +993,8 @@ window.addEventListener('keydown', function(e){
   if(t === 'INPUT' || t === 'SELECT' || t === 'TEXTAREA') return;
   if(e.code === 'Space'){ e.preventDefault(); auto = !auto; $('auto').checked = auto; dirty = true; }
   else if(e.key === 'r' || e.key === 'R' || e.key === 'к'){ $('reset').click(); }
-  else if(e.key === 'ArrowRight'){ e.preventDefault(); setElement(zi+1); }
-  else if(e.key === 'ArrowLeft'){ e.preventDefault(); setElement(zi-1); }
+  else if(e.key === 'ArrowRight'){ e.preventDefault(); setElement(zi+1, true); }
+  else if(e.key === 'ArrowLeft'){ e.preventDefault(); setElement(zi-1, true); }
 });
 document.addEventListener('visibilitychange', function(){
   if(!document.hidden){ lastT = performance.now(); dirty = true; }
@@ -952,8 +1013,7 @@ function selfTest(){
 
   var bad = 0;
   for(var z = 1; z <= 118; z++){
-    var sum = config(z).reduce(function(a,o){ return a+o.count; }, 0);
-    if(sum !== z) bad++;
+    if(config(z).reduce(function(a,o){ return a+o.count; }, 0) !== z) bad++;
   }
   add('Сумма электронов = Z у всех 118', bad === 0 ? 'все 118' : bad + ' ошибок', 'все 118', bad === 0);
 
@@ -1010,6 +1070,7 @@ $('btnTest').addEventListener('click', function(){
   s.className = r.ok === r.total ? 'ok' : 'hi';
   s.textContent = 'Самотест: ' + r.ok + ' из ' + r.total;
   $('hud').appendChild(s);
+  $('hud').__html = null;
   setTimeout(paint, 4200);
 });
 try{ window.__selfTest = selfTest; }catch(e){}
@@ -1025,10 +1086,12 @@ function frame(ts){
   if(mode === 'nuc') drawNuc(t);
   else if(mode === 'nct') drawNct(t);
   else drawAtom();
+  paint();
   dirty = false;
 }
 
-fit(); syncOuts(); $('el').value = '0'; $('sub').value = '1s'; $('orb').value = '1s:s';
+fillElements(); fillOrbitals();
+fit(); syncOuts(); syncTrio(false);
 $('auto').checked = auto; $('pts').value = budget;
 rebuild();
 try{ selfTest(); }catch(e){}

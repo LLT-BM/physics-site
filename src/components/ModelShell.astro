@@ -4,7 +4,7 @@ const { src, title, slug } = Astro.props;
 ---
 <div class="shell" data-shell data-slug={slug}>
   <div class="stagecol">
-    <div class="stage" data-stage>
+    <div class="stage">
       <iframe data-frame src={src} title={`Интерактивная модель: ${title}`}
               loading="eager" allow="fullscreen" referrerpolicy="same-origin"></iframe>
     </div>
@@ -59,7 +59,6 @@ const { src, title, slug } = Astro.props;
   if (shellEl) {
     const root: HTMLElement = shellEl;
     const frame = root.querySelector('[data-frame]') as HTMLIFrameElement;
-    const stage = root.querySelector('[data-stage]') as HTMLElement;
     const toolbar = root.querySelector('[data-toolbar]') as HTMLElement;
     const telemetry = root.querySelector('[data-telemetry]') as HTMLElement;
     const side = root.querySelector('[data-side]') as HTMLElement;
@@ -68,8 +67,8 @@ const { src, title, slug } = Astro.props;
     const preBox = root.querySelector('[data-presets]') as HTMLElement;
     const advCount = root.querySelector('[data-adv-count]') as HTMLElement;
     const preCount = root.querySelector('[data-pre-count]') as HTMLElement;
-    const advDisc = root.querySelector('[data-disc="advanced"]') as HTMLElement;
-    const preDisc = root.querySelector('[data-disc="presets"]') as HTMLElement;
+    const advDisc = root.querySelector('[data-disc="advanced"]') as HTMLDetailsElement;
+    const preDisc = root.querySelector('[data-disc="presets"]') as HTMLDetailsElement;
     const expand = root.querySelector('[data-expand]') as HTMLButtonElement;
     const slug = root.dataset.slug || 'model';
 
@@ -170,6 +169,7 @@ const { src, title, slug } = Astro.props;
       if (next === sig) return;
       sig = next;
       manifest = m;
+      const advOpen = advDisc.open, preOpen = preDisc.open;
       toolbar.innerHTML = ''; basicBox.innerHTML = ''; advBox.innerHTML = ''; preBox.innerHTML = '';
       nodes.clear();
 
@@ -189,8 +189,11 @@ const { src, title, slug } = Astro.props;
       preCount.textContent = String(m.presets.length);
       advDisc.classList.toggle('hide', na === 0);
       preDisc.classList.toggle('hide', m.presets.length === 0);
-      side.classList.toggle('hide', nb + na + m.presets.length === 0);
-      root.classList.toggle('shell--full', nb + na + m.presets.length === 0);
+      advDisc.open = advOpen;
+      preDisc.open = preOpen;
+      const empty = nb + na + m.presets.length === 0;
+      side.classList.toggle('hide', empty);
+      root.classList.toggle('shell--full', empty);
     };
 
     const renderTelemetry = (rows: Reading[]) => {
@@ -230,6 +233,10 @@ const { src, title, slug } = Astro.props;
         if (String(el.value) === String(v)) return;
         el.value = String(v);
         el.dispatchEvent(new Event('input'));
+        if (c.kind === 'select') {
+          const out = el.closest('.ctl')?.querySelector('.ctl-out') as HTMLElement | null;
+          if (out) out.textContent = (el as HTMLSelectElement).selectedOptions[0]?.textContent || '';
+        }
       });
     };
 
