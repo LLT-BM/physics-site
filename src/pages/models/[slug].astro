@@ -16,7 +16,6 @@ const { Content } = await render(m);
 const { prev, next } = await neighbours(m.id);
 const d = m.data;
 const lead = d.lead ?? d.description;
-const dateStr = d.date.toLocaleDateString('ru-RU', { timeZone:'UTC', day:'2-digit', month:'2-digit', year:'numeric' });
 
 const jsonLd = {
   '@context':'https://schema.org', '@type':'LearningResource',
@@ -29,18 +28,9 @@ const jsonLd = {
 };
 ---
 <Base title={`${d.title} — LibLabTab`} description={d.description}
-      image={d.cover} imageAlt={`${d.title}: интерактивная модель, ${d.section}`} jsonLd={jsonLd}>
+      image={d.cover} imageAlt={`${d.title}: интерактивная модель`} jsonLd={jsonLd}>
   <article class="model">
-    <header class="mhead">
-      <h1>{d.title}</h1>
-      <div class="mmeta">
-        <a class="mchip sec" href={`/sections/${d.section}/`}>{d.section}</a>
-        {d.grade && <span class="mchip grade">{d.grade} класс</span>}
-        <span class="mchip">{d.level}</span>
-        <span class="mchip">ядро v{d.coreVersion}</span>
-        <span class="mchip">{dateStr}</span>
-      </div>
-    </header>
+    <h1 class="mtitle">{d.title}</h1>
     <p class="mlead">{lead}</p>
 
     <ModelShell src={`/sim/${d.model}`} title={d.title} slug={m.id} />
@@ -85,3 +75,7 @@ const jsonLd = {
     </nav>
   </article>
 </Base>
+
+<style>
+  .mtitle{font:800 clamp(1.35rem,3.6vw,2rem)/1.14 var(--disp);margin:0 0 8px;letter-spacing:-.01em}
+</style>

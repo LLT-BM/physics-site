@@ -209,6 +209,8 @@ var NF = (typeof window.LLTfix === 'function') ? window.LLTfix : function(x,n){
   return r < 0 ? '−'+t : t;
 };
 var $ = function(id){ return document.getElementById(id); };
+/* LibLabTab · запись HTML только при изменении */
+function setHTML(el, html){ if(!el) return; if(el.__html === html) return; el.__html = html; el.innerHTML = html; }
 var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 var cv = $('field'), ctx = cv.getContext('2d');
@@ -508,9 +510,9 @@ function updateStatus(){
   if(stamp) chips.push({ t:'Фигура: ' + stamp.n });
   else chips.push({ t:mode === 'erase' ? 'Кисть: стирание' : 'Кисть: рисование' });
   if(!wrap) chips.push({ t:'Края разомкнуты' });
-  $('hud').innerHTML = chips.map(function(o){
+  setHTML($('hud'), chips.map(function(o){
     return '<span class="' + (o.c||'') + '">' + o.t + '</span>';
-  }).join('');
+  }).join(''));
 }
 
 /* ---------- цикл ---------- */

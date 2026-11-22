@@ -214,6 +214,8 @@ var NF = (typeof window.LLTfix === 'function') ? window.LLTfix : function(x,n){
   return r < 0 ? '−'+t : t;
 };
 var $ = function(id){ return document.getElementById(id); };
+/* LibLabTab · запись HTML только при изменении */
+function setHTML(el, html){ if(!el) return; if(el.__html === html) return; el.__html = html; el.innerHTML = html; }
 var TAU = Math.PI*2, A0 = 0.529177;  /* боровский радиус, Å */
 var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 var narrow = window.matchMedia && matchMedia('(max-width: 700px)').matches;
@@ -724,7 +726,7 @@ function paint(){
   $('vN').textContent = mode === 'nuc' ? NF(nucleus.length,0) : NF(A,0);
   $('cfg').textContent = cfgText(z);
   $('modeNote').textContent = NOTES[mode];
-  $('legend').innerHTML = legendHTML();
+  setHTML($('legend'), legendHTML());
 
   var chips = [];
   chips.push({ t:el.sym + ' · ' + el.name + ' · Z = ' + z, c:'hi' });
@@ -743,9 +745,9 @@ function paint(){
     chips.push({ t:'протон uud · радиус ≈ 0,84 фм' });
   }
   if(z > 103) chips.push({ t:'конфигурация предсказана, не измерена' });
-  $('hud').innerHTML = chips.map(function(o){
+  setHTML($('hud'), chips.map(function(o){
     return '<span class="'+(o.c||'')+'">'+o.t+'</span>';
-  }).join('');
+  }).join(''));
 
   var sb = $('scalebar');
   if(mode === 'atom') sb.textContent = even
@@ -760,9 +762,12 @@ function paint(){
     $(id).setAttribute('aria-pressed', String(on));
     $(id).classList.toggle('pri', on);
   });
-  Array.prototype.forEach.call($('pt').querySelectorAll('button[data-z]'), function(b){
-    b.dataset.on = (+b.dataset.z === z) ? '1' : '0';
-  });
+  if(window.__ptZ !== z){
+    window.__ptZ = z;
+    Array.prototype.forEach.call($('pt').querySelectorAll('button[data-z]'), function(b){
+      b.dataset.on = (+b.dataset.z === z) ? '1' : '0';
+    });
+  }
 }
 function paintRange(el){
   var mn = +el.min, mx = +el.max, v = +el.value;
