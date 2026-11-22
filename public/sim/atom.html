@@ -16,7 +16,7 @@
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow:hidden}
 
-.app{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:12px;height:100%;padding:12px}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 336px;gap:12px;height:100%;padding:12px}
 .stagewrap{position:relative;min-width:0;border:1px solid var(--line2);border-radius:14px;
   overflow:hidden;background:radial-gradient(ellipse at 50% 45%,var(--surface),var(--canvas) 78%)}
 #cv{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
@@ -35,7 +35,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);ov
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:6px;vertical-align:-1px}
 .scalebar{position:absolute;left:10px;bottom:10px;font:600 .7rem var(--mono);color:var(--muted);
   background:var(--scrim);border:1px solid var(--line);border-radius:10px;padding:6px 9px;
-  backdrop-filter:blur(5px);pointer-events:none;max-width:52%}
+  backdrop-filter:blur(5px);pointer-events:none;max-width:50%}
 
 .side{min-width:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px;
   scrollbar-color:var(--aqua) var(--canvas);scrollbar-width:thin}
@@ -50,8 +50,8 @@ details.panel>summary{display:flex;align-items:center;gap:9px;cursor:pointer;lis
 details.panel>summary::-webkit-details-marker{display:none}
 details.panel>summary::before{content:"▸";color:var(--sand);font:700 .9rem var(--mono)}
 details.panel[open]>summary::before{content:"▾"}
-details.panel>summary:focus-visible{outline:3px solid var(--aqua);outline-offset:3px;border-radius:8px}
 details.panel[open]>summary{margin-bottom:8px}
+details.panel>summary:focus-visible{outline:3px solid var(--aqua);outline-offset:3px;border-radius:8px}
 .count{margin-left:auto;font:600 .72rem var(--mono);color:var(--muted);
   border:1px solid var(--line2);border-radius:999px;padding:2px 8px}
 
@@ -89,6 +89,16 @@ input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:4px
 .chk{display:flex;align-items:center;gap:10px;min-height:40px;font-size:.86rem;margin-top:4px;cursor:pointer}
 .chk input{width:21px;height:21px;accent-color:var(--aqua);flex:none}
 
+.chain{border:1px dashed var(--line2);border-radius:11px;padding:9px 10px;margin-top:10px;
+  background:rgba(79,216,196,.05)}
+.chain-row{display:flex;align-items:center;gap:6px;font:700 .78rem var(--mono);flex-wrap:wrap}
+.chain-row b{color:var(--aqua);background:rgba(79,216,196,.12);border:1px solid rgba(79,216,196,.35);
+  border-radius:7px;padding:3px 8px}
+.chain-row b.s{color:var(--sand);background:rgba(217,185,140,.12);border-color:rgba(217,185,140,.35)}
+.chain-row b.l{color:var(--lilac);background:rgba(171,166,220,.12);border-color:rgba(171,166,220,.35)}
+.chain-row i{color:var(--muted);font-style:normal}
+.chain-note{margin:7px 0 0;font:600 .7rem var(--mono);color:var(--muted);line-height:1.5}
+
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
 .stats div{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:rgba(0,0,0,.24);min-width:0}
 .stats span{display:block;font:600 .66rem var(--mono);color:var(--muted);
@@ -96,8 +106,6 @@ input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:4px
 .stats b{font:700 .95rem var(--mono);color:var(--aqua)}
 .cfg{font:700 .8rem var(--mono);color:var(--sand);margin:10px 0 0;word-break:break-word;line-height:1.6}
 .note{margin:9px 0 0;font-size:.8rem;color:var(--muted);line-height:1.55}
-.link{margin:9px 0 0;font:600 .74rem var(--mono);color:var(--ice);
-  border:1px dashed var(--line2);border-radius:9px;padding:7px 9px;line-height:1.5}
 
 .pt{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:2px;margin-top:8px}
 .pt button{min-height:0;padding:0;aspect-ratio:1;border-radius:5px;font:700 .58rem var(--mono);
@@ -153,7 +161,12 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
         <label class="chk"><input type="checkbox" id="auto" checked data-llt="basic" data-label="Автовращение"> Автовращение</label>
       </div>
 
-      <p class="link" id="linkNote"></p>
+      <div class="chain">
+        <div class="chain-row">
+          <b id="chEl">H</b><i>→</i><b class="s" id="chSub">1s</b><i>→</i><b class="l" id="chOrb">s</b>
+        </div>
+        <p class="chain-note" id="chNote"></p>
+      </div>
 
       <div class="stats" data-llt-read>
         <div><span>заряд ядра Z</span><b id="vZ">1</b></div>
@@ -161,7 +174,7 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
         <div><span>электронов</span><b id="vE">1</b></div>
         <div><span>оболочек</span><b id="vS">1</b></div>
         <div><span>Z_eff</span><b id="vZeff">1,00</b></div>
-        <div><span>пик r, Å</span><b id="vR">0,53</b></div>
+        <div><span>пик r, Å</span><b id="vR">0,529</b></div>
         <div><span>точек облака</span><b id="vP">—</b></div>
         <div><span>нуклонов</span><b id="vN">1</b></div>
       </div>
@@ -225,7 +238,7 @@ var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)')
 var narrow = window.matchMedia && matchMedia('(max-width: 700px)').matches;
 function clamp(v,a,b){ return v<a?a:v>b?b:v; }
 
-/* ═══════════ данные: 118 элементов ═══════════ */
+/* ═══════════ 118 элементов ═══════════ */
 var RAW = 'H|Водород|1.008;He|Гелий|4.0026;Li|Литий|6.94;Be|Бериллий|9.0122;B|Бор|10.81;'+
 'C|Углерод|12.011;N|Азот|14.007;O|Кислород|15.999;F|Фтор|18.998;Ne|Неон|20.180;'+
 'Na|Натрий|22.990;Mg|Магний|24.305;Al|Алюминий|26.982;Si|Кремний|28.085;P|Фосфор|30.974;'+
@@ -258,8 +271,29 @@ var EL = RAW.split(';').map(function(s,i){
 var ORDER = ['1s','2s','2p','3s','3p','4s','3d','4p','5s','4d','5p','6s','4f','5d','6p','7s','5f','6d','7p'];
 var CAP = { s:2, p:6, d:10, f:14 };
 var LNAME = ['s','p','d','f'];
-function parseSub(k){ return { n:+k[0], l:LNAME.indexOf(k[1]), key:k }; }
-function lOfShape(sh){ return sh[0]==='s'?0:sh[0]==='p'?1:sh[0]==='d'?2:3; }
+function parseSub(k){
+  var s = String(k || '1s');
+  var n = parseInt(s.charAt(0),10);
+  var l = LNAME.indexOf(s.charAt(1));
+  if(!isFinite(n) || n < 1 || n > 7) n = 1;
+  if(l < 0) l = 0;
+  if(l > n-1) l = n-1;
+  return { n:n, l:l, key:n+LNAME[l] };
+}
+function lOfShape(sh){
+  var c = String(sh || 's').charAt(0);
+  return c==='s'?0:c==='p'?1:c==='d'?2:c==='f'?3:0;
+}
+function orbParts(key){
+  var pp = String(key || '1:s').split(':');
+  var n = parseInt(pp[0],10);
+  var sh = pp[1] || 's';
+  if(!isFinite(n) || n < 1 || n > 7) n = 1;
+  var l = lOfShape(sh);
+  if(l > n-1){ l = n-1; sh = SHAPES[l][0]; }
+  if(SHAPES[l].indexOf(sh) < 0) sh = SHAPES[l][0];
+  return { n:n, l:l, shape:sh, key:n+':'+sh };
+}
 
 var ANOM = {
   24:'3d5 4s1', 29:'3d10 4s1', 41:'4d4 5s1', 42:'4d5 5s1', 44:'4d7 5s1',
@@ -292,12 +326,11 @@ function config(z){
     ANOM[z].split(' ').forEach(function(tok){
       var m = tok.match(/^(\d)([spdf])(\d+)$/);
       if(!m) return;
-      var n = +m[1], l = LNAME.indexOf(m[2]), cnt = +m[3], key = n+m[2];
-      var hit = list.filter(function(o){ return o.key === key; })[0];
-      if(hit) hit.count = cnt; else list.push({ n:n, l:l, key:key, count:cnt });
+      var sb = parseSub(m[1]+m[2]), cnt = +m[3];
+      var hit = list.filter(function(o){ return o.key === sb.key; })[0];
+      if(hit) hit.count = cnt; else list.push({ n:sb.n, l:sb.l, key:sb.key, count:cnt });
     });
-    var sum = list.reduce(function(a,o){ return a+o.count; }, 0);
-    if(sum !== z) list = madelung(z);
+    if(list.reduce(function(a,o){ return a+o.count; }, 0) !== z) list = madelung(z);
   } else list = madelung(z);
   list.sort(function(a,b){ return a.n - b.n || a.l - b.l; });
   CFG[z] = list;
@@ -310,10 +343,9 @@ function sup(n){
 function cfgText(z){
   var c = coreOf(z);
   var base = c ? '[' + EL[c-1].sym + '] ' : '';
-  var from = c ? config(c).map(function(o){ return o.key; }) : [];
+  var from = c ? config(c) : [];
   var tail = config(z).filter(function(o){
-    if(from.indexOf(o.key) < 0) return true;
-    var prev = config(c).filter(function(q){ return q.key === o.key; })[0];
+    var prev = from.filter(function(q){ return q.key === o.key; })[0];
     return !prev || prev.count !== o.count;
   });
   if(!tail.length) tail = config(z);
@@ -336,7 +368,7 @@ function occupied(z,key){
 }
 function lastOccupied(z){
   var l = config(z);
-  return l[l.length-1].key;
+  return l.length ? l[l.length-1].key : '1s';
 }
 function slater(z, target){
   var list = config(z), S = 0;
@@ -359,7 +391,7 @@ function slater(z, target){
 
 /* ═══════════ радиальная часть ═══════════ */
 function laguerre(k, a, x){
-  if(k === 0) return 1;
+  if(k <= 0) return 1;
   var l0 = 1, l1 = 1 + a - x;
   if(k === 1) return l1;
   for(var i = 1; i < k; i++){
@@ -369,11 +401,13 @@ function laguerre(k, a, x){
   return l1;
 }
 function radial(n, l, ze, r){
+  if(!(n >= 1) || !(ze > 0) || !(r > 0)) return 0;
   var rho = 2*ze*r/n;
   if(rho > 700) return 0;
   var L = laguerre(n-l-1, 2*l+1, rho);
   var R = Math.pow(rho, l)*L*Math.exp(-rho/2);
-  return r*r*R*R;
+  var v = r*r*R*R;
+  return isFinite(v) ? v : 0;
 }
 
 /* ═══════════ угловые плотности ═══════════ */
@@ -407,7 +441,6 @@ function angDen(name, c, s, cf, sf){
 }
 function angPhase(name, c, s, cf, sf){
   switch(name){
-    case 's': return 1;
     case 'p_z': return c >= 0 ? 1 : -1;
     case 'p_x': return cf >= 0 ? 1 : -1;
     case 'p_y': return sf >= 0 ? 1 : -1;
@@ -445,7 +478,7 @@ function angMax(name){
 var cv = $('cv'), ctx = cv.getContext('2d');
 var W = 900, H = 560, dpr = 1;
 var yaw = 0.6, pitch = 0.42, zoom = 1, spin = 0.35, auto = !reduce, drag = false, lx = 0, ly = 0;
-var mode = 'atom', zi = 0, subKey = '1s', orbKey = '1s:s', budget = narrow ? 5000 : 12000;
+var mode = 'atom', zi = 0, subKey = '1s', orbKey = '1:s', budget = narrow ? 5000 : 12000;
 var cut = false, even = true, phaseCol = false, axes = false;
 var clouds = [], nucleus = [], ext = 1, rPeakA0 = 1, zeSel = 1, dirty = true, lastT = 0;
 var SHELL_COL = ['aqua','ice','sand','brass','lilac','rose','ok'];
@@ -458,6 +491,7 @@ function radialProfile(n, l, ze){
     var r = rmax*i/N, v = radial(n,l,ze,r);
     if(v > best){ best = v; rpeak = r; }
   }
+  if(!(rmax > 0) || !isFinite(rmax)) rmax = 10;
   return { rmax:rmax, fmax:best*1.04 || 1, rpeak:rpeak || rmax*0.3 };
 }
 function sampleCloud(n, l, shape, ze, count){
@@ -481,7 +515,7 @@ function rebuild(){
   var el = EL[zi], z = el.z;
   clouds = []; ext = 1;
   if(mode === 'atom'){
-    var list = config(z), total = list.reduce(function(a,o){ return a+o.count; }, 0);
+    var list = config(z), total = list.reduce(function(a,o){ return a+o.count; }, 0) || 1;
     var nmax = list.reduce(function(a,o){ return Math.max(a,o.n); }, 1);
     list.forEach(function(o){
       var cnt = Math.max(90, Math.round(budget*o.count/total));
@@ -497,13 +531,13 @@ function rebuild(){
   } else if(mode === 'sub'){
     var sb = parseSub(subKey), ze2 = slater(z, sb);
     var cl2 = sampleCloud(sb.n, sb.l, SHAPES[sb.l][0], ze2, budget);
-    cl2.shell = sb.n; cl2.key = subKey; cl2.even = false;
+    cl2.shell = sb.n; cl2.key = sb.key; cl2.even = false;
     clouds = [cl2];
     zeSel = ze2; rPeakA0 = cl2.rpeak; ext = cl2.rmax*0.62;
   } else if(mode === 'orb'){
-    var pp = orbKey.split(':'), n3 = +pp[0], shape = pp[1], l3 = lOfShape(shape);
-    var cl3 = sampleCloud(n3, l3, shape, 1, budget);
-    cl3.shell = n3; cl3.key = n3+LNAME[l3]; cl3.even = false;
+    var op = orbParts(orbKey);
+    var cl3 = sampleCloud(op.n, op.l, op.shape, 1, budget);
+    cl3.shell = op.n; cl3.key = op.n+LNAME[op.l]; cl3.even = false;
     clouds = [cl3];
     zeSel = 1; rPeakA0 = cl3.rpeak; ext = cl3.rmax*0.62;
   } else if(mode === 'nuc'){
@@ -512,11 +546,12 @@ function rebuild(){
   } else {
     zeSel = 1; rPeakA0 = 0; ext = 1.1;
   }
+  if(!(ext > 0) || !isFinite(ext)) ext = 1;
   dirty = true;
   paint();
 }
 function buildNucleus(el){
-  var A = Math.max(1, Math.round(el.mass)), Z = el.z;
+  var A = Math.max(1, Math.round(el.mass)), Z = Math.min(el.z, Math.round(el.mass));
   if(A > 300) A = 300;
   Z = Math.min(Z, A);
   var rn = 0.62*Math.pow(A, -1/3), minD = 2*rn;
@@ -694,12 +729,18 @@ function drawNct(t){
   ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
 }
 
-/* ═══════════ связанные простые настройки ═══════════ */
+/* ═══════════ связанная тройка: элемент ↔ подоболочка ↔ орбиталь ═══════════ */
 function notifyBridge(){
   clearTimeout(notifyBridge._t);
   notifyBridge._t = setTimeout(function(){
     if(typeof window.__lltRescan === 'function') window.__lltRescan();
-  }, 40);
+  }, 30);
+}
+function setSel(sel, val){
+  var found = false;
+  for(var i = 0; i < sel.options.length; i++) if(sel.options[i].value === val){ found = true; break; }
+  sel.value = found ? val : (sel.options.length ? sel.options[0].value : '');
+  return sel.value;
 }
 function fillElements(){
   var sel = $('el');
@@ -715,10 +756,10 @@ function fillSubshells(){
   var sel = $('sub'), z = EL[zi].z;
   sel.innerHTML = '';
   ORDER.forEach(function(k){
-    var cnt = occupied(z,k);
+    var sb = parseSub(k), cnt = occupied(z, sb.key);
     var o = document.createElement('option');
-    o.value = k;
-    o.textContent = k + (cnt ? ' · ' + cnt + ' e⁻' : ' · пусто');
+    o.value = sb.key;
+    o.textContent = sb.key + (cnt ? ' · ' + cnt + ' e⁻' : ' · пусто');
     sel.appendChild(o);
   });
 }
@@ -732,57 +773,65 @@ function fillOrbitals(){
       SHAPES[l].forEach(function(sh){
         var o = document.createElement('option');
         o.value = n + ':' + sh;
-        o.textContent = n + LNAME[l] + ' · ' + sh;
+        o.textContent = n + LNAME[lOfShape(sh)] + ' · ' + sh;
         g.appendChild(o);
       });
     }
     sel.appendChild(g);
   }
 }
-/* Одна связка: элемент ↔ подоболочка ↔ орбиталь. Меняешь одно — следуют остальные. */
 function syncTrio(notify){
   var z = EL[zi].z;
+  subKey = parseSub(subKey).key;
   if(ORDER.indexOf(subKey) < 0) subKey = lastOccupied(z);
   var sb = parseSub(subKey);
-  var pp = orbKey.split(':'), on = +pp[0] || 1, os = pp[1] || 's';
-  if(on !== sb.n || lOfShape(os) !== sb.l) orbKey = sb.n + ':' + SHAPES[sb.l][0];
-  $('el').value = String(zi);
+  var op = orbParts(orbKey);
+  if(op.n !== sb.n || op.l !== sb.l) op = orbParts(sb.n + ':' + SHAPES[sb.l][0]);
+  orbKey = op.key;
+
+  setSel($('el'), String(zi));
   fillSubshells();
-  $('sub').value = subKey;
-  $('orb').value = orbKey;
+  setSel($('sub'), subKey);
+  setSel($('orb'), orbKey);
+
   var cnt = occupied(z, subKey);
-  $('linkNote').textContent = EL[zi].sym + ' → ' + subKey +
-    (cnt ? ' (' + cnt + ' e⁻)' : ' (пусто у этого элемента)') +
-    ' → орбиталь ' + orbKey.split(':')[1] + ' при n = ' + sb.n;
+  $('chEl').textContent = EL[zi].sym + ' · Z ' + z;
+  $('chSub').textContent = subKey + (cnt ? ' · ' + cnt + ' e⁻' : ' · пусто');
+  $('chOrb').textContent = op.shape + ' · n ' + op.n;
+  $('chNote').textContent = 'Три списка связаны: смена элемента обновляет населённость подоболочек и подбор орбитали; смена подоболочки или орбитали переключает режим и подтягивает остальные.';
   if(notify) notifyBridge();
 }
 function setElement(i, keepSub){
-  zi = clamp(i, 0, EL.length-1);
-  var z = EL[zi].z;
-  if(!keepSub || !occupied(z, subKey)) subKey = lastOccupied(z);
+  var next = clamp(i, 0, EL.length-1);
+  var z = EL[next].z;
+  var keep = keepSub && occupied(z, parseSub(subKey).key) > 0;
+  if(next === zi && keep) { syncTrio(true); return; }
+  zi = next;
+  if(!keep) subKey = lastOccupied(z);
   syncTrio(true);
   rebuild();
 }
-function setSubshell(key, switchMode){
-  subKey = key;
-  var sb = parseSub(subKey);
+function setSubshell(key){
+  var sb = parseSub(key);
+  if(sb.key === subKey && mode === 'sub'){ syncTrio(true); return; }
+  subKey = sb.key;
   orbKey = sb.n + ':' + SHAPES[sb.l][0];
-  if(switchMode) mode = 'sub';
+  mode = 'sub';
   syncTrio(true);
   rebuild();
 }
 function setOrbital(key){
-  orbKey = key;
-  var pp = key.split(':'), n = +pp[0], l = lOfShape(pp[1]);
-  subKey = n + LNAME[l];
+  var op = orbParts(key);
+  if(op.key === orbKey && mode === 'orb'){ syncTrio(true); return; }
+  orbKey = op.key;
+  subKey = op.n + LNAME[op.l];
   mode = 'orb';
   syncTrio(true);
   rebuild();
 }
 function setMode(m){
   mode = m;
-  if(m === 'sub' || m === 'orb') syncTrio(true);
-  else syncTrio(true);
+  syncTrio(true);
   rebuild();
 }
 
@@ -832,7 +881,8 @@ function paint(){
     chips.push({ t:'подоболочка ' + subKey + ' · Z_eff = ' + NF(zeSel,2) });
     chips.push({ t:'пик плотности ' + NF(rPeakA0*A0,3) + ' Å', c:'ok' });
   } else if(mode === 'orb'){
-    chips.push({ t:'орбиталь ' + orbKey.split(':')[1] + ' при n = ' + orbKey.split(':')[0] });
+    var op = orbParts(orbKey);
+    chips.push({ t:'орбиталь ' + op.shape + ' при n = ' + op.n });
     chips.push({ t:'пик плотности ' + NF(rPeakA0*A0,3) + ' Å', c:'ok' });
   } else if(mode === 'nuc'){
     chips.push({ t:'ядро: ' + z + ' p + ' + Math.max(0,A-z) + ' n · R ≈ ' + NF(1.2*Math.cbrt(A),2) + ' фм' });
@@ -946,8 +996,8 @@ $('mSub').addEventListener('click', function(){ setMode('sub'); });
 $('mOrb').addEventListener('click', function(){ setMode('orb'); });
 $('mNuc').addEventListener('click', function(){ setMode('nuc'); });
 $('mNct').addEventListener('click', function(){ setMode('nct'); });
-$('el').addEventListener('change', function(e){ setElement(+e.target.value, true); });
-$('sub').addEventListener('change', function(e){ setSubshell(e.target.value, true); });
+$('el').addEventListener('change', function(e){ setElement(parseInt(e.target.value,10) || 0, true); });
+$('sub').addEventListener('change', function(e){ setSubshell(e.target.value); });
 $('orb').addEventListener('change', function(e){ setOrbital(e.target.value); });
 $('auto').addEventListener('change', function(e){ auto = e.target.checked; dirty = true; });
 $('pts').addEventListener('input', function(e){ budget = +e.target.value; syncOuts(); rebuild(); });
@@ -958,7 +1008,7 @@ $('even').addEventListener('change', function(e){ even = e.target.checked; rebui
 $('phase').addEventListener('change', function(e){ phaseCol = e.target.checked; rebuild(); });
 $('axes').addEventListener('change', function(e){ axes = e.target.checked; dirty = true; });
 $('reset').addEventListener('click', function(){
-  mode = 'atom'; zi = 0; subKey = '1s'; orbKey = '1s:s';
+  mode = 'atom'; zi = 0; subKey = '1s'; orbKey = '1:s';
   yaw = 0.6; pitch = 0.42; zoom = 1; spin = 0.35; auto = !reduce;
   budget = narrow ? 5000 : 12000;
   cut = false; even = true; phaseCol = false; axes = false;
@@ -1057,6 +1107,18 @@ function selfTest(){
   for(var n = 1; n <= 7; n++) for(var l = 0; l <= Math.min(n-1,3); l++) shapes += SHAPES[l].length;
   add('Орбиталей в списке (n ≤ 7, l ≤ 3)', shapes, 78, shapes === 78);
 
+  var okFormat = orbParts('1:s').key === '1:s' && orbParts('3:d_z²').key === '3:d_z²' &&
+                 orbParts('').key === '1:s' && orbParts('2:d_xy').l === 1;
+  add('Разбор ключа орбитали устойчив', okFormat ? 'да' : 'нет', 'да', okFormat);
+
+  var linkOK = true;
+  for(var z3 = 1; z3 <= 118; z3++){
+    var last = parseSub(lastOccupied(z3));
+    if(ORDER.indexOf(last.key) < 0) linkOK = false;
+    if(last.l > last.n-1) linkOK = false;
+  }
+  add('Внешняя подоболочка есть у всех 118', linkOK ? 'да' : 'нет', 'да', linkOK);
+
   var ok = rows.filter(function(r){ return r[3]; }).length;
   $('testTbl').innerHTML = '<thead><tr><th>Проверка</th><th>Модель</th><th>Эталон</th><th>Итог</th></tr></thead><tbody>' +
     rows.map(function(r){
@@ -1069,8 +1131,7 @@ $('btnTest').addEventListener('click', function(){
   var s = document.createElement('span');
   s.className = r.ok === r.total ? 'ok' : 'hi';
   s.textContent = 'Самотест: ' + r.ok + ' из ' + r.total;
-  $('hud').appendChild(s);
-  $('hud').__html = null;
+  $('hud').appendChild(s); $('hud').__html = null;
   setTimeout(paint, 4200);
 });
 try{ window.__selfTest = selfTest; }catch(e){}
@@ -1095,6 +1156,7 @@ fit(); syncOuts(); syncTrio(false);
 $('auto').checked = auto; $('pts').value = budget;
 rebuild();
 try{ selfTest(); }catch(e){}
+notifyBridge();
 lastT = performance.now();
 requestAnimationFrame(frame);
 })();

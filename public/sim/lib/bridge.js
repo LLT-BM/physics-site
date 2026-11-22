@@ -2,9 +2,8 @@
    Работает только с размеченными моделями:
      data-llt-stage-wrap, data-llt-stage, data-llt-ui,
      data-llt="basic|adv|action|preset|skip", data-label, data-unit, data-llt-read.
-   Модели без разметки остаются автономными: мост сообщает «legacy»,
-   страница отдаёт им весь кадр и не строит дублирующие органы управления.
-   Никаких наблюдателей за DOM: скан один раз и по команде. */
+   Модель без разметки остаётся автономной: мост сообщает «legacy».
+   window.__lltRescan() lets a model push a changed control list to the page. */
 (function(){
 'use strict';
 if(window.__lltBridge) return;
@@ -52,7 +51,9 @@ function scan(){
     var c = { key:key, label:labelOf(n), unit:n.dataset.unit || '', level:levelOf(n) };
     if(n.tagName === 'SELECT'){
       c.kind = 'select'; c.value = n.value;
-      c.options = Array.prototype.map.call(n.options, function(o){ return { value:o.value, label:txt(o) }; });
+      c.options = Array.prototype.map.call(n.options, function(o){
+        return { value:o.value, label:txt(o) };
+      });
     } else if(n.type === 'checkbox' || n.type === 'radio'){
       c.kind = 'check'; c.value = n.checked;
     } else if(n.type === 'number'){
@@ -128,16 +129,25 @@ window.addEventListener('message', function(e){
   if(d.op === 'set'){
     var n = registry.get(d.key);
     if(!n) return;
-    if(n.type === 'checkbox' || n.type === 'radio') n.checked = !!d.value;
-    else n.value = String(d.value);
+    if(n.type === 'checkbox' || n.type === 'radio'){
+      var b = !!d.value;
+      if(n.checked === b) return;
+      n.checked = b;
+    } else {
+      if(String(n.value) === String(d.value)) return;
+      n.value = String(d.value);
+    }
     n.dispatchEvent(new Event('input', { bubbles:true }));
     n.dispatchEvent(new Event('change', { bubbles:true }));
     pushTelemetry(true);
     return;
   }
   if(d.op === 'press'){
-    var b = registry.get(d.key);
-    if(b){ b.click(); setTimeout(function(){ send({ type:'values', values:values() }); pushTelemetry(true); }, 60); }
+    var btn = registry.get(d.key);
+    if(btn){
+      btn.click();
+      setTimeout(function(){ send({ type:'values', values:values() }); pushTelemetry(true); }, 60);
+    }
   }
 });
 
@@ -158,6 +168,7 @@ function embedStyle(){
   document.body.classList.add('llt-embedded');
 }
 
+/* Модель зовёт это, когда меняются подписи или состав её контролов. */
 window.__lltRescan = function(){ if(MARKED) hello(); };
 
 function boot(){
