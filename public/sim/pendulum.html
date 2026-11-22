@@ -16,9 +16,9 @@
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow:hidden}
 
-.app{display:grid;grid-template-columns:minmax(0,1fr) 332px;gap:12px;height:100%;padding:12px}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 336px;gap:12px;height:100%;padding:12px}
 .stagewrap{position:relative;min-width:0;border:1px solid var(--line2);border-radius:14px;
-  overflow:hidden;background:radial-gradient(ellipse at 50% 38%,var(--surface),var(--canvas) 76%)}
+  overflow:hidden;background:radial-gradient(ellipse at 50% 36%,var(--surface),var(--canvas) 76%)}
 #scene{display:block;width:100%;height:100%;touch-action:none;cursor:default}
 .hud{position:absolute;left:10px;top:10px;right:10px;display:flex;flex-direction:column;
   align-items:flex-start;gap:5px;pointer-events:none}
@@ -27,12 +27,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);ov
   max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hud span.hi{color:var(--sand);border-color:rgba(217,185,140,.5)}
 .hud span.ok{color:var(--ok);border-color:rgba(63,201,174,.5)}
-.hud span.bad{color:var(--rose);border-color:rgba(214,159,169,.55)}
+.hud span.gh{color:var(--rose);border-color:rgba(214,159,169,.6)}
+.hud span.bad{color:var(--rose);border-color:rgba(214,159,169,.85)}
 .legend{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px;
   pointer-events:none;font:600 .68rem var(--mono);color:var(--muted);text-align:right;
   background:var(--scrim);border:1px solid var(--line);border-radius:10px;padding:7px 9px;
   backdrop-filter:blur(5px)}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-left:6px;vertical-align:-1px}
+.legend i.ring{background:transparent;border:2px solid var(--rose)}
 .plotbox{position:absolute;left:10px;right:10px;bottom:10px;height:132px;
   border:1px solid var(--line);border-radius:10px;background:var(--scrim);
   backdrop-filter:blur(5px);overflow:hidden}
@@ -47,11 +49,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);ov
   background:linear-gradient(var(--deep),var(--aqua))}
 .panel{border:1px solid var(--line2);border-radius:14px;background:var(--surface);padding:12px 13px}
 .panel>h2{font:700 .95rem var(--disp);margin:0 0 8px;padding-left:10px;border-left:4px solid var(--aqua)}
+.panel.gh>h2{border-left-color:var(--rose)}
 details.panel>summary{display:flex;align-items:center;gap:9px;cursor:pointer;list-style:none;
   font:700 .95rem var(--disp);color:var(--ink);min-height:34px}
 details.panel>summary::-webkit-details-marker{display:none}
 details.panel>summary::before{content:"▸";color:var(--sand);font:700 .9rem var(--mono)}
 details.panel[open]>summary::before{content:"▾"}
+details.panel[open]>summary{margin-bottom:8px}
 details.panel>summary:focus-visible{outline:3px solid var(--aqua);outline-offset:3px;border-radius:8px}
 .count{margin-left:auto;font:600 .72rem var(--mono);color:var(--muted);
   border:1px solid var(--line2);border-radius:999px;padding:2px 8px}
@@ -66,6 +70,8 @@ button.pri{background:linear-gradient(135deg,var(--aqua),var(--ok));color:var(--
   border-color:var(--aqua);font-weight:700}
 button[aria-pressed="true"]{border-color:var(--aqua);color:var(--aqua);background:rgba(79,216,196,.12)}
 button.chip{border-radius:999px;font:600 .76rem var(--mono);min-height:36px;padding:6px 11px}
+button.chip.gh{border-color:rgba(214,159,169,.45);color:var(--rose)}
+button.chip.gh:hover{background:rgba(214,159,169,.14)}
 
 label{display:flex;justify-content:space-between;align-items:center;gap:8px;
   font-size:.86rem;color:var(--ink);margin-top:10px}
@@ -83,12 +89,16 @@ input[type=range]::-webkit-slider-runnable-track{height:12px;border-radius:8px;b
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;
   margin-top:-8px;border-radius:50%;background:var(--sand);border:3px solid var(--canvas);
   box-shadow:0 0 0 3px rgba(217,185,140,.26)}
+input[type=range].gh::-webkit-slider-runnable-track{
+  background:linear-gradient(90deg,#8E5566 0%,var(--rose) var(--fill,50%),
+    rgba(214,159,169,.18) var(--fill,50%),rgba(214,159,169,.18) 100%)}
+input[type=range].gh::-webkit-slider-thumb{background:var(--rose);box-shadow:0 0 0 3px rgba(214,159,169,.3)}
 input[type=range]::-moz-range-track{height:12px;border-radius:8px;background:rgba(126,214,199,.16)}
 input[type=range]::-moz-range-progress{height:12px;border-radius:8px;background:linear-gradient(90deg,var(--deep),var(--aqua))}
 input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--sand);border:3px solid var(--canvas)}
 input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:4px;border-radius:10px}
 .chk{display:flex;align-items:center;gap:10px;min-height:40px;font-size:.86rem;margin-top:4px;cursor:pointer}
-.chk input{width:21px;height:21px;accent-color:var(--aqua);flex:none}
+.chk input{width:21px;height:21px;accent-color:var(--rose);flex:none}
 
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
 .stats div{border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:rgba(0,0,0,.24);min-width:0}
@@ -102,7 +112,12 @@ input[type=range]:focus-visible{outline:3px solid var(--aqua);outline-offset:4px
 .ebar i{display:block;height:100%}
 .ebar i.k{background:linear-gradient(90deg,var(--sand),var(--brass))}
 .ebar i.p{background:linear-gradient(90deg,var(--deep),var(--aqua))}
+.dbar{height:10px;border-radius:6px;border:1px solid rgba(214,159,169,.4);
+  background:rgba(0,0,0,.3);overflow:hidden;margin-top:9px}
+.dbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8E5566,var(--rose))}
 .note{margin:9px 0 0;font-size:.8rem;color:var(--muted);line-height:1.55}
+.formula{margin:9px 0 0;font:600 .76rem var(--mono);color:var(--rose);
+  border:1px dashed rgba(214,159,169,.4);border-radius:9px;padding:7px 9px;line-height:1.5}
 kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;padding:1px 5px;color:var(--ice)}
 .offscreen{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 
@@ -119,7 +134,7 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
 <div class="app">
   <div class="stagewrap" data-llt-stage-wrap>
     <canvas id="scene" data-llt-stage role="img"
-      aria-label="Двойной маятник: два груза на шарнирах, след нижнего груза и двойник с настраиваемым отличием угла"></canvas>
+      aria-label="Двойной маятник: основной маятник и розовый двойник с настраиваемым отличием угла, между ними показано расхождение"></canvas>
     <div class="hud" id="hud"></div>
     <div class="legend" id="legend" aria-hidden="true"></div>
     <div class="plotbox" id="plotbox"><canvas id="plot" data-llt-plot aria-label="График: фазовый портрет, расхождение двойника или энергия"></canvas></div>
@@ -141,31 +156,49 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
         <label for="th2">Начальный угол θ₂ <output id="o_th2"></output></label>
         <input type="range" id="th2" min="-180" max="180" step="0.5" value="160"
                data-llt="basic" data-label="Начальный угол θ₂" data-unit="°">
-        <label for="delta">Отличие двойника δ <output id="o_delta"></output></label>
-        <input type="range" id="delta" min="0" max="5" step="0.001" value="0.1"
-               data-llt="basic" data-label="Отличие двойника δ" data-unit="°">
-        <label class="chk"><input type="checkbox" id="ghost" checked data-llt="basic" data-label="Показывать двойника"> Показывать двойника</label>
       </div>
 
       <div class="stats" data-llt-read>
         <div><span>время, с</span><b id="vT">0,0</b></div>
-        <div><span>расхождение, м</span><b id="vD">0,000</b></div>
+        <div class="cr"><span>расхождение Δ, м</span><b id="vD">0,000</b></div>
+        <div class="cr"><span>начальное Δ₀, мм</span><b id="vD0">1,745</b></div>
+        <div class="cr"><span>λ, 1/с</span><b id="vL">—</b></div>
         <div class="ca"><span>θ₁, °</span><b id="vT1">—</b></div>
         <div><span>θ₂, °</span><b id="vT2">—</b></div>
         <div class="ca"><span>ω₁, °/с</span><b id="vW1">—</b></div>
         <div><span>ω₂, °/с</span><b id="vW2">—</b></div>
         <div><span>энергия E, Дж</span><b id="vE">—</b></div>
-        <div class="cr"><span>λ, 1/с</span><b id="vL">—</b></div>
+        <div><span>дрейф E, %</span><b id="vDr">0,0000</b></div>
       </div>
       <div class="ebar" aria-hidden="true"><i class="k" id="barK"></i><i class="p" id="barP"></i></div>
       <p class="note" id="modeNote"></p>
     </section>
 
-    <section class="panel">
-      <h2>Быстрые примеры</h2>
+    <section class="panel gh">
+      <h2>Двойник</h2>
+      <div data-llt="basic">
+        <label class="chk"><input type="checkbox" id="ghost" checked data-llt="basic" data-label="Показывать двойника"> Показывать двойника</label>
+        <label for="delta">Отличие δ <output id="o_delta"></output></label>
+        <input type="range" id="delta" class="gh" min="0" max="5" step="0.001" value="0.1"
+               data-llt="basic" data-label="Отличие двойника δ" data-unit="°">
+        <label for="target">Куда добавлять δ</label>
+        <select id="target" data-llt="basic" data-label="Куда добавлять δ">
+          <option value="th2">в угол θ₂</option>
+          <option value="th1">в угол θ₁</option>
+          <option value="both">в оба угла</option>
+        </select>
+      </div>
+      <div class="row" id="dq"></div>
+      <div class="dbar" aria-hidden="true"><i id="barD"></i></div>
+      <p class="formula" id="dFormula"></p>
+      <p class="note">Розовые кольца — двойник, они рисуются поверх основного маятника, поэтому видны даже при полном совпадении. Пунктир между нижними грузами — текущее расхождение.</p>
+    </section>
+
+    <details class="panel" open>
+      <summary>Готовые примеры <span class="count">8</span></summary>
       <div class="row" id="quick"></div>
       <p class="note">Тяните любой груз мышью или пальцем. Клавиши: <kbd>Пробел</kbd> пуск, <kbd>S</kbd> шаг, <kbd>R</kbd> сброс, <kbd>G</kbd> двойник.</p>
-    </section>
+    </details>
 
     <details class="panel">
       <summary>Точный ввод <span class="count">5</span></summary>
@@ -186,7 +219,7 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
         <input type="range" id="w2" min="-540" max="540" step="1" value="0"
                data-llt="adv" data-label="Начальная ω₂" data-unit="°/с">
       </div>
-      <p class="note">Числа вводятся с клавиатуры и запоминаются: ссылку на такой запуск можно воспроизвести вручную. «Сброс» возвращает именно эти значения.</p>
+      <p class="note">Числа вводятся с клавиатуры: такой запуск можно воспроизвести вручную. «Сброс» возвращает именно эти значения.</p>
     </details>
 
     <details class="panel">
@@ -212,22 +245,16 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
                data-llt="adv" data-label="Затухание" data-unit="1/с">
       </div>
       <div class="row" id="gpre"></div>
-      <p class="note">Затухание введено как вязкий член −b·ω в угловом ускорении. Это феноменологическая модель трения, а не вывод из функции диссипации.</p>
+      <p class="note">Затухание введено как вязкий член −b·ω в угловом ускорении: феноменологическая модель трения, а не вывод из функции диссипации.</p>
     </details>
 
     <details class="panel">
-      <summary>Показ и график <span class="count">8</span></summary>
+      <summary>Показ и график <span class="count">7</span></summary>
       <div data-llt="adv">
-        <label for="target">Куда добавлять δ</label>
-        <select id="target" data-llt="adv" data-label="Куда добавлять δ">
-          <option value="th2">в угол θ₂</option>
-          <option value="th1">в угол θ₁</option>
-          <option value="both">в оба угла</option>
-        </select>
         <label for="plotMode">График под сценой</label>
         <select id="plotMode" data-llt="adv" data-label="График под сценой">
-          <option value="phase">фазовый портрет θ₂, ω₂</option>
           <option value="div">расхождение двойника ln|Δ|(t)</option>
+          <option value="phase">фазовый портрет θ₂, ω₂</option>
           <option value="energy">энергия E(t)</option>
         </select>
         <label for="spd">Темп модельного времени <output id="o_spd"></output></label>
@@ -242,7 +269,7 @@ kbd{font:600 .74rem var(--mono);border:1px solid var(--line2);border-radius:5px;
         <label class="chk"><input type="checkbox" id="tgPlot" checked data-llt="adv" data-label="Показывать график"> Показывать график</label>
       </div>
       <div class="row"><button id="btnTest" data-llt="skip">✓ Самотест</button></div>
-      <p class="note">Шаг интегратора РК4 не превышает 1,5 мс модельного времени: при высоком темпе число подшагов растёт, а точность сохраняется.</p>
+      <p class="note">Шаг РК4 не превышает 1,5 мс модельного времени: при высоком темпе растёт число подшагов, а точность сохраняется.</p>
     </details>
   </aside>
 </div>
@@ -262,7 +289,6 @@ var NF = (typeof window.LLTfix === 'function') ? window.LLTfix : function(x,n){
   return r < 0 ? '−'+t : t;
 };
 var $ = function(id){ return document.getElementById(id); };
-/* LibLabTab · запись HTML только при изменении */
 function setHTML(el, html){ if(!el) return; if(el.__html === html) return; el.__html = html; el.innerHTML = html; }
 var TAU = Math.PI*2, D2R = Math.PI/180, R2D = 180/Math.PI;
 var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -294,6 +320,7 @@ function energy(s,p){
   var pe=-(m1+m2)*g*l1*Math.cos(s[0])-m2*g*l2*Math.cos(s[1]);
   return [ke,pe];
 }
+function bob1(s,p){ return [p.l1*Math.sin(s[0]), p.l1*Math.cos(s[0])]; }
 function bob2(s,p){
   return [p.l1*Math.sin(s[0])+p.l2*Math.sin(s[1]), p.l1*Math.cos(s[0])+p.l2*Math.cos(s[1])];
 }
@@ -301,15 +328,22 @@ function sep(a,b,p){
   var A=bob2(a,p), B=bob2(b,p);
   return Math.hypot(A[0]-B[0], A[1]-B[1]);
 }
+/* Точная геометрия начального расхождения: поворот звена на δ даёт хорду 2·l·sin(δ/2). */
+function chordSep(th1, th2, deltaRad, tgt, p){
+  var k = 2*Math.sin(Math.abs(deltaRad)/2);
+  if(tgt === 'th1') return k*p.l1;
+  if(tgt === 'th2') return k*p.l2;
+  return k*Math.sqrt(p.l1*p.l1 + p.l2*p.l2 + 2*p.l1*p.l2*Math.cos(th1-th2));
+}
 
 /* ═══════════ состояние ═══════════ */
 var P = { m1:1.5, m2:1, l1:1, l2:1, g:9.81, damp:0 };
 var INIT = { th1:135*D2R, th2:160*D2R, w1:0, w2:0 };
-var st, gst, t=0, E0=0, drift=0;
+var st, gst, t=0, E0=0, drift=0, d0=0;
 var deltaDeg=0.1, target='th2';
 var playing=!reduce, speed=1, trailMax=900;
 var showGhost=true, showTrail=true, showVec=false, showGuide=true, showPlot=true;
-var plotMode='phase';
+var plotMode='div';
 var trail=[], phasePts=[], divPts=[], enPts=[], lambda=null;
 var W=900,H=560,PW=900,PH=132,dpr=1;
 var dragId=0, hoverId=0, lastT=0, dirty=true;
@@ -324,13 +358,15 @@ function offset(s){
   return o;
 }
 function syncGhost(){
-  gst = offset([st.th1,st.th2,st.w1,st.w2]);
+  gst = offset(st);
+  d0 = chordSep(st[0], st[1], deltaDeg*D2R, target, P);
   divPts=[]; lambda=null;
+  dirty=true;
 }
 function reset(){
   st=[INIT.th1,INIT.th2,INIT.w1,INIT.w2];
-  gst=offset(st);
-  t=0; trail=[]; phasePts=[]; divPts=[]; enPts=[]; lambda=null;
+  t=0; trail=[]; phasePts=[]; enPts=[];
+  syncGhost();
   var e=energy(st,P); E0=e[0]+e[1]; drift=0;
   dirty=true; paint();
 }
@@ -350,9 +386,8 @@ function fit(){
 }
 function geom(){
   var px=W*0.5, py=H*0.30;
-  var avail=Math.min(H*0.58, W*0.42);
-  var sc=Math.max(28, avail/(P.l1+P.l2));
-  return { px:px, py:py, sc:sc };
+  var avail=Math.min(H*0.56, W*0.42);
+  return { px:px, py:py, sc:Math.max(28, avail/(P.l1+P.l2)) };
 }
 function pos(g,s){
   var l1=P.l1*g.sc, l2=P.l2*g.sc;
@@ -366,12 +401,12 @@ function local(ev){
 }
 function hitTest(mx,my){
   var g=geom(), p=pos(g,st);
-  if(Math.hypot(mx-p.x2,my-p.y2)<bobR(P.m2)+12) return 2;
-  if(Math.hypot(mx-p.x1,my-p.y1)<bobR(P.m1)+12) return 1;
+  if(Math.hypot(mx-p.x2,my-p.y2)<bobR(P.m2)+14) return 2;
+  if(Math.hypot(mx-p.x1,my-p.y1)<bobR(P.m1)+14) return 1;
   return 0;
 }
 
-/* ═══════════ отрисовка сцены ═══════════ */
+/* ═══════════ отрисовка ═══════════ */
 function arrow(x1,y1,x2,y2,col,w){
   var a=Math.atan2(y2-y1,x2-x1), h=7+w;
   ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=w;
@@ -389,7 +424,7 @@ function drawTrail(g){
     var i0=c*per, i1=Math.min(n-1,i0+per);
     if(i1<=i0) break;
     var f=i1/n;
-    ctx.globalAlpha=Math.pow(f,2.1)*0.85;
+    ctx.globalAlpha=Math.pow(f,2.1)*0.8;
     ctx.strokeStyle=C('aqua','#4FD8C4');
     ctx.lineWidth=0.8+f*2.1;
     ctx.beginPath();
@@ -427,26 +462,16 @@ function drawGuides(g,p){
   fm=Math.PI/2-a2/2;
   ctx.fillText('θ₂', p.x1+Math.cos(fm)*34-6, p.y1+Math.sin(fm)*34+3);
 }
-function drawArm(g,p,ghost){
-  ctx.lineWidth=ghost?2:3.6;
-  ctx.strokeStyle=ghost?'rgba(214,159,169,.45)':C('deep','#2E9E96');
+function drawMain(g,p){
+  ctx.lineCap='round';
+  ctx.lineWidth=4.2; ctx.strokeStyle=C('deep','#2E9E96');
   ctx.beginPath(); ctx.moveTo(g.px,g.py); ctx.lineTo(p.x1,p.y1); ctx.lineTo(p.x2,p.y2); ctx.stroke();
-  if(!ghost){
-    ctx.lineWidth=1.8; ctx.strokeStyle=C('ice','#9FE8DC'); ctx.globalAlpha=.5;
-    ctx.beginPath(); ctx.moveTo(g.px,g.py); ctx.lineTo(p.x1,p.y1); ctx.lineTo(p.x2,p.y2); ctx.stroke();
-    ctx.globalAlpha=1;
-  }
-  var r1=bobR(P.m1), r2=bobR(P.m2);
-  var balls=[[p.x1,p.y1,r1,C('sand','#D9B98C'),C('brass','#C9A96E'),1],
-             [p.x2,p.y2,r2,C('aqua','#4FD8C4'),C('deep','#2E9E96'),2]];
-  balls.forEach(function(b){
+  ctx.lineWidth=1.6; ctx.strokeStyle=C('ice','#9FE8DC'); ctx.globalAlpha=.55;
+  ctx.beginPath(); ctx.moveTo(g.px,g.py); ctx.lineTo(p.x1,p.y1); ctx.lineTo(p.x2,p.y2); ctx.stroke();
+  ctx.globalAlpha=1; ctx.lineCap='butt';
+  [[p.x1,p.y1,bobR(P.m1),C('sand','#D9B98C'),C('brass','#C9A96E'),1],
+   [p.x2,p.y2,bobR(P.m2),C('aqua','#4FD8C4'),C('deep','#2E9E96'),2]].forEach(function(b){
     var x=b[0],y=b[1],r=b[2];
-    if(ghost){
-      ctx.beginPath(); ctx.arc(x,y,r*0.82,0,TAU);
-      ctx.fillStyle='rgba(214,159,169,.10)'; ctx.fill();
-      ctx.strokeStyle='rgba(214,159,169,.8)'; ctx.lineWidth=1.5; ctx.stroke();
-      return;
-    }
     ctx.save();
     ctx.shadowColor=b[3]; ctx.shadowBlur=(hoverId===b[5]||dragId===b[5])?24:12;
     var gr=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.1,x,y,r);
@@ -454,14 +479,57 @@ function drawArm(g,p,ghost){
     ctx.fillStyle=gr; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill();
     ctx.restore();
     if(hoverId===b[5]||dragId===b[5]){
-      ctx.strokeStyle='rgba(235,245,255,.7)'; ctx.lineWidth=1.5;
+      ctx.strokeStyle='rgba(235,245,255,.75)'; ctx.lineWidth=1.5;
       ctx.beginPath(); ctx.arc(x,y,r+5,0,TAU); ctx.stroke();
     }
   });
-  if(!ghost){
-    ctx.beginPath(); ctx.arc(g.px,g.py,5,0,TAU); ctx.fillStyle=C('ice','#9FE8DC'); ctx.fill();
-    ctx.beginPath(); ctx.arc(g.px,g.py,2.2,0,TAU); ctx.fillStyle=C('canvas','#071012'); ctx.fill();
-  }
+  ctx.beginPath(); ctx.arc(g.px,g.py,5,0,TAU); ctx.fillStyle=C('ice','#9FE8DC'); ctx.fill();
+  ctx.beginPath(); ctx.arc(g.px,g.py,2.2,0,TAU); ctx.fillStyle=C('canvas','#071012'); ctx.fill();
+}
+/* Двойник рисуется ПОВЕРХ основного: кольца больше грузов, поэтому видны всегда. */
+function drawGhost(g,gp,mp){
+  var rose=C('rose','#D69FA9');
+  ctx.save();
+  ctx.lineCap='round';
+  ctx.setLineDash([7,5]);
+  ctx.lineWidth=2.4; ctx.strokeStyle=rose; ctx.globalAlpha=.95;
+  ctx.beginPath(); ctx.moveTo(g.px,g.py); ctx.lineTo(gp.x1,gp.y1); ctx.lineTo(gp.x2,gp.y2); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.globalAlpha=1;
+  [[gp.x1,gp.y1,bobR(P.m1)+7],[gp.x2,gp.y2,bobR(P.m2)+7]].forEach(function(b){
+    ctx.beginPath(); ctx.arc(b[0],b[1],b[2],0,TAU);
+    ctx.fillStyle='rgba(214,159,169,.14)'; ctx.fill();
+    ctx.lineWidth=2.4; ctx.strokeStyle=rose;
+    ctx.shadowColor=rose; ctx.shadowBlur=10;
+    ctx.stroke(); ctx.shadowBlur=0;
+  });
+  ctx.beginPath(); ctx.arc(g.px,g.py,8,0,TAU);
+  ctx.lineWidth=1.6; ctx.strokeStyle=rose; ctx.globalAlpha=.8; ctx.stroke(); ctx.globalAlpha=1;
+  ctx.restore();
+
+  /* соединитель расхождения и подпись */
+  var dx=gp.x2-mp.x2, dy=gp.y2-mp.y2, px=Math.hypot(dx,dy);
+  var d=sep(st,gst,P);
+  ctx.save();
+  ctx.setLineDash([3,4]); ctx.lineWidth=1.6; ctx.strokeStyle=rose;
+  ctx.beginPath(); ctx.moveTo(mp.x2,mp.y2); ctx.lineTo(gp.x2,gp.y2); ctx.stroke();
+  ctx.setLineDash([]);
+  var lx, ly;
+  if(px<26){ lx=mp.x2+bobR(P.m2)+22; ly=mp.y2-bobR(P.m2)-14; 
+    ctx.globalAlpha=.6; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(mp.x2+8,mp.y2-8); ctx.lineTo(lx-6,ly+4); ctx.stroke(); ctx.globalAlpha=1;
+  } else { lx=(mp.x2+gp.x2)/2+10; ly=(mp.y2+gp.y2)/2-8; }
+  var label='Δ = '+(d<0.01 ? NF(d*1000,2)+' мм' : NF(d,3)+' м');
+  ctx.font='700 11px JetBrains Mono, monospace';
+  var tw=ctx.measureText(label).width;
+  lx=clamp(lx,6,W-tw-14); ly=clamp(ly,20,H-14);
+  ctx.fillStyle='rgba(6,17,15,.82)';
+  ctx.beginPath();
+  if(ctx.roundRect) ctx.roundRect(lx-6,ly-13,tw+12,19,6); else ctx.rect(lx-6,ly-13,tw+12,19);
+  ctx.fill();
+  ctx.strokeStyle='rgba(214,159,169,.55)'; ctx.lineWidth=1; ctx.stroke();
+  ctx.fillStyle=rose; ctx.fillText(label,lx,ly);
+  ctx.restore();
 }
 function drawVec(g,p){
   var k=g.sc*0.11;
@@ -477,17 +545,14 @@ function drawVec(g,p){
 }
 
 /* ═══════════ график ═══════════ */
-function plotFrame(label){
+function drawPlot(){
+  if(!showPlot) return;
+  var L=36,R=10,T=20,B=18, iw=PW-L-R, ih=PH-T-B;
   pctx.clearRect(0,0,PW,PH);
   pctx.font='600 9px JetBrains Mono, monospace';
   pctx.fillStyle=C('muted','#8FA8A6');
-  pctx.fillText(label, 8, 13);
-}
-function drawPlot(){
-  if(!showPlot) return;
-  var L=34,R=10,T=20,B=18, iw=PW-L-R, ih=PH-T-B;
   if(plotMode==='phase'){
-    plotFrame('фазовый портрет: θ₂ по горизонтали, ω₂ по вертикали');
+    pctx.fillText('фазовый портрет: θ₂ по горизонтали, ω₂ по вертикали', 8, 13);
     pctx.strokeStyle=C('line','rgba(126,214,199,.16)'); pctx.lineWidth=1;
     pctx.beginPath(); pctx.moveTo(L,T+ih/2); pctx.lineTo(L+iw,T+ih/2);
     pctx.moveTo(L+iw/2,T); pctx.lineTo(L+iw/2,T+ih); pctx.stroke();
@@ -522,18 +587,19 @@ function drawPlot(){
     return;
   }
   var arr = plotMode==='div' ? divPts : enPts;
-  var name = plotMode==='div' ? 'ln|Δ| от времени: наклон = показатель Ляпунова' : 'полная энергия E(t)';
-  plotFrame(name);
+  pctx.fillText(plotMode==='div'
+    ? 'ln|Δ| от времени: наклон прямой = показатель Ляпунова'
+    : 'полная энергия E(t)', 8, 13);
   pctx.strokeStyle=C('line','rgba(126,214,199,.16)'); pctx.lineWidth=1;
   pctx.beginPath(); pctx.moveTo(L,T+ih); pctx.lineTo(L+iw,T+ih); pctx.moveTo(L,T); pctx.lineTo(L,T+ih); pctx.stroke();
   if(arr.length<2){
     pctx.fillStyle=C('muted','#8FA8A6');
-    pctx.fillText(plotMode==='div'?'включите двойника и запустите движение':'данные появятся после запуска', L+6, T+ih/2);
+    pctx.fillText(plotMode==='div'?'нужен ненулевой δ и запущенное движение':'данные появятся после запуска', L+6, T+ih/2);
     return;
   }
   var tmax=arr[arr.length-1].t||1, mn=Infinity, mx=-Infinity;
   arr.forEach(function(o){ mn=Math.min(mn,o.v); mx=Math.max(mx,o.v); });
-  if(mx-mn<1e-9){ mx=mn+1; }
+  if(mx-mn<1e-9) mx=mn+1;
   var pad=(mx-mn)*0.12; mn-=pad; mx+=pad;
   pctx.strokeStyle=plotMode==='div'?C('rose','#D69FA9'):C('sand','#D9B98C');
   pctx.lineWidth=1.8; pctx.beginPath();
@@ -557,7 +623,7 @@ function estimateLambda(){
   var n=divPts.length;
   if(n<12){ lambda=null; return; }
   var pts=[];
-  for(var i=Math.max(0,n-260);i<n;i++){
+  for(var i=Math.max(0,n-300);i<n;i++){
     var d=Math.exp(divPts[i].v);
     if(d>1e-7 && d<0.35) pts.push(divPts[i]);
   }
@@ -573,36 +639,46 @@ function paint(){
   var tot=ke+peShift+1e-9;
   var d = showGhost ? sep(st,gst,P) : 0;
   $('vT').textContent=NF(t,1);
-  $('vD').textContent=showGhost?NF(d,3):'—';
+  $('vD').textContent=showGhost?NF(d,4):'—';
+  $('vD0').textContent=showGhost?NF(d0*1000,3):'—';
+  $('vL').textContent=(showGhost&&lambda!==null)?NF(lambda,3):'—';
   $('vT1').textContent=NF(wrapPi(st[0])*R2D,1);
   $('vT2').textContent=NF(wrapPi(st[1])*R2D,1);
   $('vW1').textContent=NF(st[2]*R2D,0);
   $('vW2').textContent=NF(st[3]*R2D,0);
   $('vE').textContent=NF(E,2);
-  $('vL').textContent=(showGhost&&lambda!==null)?NF(lambda,3):'—';
+  $('vDr').textContent=P.damp===0?NF(drift*100,4):'—';
   $('barK').style.width=(ke/tot*100).toFixed(1)+'%';
   $('barP').style.width=(peShift/tot*100).toFixed(1)+'%';
+  var span=P.l1+P.l2;
+  $('barD').style.width=(showGhost?clamp(d/span*100,0,100):0).toFixed(1)+'%';
 
   var chips=[];
   chips.push({ t:playing?'движение · РК4, шаг ≤ 1,5 мс':'пауза', c:playing?'ok':'' });
   if(showGhost){
     var where = target==='both'?'в оба угла':(target==='th1'?'в θ₁':'в θ₂');
-    chips.push({ t:'двойник: δ = '+NF(deltaDeg,3)+'° '+where, c:'hi' });
-    chips.push({ t:'расхождение '+NF(d,3)+' м'+(lambda!==null?' · λ ≈ '+NF(lambda,3)+' 1/с':''),
-                 c:d>0.6?'bad':'' });
+    chips.push({ t:'двойник виден · δ = '+NF(deltaDeg,3)+'° '+where, c:'gh' });
+    if(deltaDeg===0) chips.push({ t:'δ = 0: двойник совпадает с основным', c:'gh' });
+    else chips.push({ t:'Δ₀ = '+NF(d0*1000,3)+' мм → сейчас '+NF(d,4)+' м', c:d>0.6?'bad':'gh' });
+    if(lambda!==null) chips.push({ t:'λ ≈ '+NF(lambda,3)+' 1/с · '+(lambda>0.2?'хаос':'регулярно') });
+  } else {
+    chips.push({ t:'двойник выключен' });
   }
-  if(P.damp===0) chips.push({ t:'дрейф энергии '+NF(drift*100,4)+' %', c:Math.abs(drift)>1e-4?'bad':'' });
-  else chips.push({ t:'затухание b = '+NF(P.damp,3)+' 1/с' });
+  if(P.damp===0&&Math.abs(drift)>1e-4) chips.push({ t:'дрейф энергии '+NF(drift*100,4)+' %', c:'bad' });
   setHTML($('hud'), chips.map(function(o){ return '<span class="'+(o.c||'')+'">'+o.t+'</span>'; }).join(''));
 
   setHTML($('legend'),
     '<span>груз m₁<i style="background:'+C('sand','#D9B98C')+'"></i></span>'+
     '<span>груз m₂<i style="background:'+C('aqua','#4FD8C4')+'"></i></span>'+
-    (showGhost?'<span>двойник<i style="background:'+C('rose','#D69FA9')+'"></i></span>':''));
+    (showGhost?'<span>двойник<i class="ring"></i></span>':''));
 
   $('modeNote').textContent = showGhost
-    ? 'Двойник начинается с тем же состоянием, но с добавкой δ к выбранному углу. В регулярном режиме расхождение растёт линейно, в хаотическом — экспоненциально.'
+    ? 'Двойник стартует из того же состояния с добавкой δ. Полоса под показаниями — расхождение в долях полной длины маятника.'
     : 'Двойник выключен: видно только одно движение. Включите его, чтобы измерить чувствительность к начальным условиям.';
+
+  $('dFormula').textContent = target==='both'
+    ? 'Δ₀ = 2·sin(δ/2)·√(l₁² + l₂² + 2l₁l₂cos(θ₁−θ₂)) = ' + NF(d0*1000,3) + ' мм'
+    : 'Δ₀ = 2·' + (target==='th1'?'l₁':'l₂') + '·sin(δ/2) = ' + NF(d0*1000,3) + ' мм';
 
   $('play').textContent = playing ? '❚❚ Пауза' : '▶ Пуск';
   $('play').dataset.label = $('play').textContent;
@@ -640,6 +716,8 @@ function syncInputs(){
   $('w2').value=Math.round(INIT.w2*R2D);
   $('delta').value=deltaDeg;
   $('dn').value=deltaDeg;
+  $('target').value=target;
+  $('ghost').checked=showGhost;
   syncOuts();
 }
 
@@ -648,30 +726,36 @@ function setAngle(which,deg){
   var v=clamp(deg,-180,180)*D2R;
   if(which===1){ INIT.th1=v; st[0]=v; } else { INIT.th2=v; st[1]=v; }
   st[2]=0; st[3]=0; INIT.w1=0; INIT.w2=0;
-  syncGhost(); trail=[]; phasePts=[]; enPts=[];
-  var e=energy(st,P); E0=e[0]+e[1]; drift=0; t=0;
-  syncInputs(); dirty=true; paint();
+  t=0; trail=[]; phasePts=[]; enPts=[];
+  syncGhost();
+  var e=energy(st,P); E0=e[0]+e[1]; drift=0;
+  syncInputs(); paint();
+}
+function setDelta(v){
+  deltaDeg=clamp(v,0,5);
+  syncGhost(); syncInputs(); paint();
 }
 $('th1').addEventListener('input',function(e){ setAngle(1,+e.target.value); });
 $('th2').addEventListener('input',function(e){ setAngle(2,+e.target.value); });
 $('th1n').addEventListener('input',function(e){ var v=parseFloat(e.target.value); if(isFinite(v)) setAngle(1,v); });
 $('th2n').addEventListener('input',function(e){ var v=parseFloat(e.target.value); if(isFinite(v)) setAngle(2,v); });
-function setDelta(v){
-  deltaDeg=clamp(v,0,5);
-  syncGhost(); syncInputs(); dirty=true; paint();
-}
 $('delta').addEventListener('input',function(e){ setDelta(+e.target.value); });
 $('dn').addEventListener('input',function(e){ var v=parseFloat(e.target.value); if(isFinite(v)) setDelta(v); });
-$('w1').addEventListener('input',function(e){ INIT.w1=+e.target.value*D2R; st[2]=INIT.w1; syncGhost(); syncOuts(); dirty=true; });
-$('w2').addEventListener('input',function(e){ INIT.w2=+e.target.value*D2R; st[3]=INIT.w2; syncGhost(); syncOuts(); dirty=true; });
+$('target').addEventListener('change',function(e){ target=e.target.value; syncGhost(); syncInputs(); paint(); });
+$('ghost').addEventListener('change',function(e){
+  showGhost=e.target.checked;
+  if(showGhost) syncGhost();
+  dirty=true; paint();
+});
+$('w1').addEventListener('input',function(e){ INIT.w1=+e.target.value*D2R; st[2]=INIT.w1; syncGhost(); syncOuts(); paint(); });
+$('w2').addEventListener('input',function(e){ INIT.w2=+e.target.value*D2R; st[3]=INIT.w2; syncGhost(); syncOuts(); paint(); });
 ['m1','m2','l1','l2','g','damp'].forEach(function(k){
   $(k).addEventListener('input',function(e){
     P[k]=+e.target.value;
     var en=energy(st,P); E0=en[0]+en[1]; drift=0; enPts=[];
-    syncOuts(); dirty=true; paint();
+    syncGhost(); syncOuts(); paint();
   });
 });
-$('target').addEventListener('change',function(e){ target=e.target.value; syncGhost(); paint(); });
 $('plotMode').addEventListener('change',function(e){ plotMode=e.target.value; dirty=true; });
 $('spd').addEventListener('input',function(e){ speed=+e.target.value; syncOuts(); });
 $('trail').addEventListener('input',function(e){
@@ -679,23 +763,34 @@ $('trail').addEventListener('input',function(e){
   if(trail.length>trailMax) trail.splice(0,trail.length-trailMax);
   syncOuts(); dirty=true;
 });
-$('ghost').addEventListener('change',function(e){ showGhost=e.target.checked; if(showGhost) syncGhost(); dirty=true; paint(); });
 $('tgTrail').addEventListener('change',function(e){ showTrail=e.target.checked; if(!showTrail) trail=[]; dirty=true; });
 $('tgVec').addEventListener('change',function(e){ showVec=e.target.checked; dirty=true; });
 $('tgGuide').addEventListener('change',function(e){ showGuide=e.target.checked; dirty=true; });
 $('tgPlot').addEventListener('change',function(e){ showPlot=e.target.checked; fit(); paint(); });
 $('play').addEventListener('click',function(){ playing=!playing; dirty=true; paint(); });
-$('stepBtn').addEventListener('click',function(){ playing=false; advance(0.05); dirty=true; paint(); });
+$('stepBtn').addEventListener('click',function(){ playing=false; advance(0.05); paint(); });
 $('reset').addEventListener('click',function(){ reset(); syncInputs(); });
 
+[0,0.001,0.1,1,5].forEach(function(v){
+  var b=document.createElement('button');
+  b.className='chip gh'; b.type='button'; b.dataset.llt='preset';
+  b.dataset.label='δ = '+NF(v,3)+'°';
+  b.textContent='δ = '+NF(v,3)+'°';
+  b.addEventListener('click',function(){
+    showGhost=true; setDelta(v);
+  });
+  $('dq').appendChild(b);
+});
+
 var PRE=[
-  ['Классика 90/90',90,90,0,0,0.1],
-  ['Хаос 135/160',135,160,0,0,0.1],
-  ['Малые углы 3°',3,3,0,0,0.1],
-  ['У острия 179,7°',179.7,179.7,0,0,0.001],
-  ['Раскрутка',15,15,0,300,0.1],
-  ['Антифаза',20,-20,0,0,0.1],
-  ['δ = 0 (контроль)',135,160,0,0,0]
+  ['Хаос 135/160',135,160,0,0,0.1,'th2'],
+  ['Двойник врозь 5°',135,160,0,0,5,'th2'],
+  ['Малые углы 3°',3,3,0,0,0.1,'th2'],
+  ['Классика 90/90',90,90,0,0,0.1,'th2'],
+  ['δ в θ₁',135,160,0,0,1,'th1'],
+  ['δ в оба угла',135,160,0,0,1,'both'],
+  ['У острия 179,7°',179.7,179.7,0,0,0.001,'th2'],
+  ['δ = 0 (контроль)',135,160,0,0,0,'th2']
 ];
 PRE.forEach(function(q){
   var b=document.createElement('button');
@@ -703,7 +798,7 @@ PRE.forEach(function(q){
   b.textContent=q[0];
   b.addEventListener('click',function(){
     INIT={ th1:q[1]*D2R, th2:q[2]*D2R, w1:q[3]*D2R, w2:q[4]*D2R };
-    deltaDeg=q[5]; showGhost=true; $('ghost').checked=true;
+    deltaDeg=q[5]; target=q[6]; showGhost=true;
     reset(); syncInputs(); playing=true; paint();
   });
   $('quick').appendChild(b);
@@ -715,7 +810,7 @@ PRE.forEach(function(q){
   b.addEventListener('click',function(){
     P.g=q[1]; $('g').value=q[1];
     var en=energy(st,P); E0=en[0]+en[1]; drift=0; enPts=[];
-    syncOuts(); dirty=true; paint();
+    syncGhost(); syncOuts(); paint();
   });
   $('gpre').appendChild(b);
 });
@@ -750,7 +845,11 @@ window.addEventListener('keydown',function(e){
   if(e.code==='Space'){ e.preventDefault(); playing=!playing; paint(); }
   else if(e.key==='s'||e.key==='S'||e.key==='ы'){ playing=false; advance(0.05); paint(); }
   else if(e.key==='r'||e.key==='R'||e.key==='к'){ reset(); syncInputs(); }
-  else if(e.key==='g'||e.key==='G'||e.key==='п'){ showGhost=!showGhost; $('ghost').checked=showGhost; if(showGhost) syncGhost(); paint(); }
+  else if(e.key==='g'||e.key==='G'||e.key==='п'){
+    showGhost=!showGhost; $('ghost').checked=showGhost;
+    if(showGhost) syncGhost();
+    dirty=true; paint();
+  }
 });
 document.addEventListener('visibilitychange',function(){
   if(!document.hidden){ lastT=performance.now(); dirty=true; }
@@ -775,8 +874,7 @@ function advance(sd){
   t+=sd;
   var e=energy(st,P), E=e[0]+e[1];
   if(P.damp===0 && Math.abs(E0)>1e-9) drift=(E-E0)/Math.abs(E0);
-  var w=bob2(st,P);
-  if(showTrail){ trail.push(w); if(trail.length>trailMax) trail.splice(0,trail.length-trailMax); }
+  if(showTrail){ trail.push(bob2(st,P)); if(trail.length>trailMax) trail.splice(0,trail.length-trailMax); }
   phasePts.push({ th:wrapPi(st[1]), w:st[3] });
   if(phasePts.length>900) phasePts.splice(0,phasePts.length-900);
   enPts.push({ t:t, v:E });
@@ -786,24 +884,27 @@ function advance(sd){
     if(d>1e-14){ divPts.push({ t:t, v:Math.log(d) }); if(divPts.length>900) divPts.splice(0,divPts.length-900); }
     estimateLambda();
   }
+  dirty=true;
 }
 
 /* ═══════════ самотест ═══════════ */
 function simRun(cfg){
   var p={ m1:cfg.m1||1, m2:cfg.m2||1, l1:cfg.l1||1, l2:cfg.l2||1, g:cfg.g||9.81, damp:cfg.damp||0 };
   var s=[cfg.th1*D2R,cfg.th2*D2R,(cfg.w1||0)*D2R,(cfg.w2||0)*D2R];
-  var d=(cfg.delta||0)*D2R;
-  var gg=[s[0],s[1]+d,s[2],s[3]];
-  var e0=energy(s,p), E0=e0[0]+e0[1];
-  var T=cfg.T||20, h=MAXH, n=Math.round(T/h), maxSep=0, lam=null;
-  var log=[];
+  var d=(cfg.delta||0)*D2R, tgt=cfg.target||'th2';
+  var gg=[s[0],s[1],s[2],s[3]];
+  if(tgt==='th1'||tgt==='both') gg[0]+=d;
+  if(tgt==='th2'||tgt==='both') gg[1]+=d;
+  var start=sep(s,gg,p);
+  var e0=energy(s,p), EE0=e0[0]+e0[1];
+  var T=cfg.T||20, h=MAXH, n=Math.round(T/h), maxSep=0, lam=null, log=[];
   for(var i=0;i<n;i++){
     s=rk4(s,h,p); gg=rk4(gg,h,p);
     var sp=sep(s,gg,p);
     maxSep=Math.max(maxSep,sp);
     if(sp>1e-12) log.push({ t:(i+1)*h, v:Math.log(sp) });
   }
-  var e1=energy(s,p), E1=e1[0]+e1[1];
+  var e1=energy(s,p), EE1=e1[0]+e1[1];
   if(log.length>20){
     var pts=log.filter(function(o){ var dd=Math.exp(o.v); return dd>1e-7&&dd<0.35; });
     if(pts.length>10){
@@ -813,12 +914,38 @@ function simRun(cfg){
       if(Math.abs(den)>1e-12) lam=(m*sxy-sx*sy)/den;
     }
   }
-  return { drift:Math.abs(E0)>1e-9?Math.abs((E1-E0)/Math.abs(E0)):0,
-           E0:E0, E1:E1, sep:sep(s,gg,p), maxSep:maxSep, lam:lam, p:p };
+  return { drift:Math.abs(EE0)>1e-9?Math.abs((EE1-EE0)/Math.abs(EE0)):0,
+           E0:EE0, E1:EE1, start:start, sep:sep(s,gg,p), maxSep:maxSep, lam:lam, p:p };
 }
 function selfTest(){
   var rows=[];
   function add(name,got,want,ok){ rows.push([name,String(got),String(want),ok]); }
+  var pp={ m1:1.5, m2:1, l1:1, l2:1, g:9.81, damp:0 };
+
+  /* точная геометрия δ: хорда поворота звена */
+  [[0.1,'th2',1],[5,'th2',1],[0.1,'th1',1.5],[2,'th1',1.5]].forEach(function(c){
+    var deg=c[0], tgt=c[1], th1=135*D2R, th2=160*D2R;
+    var s=[th1,th2,0,0], gg=[th1,th2,0,0];
+    if(tgt==='th1') gg[0]+=deg*D2R; else gg[1]+=deg*D2R;
+    var got=sep(s,gg,pp);
+    var want=2*(tgt==='th1'?pp.l1:pp.l2)*Math.sin(deg*D2R/2);
+    add('δ='+NF(deg,3)+'° в '+tgt+': Δ₀ = 2l·sin(δ/2)', NF(got*1000,4)+' мм', NF(want*1000,4)+' мм',
+        Math.abs(got-want)<1e-12);
+  });
+  (function(){
+    var deg=1, th1=135*D2R, th2=160*D2R;
+    var s=[th1,th2,0,0], gg=[th1+deg*D2R,th2+deg*D2R,0,0];
+    var got=sep(s,gg,pp);
+    var want=2*Math.sin(deg*D2R/2)*Math.sqrt(pp.l1*pp.l1+pp.l2*pp.l2+2*pp.l1*pp.l2*Math.cos(th1-th2));
+    add('δ=1° в оба угла: теорема косинусов', NF(got*1000,4)+' мм', NF(want*1000,4)+' мм',
+        Math.abs(got-want)<1e-12);
+  })();
+
+  var zero=simRun({ th1:135, th2:160, delta:0, T:10, m1:1.5, m2:1 });
+  add('δ = 0: траектории совпадают', NF(zero.maxSep,12)+' м', '0', zero.maxSep<1e-12);
+
+  var big=simRun({ th1:135, th2:160, delta:5, T:2, m1:1.5, m2:1 });
+  add('δ = 5°: двойник сразу разведён', NF(big.start*1000,2)+' мм', '> 80 мм', big.start>0.08);
 
   var reg=simRun({ th1:3, th2:3, delta:0.1, T:20 });
   add('Малые углы: дрейф энергии', NF(reg.drift*100,6)+' %', '< 0,001 %', reg.drift<1e-5);
@@ -831,33 +958,29 @@ function selfTest(){
   add('Хаос: расхождение за 20 с', NF(ch.sep,3)+' м', '> 0,1 м', ch.sep>0.1);
   add('Хаос: λ > 0', ch.lam===null?'—':NF(ch.lam,3), '> 0,2 1/с', ch.lam!==null&&ch.lam>0.2);
 
-  var zero=simRun({ th1:135, th2:160, delta:0, T:10, m1:1.5, m2:1 });
-  add('δ = 0: траектории совпадают', NF(zero.maxSep,10)+' м', '0', zero.maxSep<1e-12);
-
   var dmp=simRun({ th1:60, th2:60, delta:0.1, T:15, damp:0.2 });
   add('Затухание уводит энергию', NF(dmp.E1,2)+' Дж', 'меньше '+NF(dmp.E0,2), dmp.E1<dmp.E0);
 
-  var p0={ m1:1.5, m2:1, l1:1, l2:1, g:9.81, damp:0 };
-  var rest=energy([0,0,0,0],p0);
-  var want=-(p0.m1+p0.m2)*p0.g*p0.l1-p0.m2*p0.g*p0.l2;
+  var rest=energy([0,0,0,0],pp);
+  var want=-(pp.m1+pp.m2)*pp.g*pp.l1-pp.m2*pp.g*pp.l2;
   add('E в покое = −(m₁+m₂)gl₁ − m₂gl₂', NF(rest[1],4), NF(want,4),
       Math.abs(rest[0])<1e-12 && Math.abs(rest[1]-want)<1e-9);
 
-  var pl={ m1:1, m2:1, l1:1, l2:1, g:9.81, damp:0 }, eps=1e-6, A=[[0,0],[0,0]];
+  var pl2={ m1:1, m2:1, l1:1, l2:1, g:9.81, damp:0 }, eps=1e-6, A=[[0,0],[0,0]];
   for(var j=0;j<2;j++){
     var sp=[0,0,0,0], sm=[0,0,0,0];
     sp[j]=eps; sm[j]=-eps;
-    var dp=deriv(sp,pl), dm=deriv(sm,pl);
+    var dp=deriv(sp,pl2), dm=deriv(sm,pl2);
     A[0][j]=(dp[2]-dm[2])/(2*eps);
     A[1][j]=(dp[3]-dm[3])/(2*eps);
   }
   var tr=A[0][0]+A[1][1], det=A[0][0]*A[1][1]-A[0][1]*A[1][0];
   var disc=Math.sqrt(Math.max(0,tr*tr-4*det));
-  var w2a=-(tr+disc)/2, w2b=-(tr-disc)/2;
-  var lo=Math.min(w2a,w2b), hi=Math.max(w2a,w2b);
-  var theoLo=9.81*(2-Math.SQRT2), theoHi=9.81*(2+Math.SQRT2);
-  add('ω² медленной моды = (g/l)(2−√2)', NF(lo,4), NF(theoLo,4), Math.abs(lo-theoLo)<1e-3);
-  add('ω² быстрой моды = (g/l)(2+√2)', NF(hi,4), NF(theoHi,4), Math.abs(hi-theoHi)<1e-3);
+  var lo=Math.min(-(tr+disc)/2,-(tr-disc)/2), hi=Math.max(-(tr+disc)/2,-(tr-disc)/2);
+  add('ω² медленной моды = (g/l)(2−√2)', NF(lo,4), NF(9.81*(2-Math.SQRT2),4),
+      Math.abs(lo-9.81*(2-Math.SQRT2))<1e-3);
+  add('ω² быстрой моды = (g/l)(2+√2)', NF(hi,4), NF(9.81*(2+Math.SQRT2),4),
+      Math.abs(hi-9.81*(2+Math.SQRT2))<1e-3);
   add('Период медленной моды', NF(TAU/Math.sqrt(lo),4)+' с', '2,6211 с',
       Math.abs(TAU/Math.sqrt(lo)-2.6211)<0.002);
   add('Период быстрой моды', NF(TAU/Math.sqrt(hi),4)+' с', '1,0857 с',
@@ -875,7 +998,7 @@ $('btnTest').addEventListener('click',function(){
   var s=document.createElement('span');
   s.className=r.ok===r.total?'ok':'bad';
   s.textContent='Самотест: '+r.ok+' из '+r.total;
-  $('hud').appendChild(s);
+  $('hud').appendChild(s); $('hud').__html=null;
   setTimeout(paint,4200);
 });
 try{ window.__selfTest=selfTest; }catch(e){}
@@ -884,16 +1007,16 @@ try{ window.__selfTest=selfTest; }catch(e){}
 function frame(ts){
   requestAnimationFrame(frame);
   var dt=Math.min(.033,(ts-lastT)/1000||0); lastT=ts;
-  if(playing&&!dragId){ advance(dt*speed); dirty=true; }
+  if(playing&&!dragId) advance(dt*speed);
   if(!dirty) return;
   var g=geom(), p=pos(g,st);
   ctx.clearRect(0,0,W,H);
   if(showTrail) drawTrail(g);
   if(showGuide) drawGuides(g,p);
   drawMount(g);
-  if(showGhost) drawArm(g,pos(g,gst),true);
-  drawArm(g,p,false);
+  drawMain(g,p);
   if(showVec) drawVec(g,p);
+  if(showGhost) drawGhost(g,pos(g,gst),p);
   drawPlot();
   paint();
   dirty=false;

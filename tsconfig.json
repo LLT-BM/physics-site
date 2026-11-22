@@ -8,11 +8,14 @@
     "dist",
     "node_modules",
     "tools",
-    "public"
+    "public",
+    ".repo-trash",
+    "src/components/FrameBridge.astro"
   ],
   "compilerOptions": {
     "strictNullChecks": true,
     "allowJs": false,
-    "verbatimModuleSyntax": false
+    "verbatimModuleSyntax": false,
+    "skipLibCheck": true
   }
 }
